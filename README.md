@@ -1,4 +1,4 @@
-# javascript notes
+# react notes
 
 
 ## description
