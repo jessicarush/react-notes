@@ -1,0 +1,81 @@
+# Application Layout
+
+## Table of Contents
+
+<!-- toc -->
+
+  * [1. Place components in separate files](#1-place-components-in-separate-files)
+  * [2. Create a top level component called App](#2-create-a-top-level-component-called-app)
+- [3. Render your App in your index.js](#3-render-your-app-in-your-indexjs)
+- [4. Add all the component scripts to your html](#4-add-all-the-component-scripts-to-your-html)
+
+<!-- tocstop -->
+
+## 1. Place components in separate files
+
+Usually you'll have many components. Standard practice is that each should be in their own file.
+
+*welcome.js*
+```javascript
+class Welcome extends React.Component {
+  render() {
+    return (
+      <div>
+        <p>Hello...</p>
+      </div>
+    );
+  }
+}
+```
+
+
+## 2. Create a top level component called App
+
+This will be where we bring together all the other components. This will be the one thing we render into the DOM.
+
+*index.js*
+```javascript
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+        <Welcome/>
+        <AnotherComponent/>
+      </div>
+    );
+  }
+}
+```
+
+# 3. Render your App in your index.js
+
+*index.js*
+```javascript
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+        <Welcome/>
+        <AnotherComponent/>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<App/>, document.getElementById('root'));
+```
+
+# 4. Add all the component scripts to your html
+
+```html
+  <!-- React -->
+  <script src="https://unpkg.com/react/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+  <!-- Babel transpiles our JSX syntax into valid JavaScript -->
+  <script src="https://unpkg.com/babel-standalone"></script>
+  <!-- Our components (order is important!)-->
+  <script src="js/welcome.js" type="text/jsx"></script>
+  <script src="js/index.js" type="text/jsx"></script>
+
+</body>
+```
