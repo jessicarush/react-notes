@@ -33,7 +33,7 @@ class Welcome extends React.Component {
 
 This will be where we bring together all the other components. This will be the one thing we render into the DOM.
 
-*index.js*
+*app.js*
 ```javascript
 class App extends React.Component {
   render() {
@@ -47,25 +47,14 @@ class App extends React.Component {
 }
 ```
 
-# 3. Render your App in your index.js
+## 3. Render your App in an index.js
 
 *index.js*
 ```javascript
-class App extends React.Component {
-  render() {
-    return (
-      <div>
-        <Welcome/>
-        <AnotherComponent/>
-      </div>
-    );
-  }
-}
-
 ReactDOM.render(<App/>, document.getElementById('root'));
 ```
 
-# 4. Add all the component scripts to your html
+## 4. Add all the component scripts to your html
 
 ```html
   <!-- React -->
@@ -75,6 +64,7 @@ ReactDOM.render(<App/>, document.getElementById('root'));
   <script src="https://unpkg.com/babel-standalone"></script>
   <!-- Our components (order is important!)-->
   <script src="js/welcome.js" type="text/jsx"></script>
+  <script src="js/app.js" type="text/jsx"></script>
   <script src="js/index.js" type="text/jsx"></script>
 
 </body>

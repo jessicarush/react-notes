@@ -78,7 +78,7 @@ class Welcome extends React.Component {
 
 ## Props are Immutable
 
-One major thing to note is that properties passed to components are immutable.
+One major thing to note is that properties passed to components are immutable. On other words, you cannot assign a new value to them.
 
 
 ## Props can be many types of data
@@ -119,4 +119,44 @@ class Welcome extends React.Component {
     );
   }
 }
+```
+
+## Default properties
+
+Components can specify default values for properties.
+To set default properties in a component:
+
+```javascript
+class Welcome extends React.Component {
+  static defaultProps = {
+    color: "red",
+    num: 5
+  };
+  render() {
+    return (
+      <div>
+        <p>Welcome {this.props.name}.</p>
+        <p>number: {this.props.num}</p>
+        <p>color: {this.props.color}</p>
+      </div>
+    );
+  }
+}
+```
+
+This component will now use the default values when the properties are missing:
+
+```javascript
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+        <Welcome name="Jessica" />
+        <Welcome name="Scott" num={13} color="orange" />
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<App/>, document.getElementById('root'));
 ```
