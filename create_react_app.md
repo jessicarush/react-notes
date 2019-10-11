@@ -6,6 +6,15 @@ Create-react-app is a command line utility script that creates a skeleton react 
 
 <!-- toc -->
 
+- [Install](#install)
+- [Files & Directories](#files--directories)
+- [Webpack](#webpack)
+- [Modules](#modules)
+- [Conventions](#conventions)
+  * [CSS and image assets](#css-and-image-assets)
+
+<!-- tocstop -->
+
 ## Install
 
 You need *node* installed on your local machine (it’s not required on the server) in order to install Create React App. To test that it's installed:
@@ -180,7 +189,7 @@ class Message extends Component {
     return (
       <div className="Message">
         <h1 className="Message-header">{ this.props.title }</h1>
-        <p className="Message-body">{ this.props.msg}</p>
+        <p className="Message-body">{ this.props.msg }</p>
       </div>
     );
   }
@@ -205,5 +214,4 @@ class Message extends Component {
     );
   }
 }
-
 ```

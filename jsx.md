@@ -232,9 +232,35 @@ Note that with the above, you'll get a **Warning** in the console that reads: `W
 
 The reason for this is...
 
-The solution is: 
+> Keys help React identify which items have changed, are added, or are removed. Keys should be given to the elements inside the array to give the elements a stable identity
+
+The solution is:
 ```javascript
 // ...
         { msgs.map(m => <li key={m.id}>{m.text}</li>) }
 // ...
+```
+
+Note that this seems to happen as a result of using `map()`. In the following example I received the same warning:
+
+```javascript
+<div className="Pokedex">
+
+  {this.props.pokemon.map(p => (
+    <Pokecard id={p.id} name={p.name} type={p.type} exp={p.base_experience} />
+  ))}
+
+</div>
+```
+
+When I added a key property, the warning went away:
+
+```javascript
+<div className="Pokedex">
+
+  {this.props.pokemon.map(p => (
+    <Pokecard key={p.id} id={p.id} name={p.name} type={p.type} exp={p.base_experience} />
+  ))}
+
+</div>
 ```

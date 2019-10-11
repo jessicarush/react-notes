@@ -1,8 +1,14 @@
 # Styling React Components
 
 ## Table of Contents
+
 <!-- toc -->
 
+- [Stylesheet styles](#stylesheet-styles)
+- [Conditional Styles](#conditional-styles)
+- [Inline Styles](#inline-styles)
+
+<!-- tocstop -->
 
 ## Stylesheet styles
 
