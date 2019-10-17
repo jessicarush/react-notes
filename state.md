@@ -19,6 +19,8 @@ While React *properties* represent immutable data passed to components, *states*
 - [Changing State](#changing-state)
 - [React Events](#react-events)
 - [State as Props pattern](#state-as-props-pattern)
+- [Updating existing state values](#updating-existing-state-values)
+- [Mutating state](#mutating-state)
 
 <!-- tocstop -->
 
@@ -92,16 +94,17 @@ Note that you never directly modify a state via assignment. For example `this.st
 
 > Think of setState() as a request rather than an immediate command to update the component. For better perceived performance, React may delay it, and then update several components in a single pass. React does not guarantee that the state changes are applied immediately.
 
-You can pass an object of key value pairs or a function that returns and object. Note that `this.setState()` is asynchronous and any state-changes made to a component will cause it to re-render ([unless shouldComponentUpdate() returns false](https://reactjs.org/docs/react-component.html#setstate)).
+You can pass an object of key value pairs or, a function that returns an object or, a callback. Note that `this.setState()` is asynchronous and any state-changes made to a component will cause it to re-render ([unless shouldComponentUpdate() returns false](https://reactjs.org/docs/react-component.html#setstate)).
 
 Normally, an event would trigger a state change but for the moment, to illustrate changing a state the following class has a method that uses the `setInterval()` Window/Global Scope method to change the score state every 1000ms.
 
+Passing a regular object to `setState()`:
 ```javascript
 class StateDemo extends Component {
   constructor(props) {
     super(props);
     this.state = { score: 0};
-    this.changeState();  // normally you would never do this!
+    this.changeState();  // for demonstration only!
   }
 
   changeState() {
@@ -120,6 +123,49 @@ class StateDemo extends Component {
   }
 }
 ```
+
+Passing a function to `setState()`:
+```javascript
+changeState() {
+  this.setState(() => {
+    let randomNum = Math.floor(Math.random() * 100);
+    return {score: randomNum};
+  });
+}
+```
+
+Passing a callback to `setState()`:
+```javascript
+// ... outside of the component
+function randomScore() {
+  let randomNum = Math.floor(Math.random() * 100);
+  return {score: randomNum};
+}
+
+// ... in the component
+changeState() {
+  this.setState(randomScore);
+}
+```
+or:
+
+```javascript
+// ... in the component
+randomScore() {
+  let randomNum = Math.floor(Math.random() * 100);
+  return {score: randomNum};
+}
+changeState() {
+  this.setState(this.randomScore);
+}
+```
+
+Note that using a callback makes testing code much simpler, for example:
+
+```javascript
+expect(incrementScore({count: 0})).toEqual({count: 1});
+```
+
 
 ## React Events
 
@@ -170,6 +216,7 @@ class Button extends Component {
 }
 ```
 
+
 ## State as Props pattern
 
 A common pattern in react apps is that we will have a *stateful* parent component that passes down its state values as props to a *stateless* child component. For example:
@@ -191,3 +238,69 @@ class ParentComponent extends Component {
 ```
 
 This concept is referred to as *downward data flow*. It means that generally, components get simpler as you drill down the component hierarchy and parents tend to be more stateful than their children.
+
+
+
+## Updating existing state values
+
+Remember that `setState()` is asynchronous, which means it's risky to assume the a previous call has finished when you call it again. In addition, React will sometimes batch calls to `setState()` together for better performance. As a result, if we wanted to update an existing state value, there is a right and wrong way to do it. This is where passing a function or callback to `setState()` becomes helpful.
+
+When passing a function where we want to update a state value, we give it the current state as a parameter. The function should use that parameter to do any calculating, then return an object representing the new state.
+
+Using a function:
+```javascript
+class Score extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { score: 0 };
+    this.addPoint = this.addPoint.bind(this);
+  }
+  addPoint() {
+    // Wrong:
+    // this.setState({score: this.state.score + 1});
+    // Right:
+    this.setState(currentState => {
+      return {score: currentState.score + 1};
+    })
+  }
+  render() {
+    return (
+      <div>
+        <h1>Score is: {this.state.score}</h1>
+        <button onClick={this.addPoint}>add point</button>
+      </div>
+    )
+  }
+}
+```
+
+Using a callback:
+```javascript
+function incrementScore(currentState) {
+  return {score: currentState.score + 1};
+}
+
+class Score extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { score: 0 };
+    this.addPoint = this.addPoint.bind(this);
+  }
+  addPoint() {
+    // Wrong:
+    // this.setState({score: this.state.score + 1});
+    // Right:
+    this.setState(incrementScore);
+  }
+  render() {
+    return (
+      <div>
+        <h1>Score is: {this.state.score}</h1>
+        <button onClick={this.addPoint}>add point</button>
+      </div>
+    )
+  }
+}
+```
+
+## Mutating state
