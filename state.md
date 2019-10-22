@@ -243,7 +243,7 @@ This concept is referred to as *downward data flow*. It means that generally, co
 
 ## Updating existing state values
 
-Remember that `setState()` is asynchronous, which means it's risky to assume the a previous call has finished when you call it again. In addition, React will sometimes batch calls to `setState()` together for better performance. As a result, if we wanted to update an existing state value, there is a right and wrong way to do it. This is where passing a function or callback to `setState()` becomes helpful.
+Remember that `setState()` is asynchronous, which means it's risky to assume the a previous call has finished when you call it again. In addition, React will sometimes batch calls to `setState()` together for better performance. As a result, if we wanted to update a state using its existing value, there is a right and wrong way to do it. This is where passing a function or callback to `setState()` becomes helpful.
 
 When passing a function where we want to update a state value, we give it the current state as a parameter. The function should use that parameter to do any calculating, then return an object representing the new state.
 
@@ -287,9 +287,6 @@ class Score extends Component {
     this.addPoint = this.addPoint.bind(this);
   }
   addPoint() {
-    // Wrong:
-    // this.setState({score: this.state.score + 1});
-    // Right:
     this.setState(incrementScore);
   }
   render() {
@@ -303,4 +300,71 @@ class Score extends Component {
 }
 ```
 
-## Mutating state
+When using a callback to is a method in the class, remember to add `this`:
+```javascript
+class Score extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { score: 0 };
+    this.addPoint = this.addPoint.bind(this);
+  }
+  incrementScore(currentState) {
+    return {score: currentState.score + 1};
+  }
+  addPoint() {
+    this.setState(this.incrementScore); // this
+  }
+  render() {
+    return (
+      <div>
+        <h1>Score is: {this.state.score}</h1>
+        <button onClick={this.addPoint}>add point</button>
+      </div>
+    )
+  }
+}
+```
+
+## Mutable data structures & state
+
+If a state value is a mutable data structure like an object or array, we also have to follow safe practices when updating or editing a value within those data structures. Once again, we don't assign a new value directly, but rather we make a copy of the data structure, make the changes, return the new data structure and then `setState()` with that new object.
+
+For example:
+
+```javascript
+class StateDemo extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { numbers: [] };
+    this.addNumber = this.addNumber.bind(this);
+  }
+  addNumber() {
+    let i = Math.floor(Math.random() * 10);
+    // WRONG - modify the state value directly:
+    // this.state.numbers.push(i);
+    // RIGHT - make a copy of the existing array and add/change as needed:
+    let new_numbers = [...this.state.numbers, i];
+    this.setState({ numbers: new_numbers });
+
+  }
+  render() {
+    return (
+      <div className="StateDemo">
+        <p>Greetings: {this.state.numbers}</p>
+        <button onClick={this.addNumber}>text</button>
+      </div>
+    );
+  }
+}
+```
+
+Obviously creating copies of data structures comes with a processing efficiency penalty, but the gains in terms of ensuring your app doesn't have difficult to find bugs due to reacts handling of things under the hood is mostly worth it.
+
+
+## State Design
+
+Designing components and deciding where states will go, takes time and practice. Some ideas to consider:
+
+- **Minimize state** - in react, try to put as little data in state as possible. In other words, only include data that will change. If the data will not be changing, it should be a *prop*.
+
+- **State on the parent** - in an attempt to support *downward data flow* we should, whenever possible, have our states be in the parent component.
