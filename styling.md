@@ -16,7 +16,7 @@ Create and link a stylesheet as you normally would.
 
 Note that while you can name your classes however you like, many people prefer to name them according to what the component is named. For example:
 
-*app.css:*
+*Machine.css:*
 ```css
 .Machine {
   background: rgb(245,242,240);
@@ -25,8 +25,10 @@ Note that while you can name your classes however you like, many people prefer t
 }
 ```
 
-*machine.js:*
+*Machine.js:*
 ```javascript
+import './Machine.css';
+
 class Machine extends React.Component {
   render() {
     return (
@@ -44,7 +46,7 @@ Note that we are not using the standard HTML attribute `class=""` but rather `cl
 
 You can easily apply different styles using conditions, for example:
 
-*machine.js:*
+*Machine.js:*
 ```javascript
 class Machine extends React.Component {
   render() {
@@ -62,7 +64,7 @@ class Machine extends React.Component {
 
 While I prefer using stylesheets, you can also apply *inline* css:
 
-*machine.js:*
+*Machine.js:*
 ```javascript
 class Machine extends React.Component {
   render() {
@@ -82,7 +84,7 @@ class Machine extends React.Component {
 
 The benefit to this is that you could have your css values come from properties:
 
-*machine.js:*
+*Machine.js:*
 ```javascript
 class Machine extends React.Component {
   render() {
