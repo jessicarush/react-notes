@@ -1,19 +1,19 @@
 # Properties (props)
 
-Properties are what we use to make a component configurable.
-
 ## Table of Contents
 
 <!-- toc -->
 
-- [Example](#example)
+- [Introduction/Example](#introductionexample)
 - [Props are Immutable](#props-are-immutable)
 - [Props can be many types of data](#props-can-be-many-types-of-data)
 - [Default properties](#default-properties)
 
 <!-- tocstop -->
 
-## Example
+## Introduction/Example
+
+Properties are what we use to make a component configurable.
 
 You can pass properties to a component like you would an attribute value pair:
 

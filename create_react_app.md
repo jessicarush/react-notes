@@ -1,11 +1,10 @@
 # Create React App
 
-Create-react-app is a command line utility script that creates a skeleton react project and configures is so that your JS files are run through Babel automatically. It also allows us to use some additional modern JavaScript features and makes testing and deployment much easier.
-
 ## Table of Contents
 
 <!-- toc -->
 
+- [Introduction](#introduction)
 - [Install](#install)
 - [Files & Directories](#files--directories)
 - [Webpack](#webpack)
@@ -14,6 +13,11 @@ Create-react-app is a command line utility script that creates a skeleton react 
   * [CSS and image assets](#css-and-image-assets)
 
 <!-- tocstop -->
+
+## Introduction
+
+Create-react-app is a command line utility script that creates a skeleton react project and configures is so that your JS files are run through Babel automatically. It also allows us to use some additional modern JavaScript features and makes testing and deployment much easier.
+
 
 ## Install
 

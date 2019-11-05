@@ -1,9 +1,5 @@
 # Components
 
-Components are the building blocks of React.
-
-> Components let you split the UI into independent, reusable pieces, and think about each piece in isolation.
-
 ## Table of Contents
 
 <!-- toc -->
@@ -15,6 +11,10 @@ Components are the building blocks of React.
 <!-- tocstop -->
 
 ## Introduction
+
+Components are the building blocks of React.
+
+> Components let you split the UI into independent, reusable pieces, and think about each piece in isolation.
 
 We can create class-based components or function-based components. Class based components look something like this:
 

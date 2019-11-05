@@ -1,12 +1,10 @@
 # JSX
 
-React components have a render function that specifies what the HTML output of the React component will be. *JavaScript Syntax eXtension* or *JavaScript XML* (JSX), is a React extension that allows us to write JavaScript that looks like HTML.
-
-
 ## Table of Contents
 
 <!-- toc -->
 
+- [Introduction](#introduction)
 - [Rules](#rules)
 - [Javascript in JSX](#javascript-in-jsx)
   * [Functions](#functions)
@@ -14,6 +12,11 @@ React components have a render function that specifies what the HTML output of t
   * [Loops](#loops)
 
 <!-- tocstop -->
+
+## Introduction
+
+React components have a render function that specifies what the HTML output of the React component will be. *JavaScript Syntax eXtension* or *JavaScript XML* (JSX), is a React extension that allows us to write JavaScript that looks like HTML.
+
 
 ## Rules
 

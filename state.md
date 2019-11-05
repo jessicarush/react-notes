@@ -1,5 +1,22 @@
 # React State
 
+## Table of Contents
+
+<!-- toc -->
+
+- [Introduction](#introduction)
+- [Example](#example)
+- [Changing State](#changing-state)
+- [React Events](#react-events)
+- [State as Props pattern](#state-as-props-pattern)
+- [Updating existing state values](#updating-existing-state-values)
+- [Mutable data structures & state](#mutable-data-structures--state)
+- [State Design](#state-design)
+
+<!-- tocstop -->
+
+## Introduction
+
 State in a web application can describes when things need to change as a result of an event (clicking something, data changes, etc.). Examples are a logged-in user sees different content from an anonymous user, clicking an 'edit' button could open a modal window, sections could expand or collapse, etc.
 
 In frontend/client-side, there are generally two types of things that state will track:
@@ -10,19 +27,6 @@ Traditionally we kept track of state by selecting DOM elements and checking thei
 
 While React *properties* represent immutable data passed to components, *states* represent data specific to a component that is likely to change over time. Like *props*, state is an object, and an instance attribute on a component.
 
-
-## Table of Contents
-
-<!-- toc -->
-
-- [Example](#example)
-- [Changing State](#changing-state)
-- [React Events](#react-events)
-- [State as Props pattern](#state-as-props-pattern)
-- [Updating existing state values](#updating-existing-state-values)
-- [Mutating state](#mutating-state)
-
-<!-- tocstop -->
 
 ## Example
 
@@ -171,7 +175,7 @@ expect(incrementScore({count: 0})).toEqual({count: 1});
 
 In React, every JSX element has built-in attributes representing every kind of browser event. They are camel-case and take callback functions as event listeners.
 
-In the following example we've created a button and added an event handler. We've created a method in the component to handle the click event. The only thing that's unexpected here is that we in order to use `this.setState` within that event handling method, we have to clarify what `this` is referring. As it turns out, the calling object not out component but some other part of React. To clarify `this` is referring to our component, we have to do some binding:
+In the following example we've created a button and added an event handler. We've created a method in the component to handle the click event. The only thing that's unexpected here is that in order to use `this.setState` within that event handling method, we have to clarify what `this` is referring. As it turns out, the calling object is not our component but some other part of React. To clarify that `this` should be referring to our component, we have to do some binding:
 
 ```javascript
 class Button extends Component {
