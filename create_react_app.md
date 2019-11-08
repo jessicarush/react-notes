@@ -185,7 +185,7 @@ import React, { Component } from 'react';
 import `./Message.css`
 ```
 
-It is also conventional to add a `className` that is the component name to the top-level html element that is being returned. All sub-item styles should be prefixed with this name. For example:
+It is also conventional to add a `className` that is the same as the component name to the top-level html element that is being returned. All sub-item styles should be prefixed with this name. For example:
 
 ```javascript
 class Message extends Component {

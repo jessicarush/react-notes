@@ -4,6 +4,12 @@
 
 <!-- toc -->
 
+- [Introduction](#introduction)
+- [Event Types](#event-types)
+- [Event Data](#event-data)
+- [this binding](#this-binding)
+- [Passing arguments to handlers](#passing-arguments-to-handlers)
+- [Naming event handlers](#naming-event-handlers)
 
 <!-- tocstop -->
 
@@ -163,7 +169,7 @@ class TestComponent extends Component {
 }
 ```
 
-## This binding
+## this binding
 
 Because of the way event callbacks are handled by react, in order to use the `this` keyword within a callback function (for example to change state with `this.setState()`), we need to either bind `this` in the constructor or use arrow syntax and babel as discussed in [state.md](state.md).
 
@@ -192,7 +198,7 @@ class Button extends Component {
 }
 ```
 
-You need to be using *create-react-app (babel)* to do it this way:
+You need to be using *create-react-app (babel)* to do it this way. Keep in mind this is not yet a standard but considered *experimental syntax*:
 
 ```javascript
 class Button extends Component {
@@ -216,7 +222,7 @@ class Button extends Component {
 }
 ```
 
-If you're not referencing `this` in the callback, you don't need to worry about binding.
+Just to be clear, if you're not referencing `this` in the callback, you don't need to worry about binding.
 
 ```javascript
 class Button extends Component {
@@ -234,5 +240,125 @@ class Button extends Component {
       </div>
     );
   }
+}
+```
+
+You can also do inline binding, but this is considered less ideal in that a new function is created with every click event. It looks like this:
+
+```javascript
+<button onClick={this.handleClick.bind(this)}>Click me</button>
+```
+
+## Passing arguments to handlers
+
+If you need to pass arguments to the handler, one quick and dirty way is to use the last inline binding style from above:
+
+```javascript
+<button onClick={this.handleClick.bind(this, arg1, arg2)}>Click me</button>
+```
+
+If the button (or whatever) were inside a child component, we could pass the whole function as a prop then do then reference the prop in the child's event attribute:
+
+*ParentComponent.js*
+```javascript
+<ChildComponent handleClick={this.handleChildClick.bind(this, 'tomato')}/>
+```
+
+*ChildComponent.js*
+```javascript
+<button onClick={this.props.handleClick}>Click me</button>
+```
+
+BUT, as mentioned above, inline binding isn't ideal for performance reasons. It's too bad, because the preferred way is a little more lengthy. Basically you have to create a new function that calls the function with the arguments so:
+
+```javascript
+class TestComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {color: 'tomato'};
+    this.handleSetColor1 = this.handleSetColor1.bind(this);
+    this.handleSetColor2 = this.handleSetColor2.bind(this);
+  }
+  setColor(color) {
+    this.setState({color: color});
+  }
+  handleSetColor1() {
+    this.setColor('aquamarine');
+  }
+  handleSetColor2() {
+    this.setColor('teal');
+  }
+  render() {
+    const styles = {backgroundColor: this.state.color};
+    return (
+      <div className="TestComponent" style={styles}>
+        <button onClick={this.handleSetColor1}>Click me</button>
+        <button onClick={this.handleSetColor2}>Click me</button>
+      </div>
+    )
+  }
+}
+```
+
+If the event was in the child, it would be the same idea:
+
+*ParentComponent.js*
+```javascript
+class TestComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {color: 'tomato'};
+    this.setColor = this.setColor.bind(this);
+  }
+  setColor(color) {
+    this.setState({color: color});
+  }
+  render() {
+    const styles = {backgroundColor: this.state.color};
+    return (
+      <div className="TestComponent" style={styles}>
+        <ChildComponent setColor={this.setColor} />
+      </div>
+    )
+  }
+}
+```
+
+*ChildComponent.js*
+```javascript
+class TestChildComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.handleSetColor = this.handleSetColor.bind(this);
+  }
+  handleSetColor() {
+    this.props.setColor('honeydew');
+  }
+  render() {
+    return (
+      <div className="TestChildComponent">
+        <button onClick={this.handleSetColor}>Click me</button>
+      </div>
+    )
+  }
+}
+```
+
+It's no wonder people prefer using inline binding despite the performance penalty.
+
+
+## Naming event handlers
+
+Know that React doesn't care how your event handling functions are named but a recommended approach for consistency reasons is this:
+
+- name the parent function according to the action it performs e.g. `removeThing`, `setThing`, `updateThing`, etc.
+
+- name the matching child's event handler the same thing prefixed with `handle` e.g. `handleRemoveThing`, `handleSetThing`, `handleUpdateThing`, etc.
+
+Eventually we should get used to seeing the same patterns in our child components:
+
+```javascript
+handleUpdateThing() {
+  this.props.updateThing(arg);
 }
 ```

@@ -6,10 +6,12 @@
 
 - [Introduction](#introduction)
 - [Rules](#rules)
+- [Commenting](#commenting)
 - [Javascript in JSX](#javascript-in-jsx)
   * [Functions](#functions)
   * [Conditionals](#conditionals)
   * [Loops](#loops)
+  * [Keys](#keys)
 
 <!-- tocstop -->
 
@@ -53,6 +55,23 @@ class App extends React.Component {
   render() {
     return (
       <div>
+        <Welcome name="Jessica" day="Thursday"/>
+      </div>
+    );
+  }
+}
+```
+
+## Commenting
+
+If you want to write comments in your components, JSX requires that you use multiline JS/css style but wrapped in curly braces like so `{/* comment */}`:
+
+```javascript
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+        {/* Here's my comment */}
         <Welcome name="Jessica" day="Thursday"/>
       </div>
     );
@@ -231,13 +250,15 @@ class Messages extends React.Component {
 }
 ```
 
+### Keys
+
 Note that with the above, you'll get a **Warning** in the console that reads: `Warning: Each child in a list should have a unique "key" prop`.
 
 The reason for this is...
 
 > Keys help React identify which items have changed, are added, or are removed. Keys should be given to the elements inside the array to give the elements a stable identity
 
-The solution is:
+Using the example above, the solution is:
 ```javascript
 // ...
         { msgs.map(m => <li key={m.id}>{m.text}</li>) }

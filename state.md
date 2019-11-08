@@ -198,7 +198,7 @@ class Button extends Component {
 }
 ```
 
-Another way to handle the `this` problem is to use an arrow-type syntax. Like the shorthand method above for initializing state, you also **need to be using create-react-app and babel to do it this way**:
+Another way to handle the `this` problem is to use an arrow-type syntax. Like the shorthand method above for initializing state, you also **need to be using create-react-app and babel to do it this way** as this is considered *experimental syntax* and is not yet part of the standard spec.
 
 ```javascript
 class Button extends Component {
@@ -372,3 +372,11 @@ Designing components and deciding where states will go, takes time and practice.
 - **Minimize state** - in react, try to put as little data in state as possible. In other words, only include data that will change. If the data will not be changing, it should be a *prop*.
 
 - **State on the parent** - in an attempt to support *downward data flow* we should, whenever possible, have our states be in the parent component.
+
+If for example I had a child components that I wanted to change state. While the child could, in theory, have it's own state, we could also do something like this:
+
+1. parent component defines a function
+2. the function is passed to the child component as a prop
+3. the child invoked the prop
+4. the parent function is called, often setting a new state
+5. the parent and children are re-rendered as a result of the state change.
