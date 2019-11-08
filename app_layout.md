@@ -69,3 +69,11 @@ ReactDOM.render(<App/>, document.getElementById('root'));
 
 </body>
 ```
+
+## 5. Run your app on a server
+
+If you try to open your `index.html`, you'll get issues because of the CORS stuff. Instead, navigate to the directory and run it on a python server:
+
+```bash
+python3 -m http.server
+```
