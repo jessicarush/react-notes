@@ -169,6 +169,8 @@ class TestComponent extends Component {
 }
 ```
 
+You can also access the JavaScript standard `e.target`, `e.target.value`, etc.
+
 ## this binding
 
 Because of the way event callbacks are handled by react, in order to use the `this` keyword within a callback function (for example to change state with `this.setState()`), we need to either bind `this` in the constructor or use arrow syntax and babel as discussed in [state.md](state.md).
