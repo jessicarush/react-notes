@@ -8,6 +8,7 @@
 - [2. Create a top level component called App](#2-create-a-top-level-component-called-app)
 - [3. Render your App in an index.js](#3-render-your-app-in-an-indexjs)
 - [4. Add all the component scripts to your html](#4-add-all-the-component-scripts-to-your-html)
+- [5. Run your app on a server](#5-run-your-app-on-a-server)
 
 <!-- tocstop -->
 
