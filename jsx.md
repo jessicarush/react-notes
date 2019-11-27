@@ -11,7 +11,9 @@
   * [Functions](#functions)
   * [Conditionals](#conditionals)
   * [Loops](#loops)
-  * [Keys](#keys)
+- [Keys](#keys)
+  * [uuid](#uuid)
+- [Breaking code into chunks](#breaking-code-into-chunks)
 
 <!-- tocstop -->
 
@@ -250,7 +252,7 @@ class Messages extends React.Component {
 }
 ```
 
-### Keys
+## Keys
 
 Note that with the above, you'll get a **Warning** in the console that reads: `Warning: Each child in a list should have a unique "key" prop`.
 
@@ -271,20 +273,98 @@ Note that this seems to happen as a result of using `map()`. In the following ex
 <div className="Pokedex">
 
   {this.props.pokemon.map(p => (
-    <Pokecard id={p.id} name={p.name} type={p.type} exp={p.base_experience} />
+    <Pokecard name={p.name} type={p.type} exp={p.base_experience} />
   ))}
 
 </div>
 ```
 
-When I added a key property, the warning went away:
+When I add a key property, provided the key is unique, react will be satisfied. I this case, the names will always be unique, so they can be used for keys:
 
 ```javascript
 <div className="Pokedex">
 
   {this.props.pokemon.map(p => (
-    <Pokecard key={p.id} id={p.id} name={p.name} type={p.type} exp={p.base_experience} />
+    <Pokecard key={p.name} name={p.name} type={p.type} exp={p.base_experience} />
   ))}
 
 </div>
+```
+
+### uuid
+
+In the event that you don't have any obvious, easy id or name to use for keys, there are a couple of options. The first is to use the index number of the item. This index number can be accessed automatically as the second argument to the `map()` method:
+
+```javascript
+const todoItems = todos.map((todo, index) =>
+  // Only do this as a last resort
+  <li key={index}>{todo.text}</li>
+);
+```
+
+> We don’t recommend using indexes for keys if the order of items may change. This can negatively impact performance and may cause issues with component state.
+
+Instead, we can use an external library to help: [uuid](https://www.npmjs.com/package/uuid)
+
+First you would need to install it:
+
+```bash
+npm install uuid
+```
+
+Then import it using the id version type of your choice. For example, v1 is a timestamp, v4 is random.
+
+```javascript
+import uuid from 'uuid/v4';
+```
+
+Then use the function call to generate it:
+
+```javascript
+let todos = [
+  {id: uuid(), text: 'Water plants'},
+  {id: uuid(), text: 'Get milk'}
+]
+
+const todoItems = todos.map(todo =>
+  <li key={todo.id}>{todo.text}</li>
+);
+```
+
+
+## Breaking code into chunks
+
+With map rendered components the `render()` method of the parent component can get pretty long. Feel free to pull any sections out into their own functions to help organize your code better. For example:
+
+```javascript
+class TestComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: [
+        {id: 1, name: 'cream', qty: '3 cartons'},
+        {id: 2, name: 'brocolli', qty: '1 bunch'},
+        {id: 3, name: 'cucumber', qty: '2'}
+      ]
+    };
+  }
+
+  renderItems() {
+    return (
+      <ul>
+        {this.state.items.map(item => (
+          <li key={item.id}>{item.name} - {item.qty}</li>
+        ))}
+      </ul>
+    );
+  }
+
+  render() {
+    return (
+      <div>
+        {this.renderItems()}
+      </div>
+    );
+  }
+}
 ```

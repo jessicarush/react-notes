@@ -22,7 +22,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Welcome name="Jessica" day="Thursday"/>
+        <Welcome name="Jessica" day="Thursday" />
       </div>
     );
   }

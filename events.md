@@ -319,7 +319,7 @@ class TestComponent extends Component {
     const styles = {backgroundColor: this.state.color};
     return (
       <div className="TestComponent" style={styles}>
-        <ChildComponent setColor={this.setColor} />
+        <TestChildComponent setColor={this.setColor} />
       </div>
     )
   }

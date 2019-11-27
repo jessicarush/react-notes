@@ -92,6 +92,7 @@ class Game2 extends Component {
 export default Game2;
 ```
 
+
 ## Changing State
 
 Note that you never directly modify a state via assignment. For example `this.state.score = 25;` is NOT how it's done. Instead, we use a React method called `this.setState()`.
@@ -244,7 +245,6 @@ class ParentComponent extends Component {
 This concept is referred to as *downward data flow*. It means that generally, components get simpler as you drill down the component hierarchy and parents tend to be more stateful than their children.
 
 
-
 ## Updating existing state values
 
 Remember that `setState()` is asynchronous, which means it's risky to assume the a previous call has finished when you call it again. In addition, React will sometimes batch calls to `setState()` together for better performance. As a result, if we wanted to update a state using its existing value, there is a right and wrong way to do it. This is where passing a function or callback to `setState()` becomes helpful.
@@ -304,7 +304,7 @@ class Score extends Component {
 }
 ```
 
-When using a callback to is a method in the class, remember to add `this`:
+When the callback is a method in the class, remember to add `this`:
 ```javascript
 class Score extends Component {
   constructor(props) {
@@ -380,3 +380,58 @@ If for example I had a child components that I wanted to change state. While the
 3. the child invoked the prop
 4. the parent function is called, often setting a new state
 5. the parent and children are re-rendered as a result of the state change.
+
+When you use this pattern, both the parent and the child need to bind their callback functions. For example:
+
+Parent component:
+```javascript
+class TestComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {color: 'rgb(255,99,71)'};
+    this.setColor = this.setColor.bind(this);
+  }
+
+  randomColor() {
+    function random(n) {
+      return Math.floor(Math.random() * (n + 1));
+    }
+    return `rgb(${random(255)},${random(255)},${random(255)})`;
+  }
+
+  setColor() {
+    this.setState({color: this.randomColor()});
+  }
+
+  render() {
+    return (
+      <div className="TestComponent">
+        <TestChildComponent color={this.state.color} setColor={this.setColor} />
+      </div>
+    )
+  }
+}
+```
+
+Child component:
+```javascript
+class TestChildComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.handleSetColor = this.handleSetColor.bind(this);
+  }
+  
+  handleSetColor() {
+    this.props.setColor();
+  }
+
+  render() {
+    const styles = {backgroundColor: this.props.color};
+    return (
+      <div style={styles} className="TestChildComponent">
+        <button onClick={this.handleSetColor}>Click me</button>
+      </div>
+    )
+  }
+}
+```
