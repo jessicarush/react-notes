@@ -420,7 +420,7 @@ class TestChildComponent extends Component {
     super(props);
     this.handleSetColor = this.handleSetColor.bind(this);
   }
-  
+
   handleSetColor() {
     this.props.setColor();
   }
@@ -433,5 +433,76 @@ class TestChildComponent extends Component {
       </div>
     )
   }
+}
+```
+
+That being said, when you have state properties that are mainly for presentation, that state information could be stored in the component where it is being used. For the "core" data in an app, try to centralize the data in a parent component.  It can be helpful to frame it through the question: "what data would I want to send off to a database?".  In cases where we're only using a state/function for display purpose and wouldn't need to store that in a database, it might be preferable to keep it in the child component.
+
+
+## Updating state with map() vs for  
+
+I keep hearing that `for` loops are uncommon in the React world in favour of other iterators like `map()`. I can't seem to pinpoint a real reason for this beyond preference so here are two methods that achieving the same result.
+
+First, imagine I have a state that looks like this:
+
+```javascript
+this.state = {
+  todos: [
+    { id: uuid(), task: 'water plants', editing: false, completed: false },
+    { id: uuid(), task: 'shopping', editing: false, completed: false },
+    { id: uuid(), task: 'recycling', editing: false, completed: false }
+    // etc
+  ] };
+```
+
+What I want to do, is update a property of one of the objects which I'm going to select by id.
+
+Here's doing it with a for loop:
+```javascript
+editTodo(id) {
+  this.setState(currentState => {
+    for (let i = 0; i < currentState.todos.length; i++) {
+      if (currentState.todos[i].id === id) {
+        currentState.todos[i].editing = true;
+        break;
+      }
+    }
+    return currentState;
+  });
+}
+```
+
+And with map():
+```javascript
+editTodo(id) {
+  const newTodos = this.state.todos.map(todo => {
+    if (todo.id === id) {
+      return { ...todo, editing: true };
+    } else {
+      return todo;
+    }
+  });
+  this.setState({ todos: newTodos});
+}
+```
+
+## Toggling a true/false state
+
+This is more of a plain old JavaScript note, rather that a React-specific note but it came up so I'm making a note of it.
+
+When you want to toggle a state on and off, a very long way might be something like this;
+
+```javascript
+if (state.todos[i].id === id) {
+  state.todos[i].completed = (state.todos[i].completed === true) ? false : true;
+  break;
+}
+```
+
+But I always forget, it's way simpler to use the `!` not operand:
+```javascript
+if (state.todos[i].id === id) {
+  state.todos[i].completed = !state.todos[i].completed;
+  break;
 }
 ```
