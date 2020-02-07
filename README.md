@@ -10,7 +10,7 @@ In the same spirit as my [python notes](https://github.com/jessicarush/python-no
 
 Some examples and notes come from the following:
 
-- [The Road tp Learn React](https://eloquentjavascript.net) - *Robin Wieruch*  
+- [The Road to Learn React](https://eloquentjavascript.net) - *Robin Wieruch*  
 - [The Modern React Bootcamp (Hooks, Context,NextJS, Router)](https://www.udemy.com/course/modern-react-bootcamp/) - *Colt Steele*  
 
 
