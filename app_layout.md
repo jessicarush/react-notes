@@ -40,8 +40,8 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Welcome/>
-        <AnotherComponent/>
+        <Welcome />
+        <AnotherComponent />
       </div>
     );
   }
@@ -52,7 +52,7 @@ class App extends React.Component {
 
 *index.js*
 ```javascript
-ReactDOM.render(<App/>, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
 ## 4. Add all the component scripts to your html
