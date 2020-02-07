@@ -64,7 +64,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
   <!-- Babel transpiles our JSX syntax into valid JavaScript -->
   <script src="https://unpkg.com/babel-standalone"></script>
-  
+
   <!-- Our components (order is important!)-->
   <script src="js/welcome.js" type="text/jsx"></script>
   <script src="js/app.js" type="text/jsx"></script>
@@ -75,7 +75,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ## 5. Run your app on a server
 
-If you try to open your `index.html`, you'll get issues because of the CORS stuff. Instead, navigate to the directory and run it on a python server:
+If you try to open your `index.html`, you'll have issues because of the [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) stuff. Instead, navigate to the directory and run it on a python server:
 
 ```bash
 python3 -m http.server
