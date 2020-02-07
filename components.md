@@ -46,7 +46,7 @@ class Welcome extends React.Component {
   }
 }
 
-ReactDOM.render(<Welcome/>, document.getElementById('root'));
+ReactDOM.render(<Welcome />, document.getElementById('root'));
 ```
 
 Note that in the render function inside the class, you can only return one element. Therefor, if you're actually creating a number of elements, they should all be wrapped in one, e.g. a `<div>`:
@@ -64,7 +64,7 @@ class Welcome extends React.Component {
   }
 }
 
-ReactDOM.render(<Welcome/>, document.getElementById('root'));
+ReactDOM.render(<Welcome />, document.getElementById('root'));
 ```
 
 ## Function-based components
@@ -84,5 +84,5 @@ function Welcome() {
   );
 }
 
-ReactDOM.render(<Welcome/>, document.getElementById('root'));
+ReactDOM.render(<Welcome />, document.getElementById('root'));
 ```
