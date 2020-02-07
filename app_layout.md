@@ -61,8 +61,10 @@ ReactDOM.render(<App />, document.getElementById('root'));
   <!-- React -->
   <script src="https://unpkg.com/react/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+
   <!-- Babel transpiles our JSX syntax into valid JavaScript -->
   <script src="https://unpkg.com/babel-standalone"></script>
+  
   <!-- Our components (order is important!)-->
   <script src="js/welcome.js" type="text/jsx"></script>
   <script src="js/app.js" type="text/jsx"></script>
