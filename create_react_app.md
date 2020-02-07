@@ -16,7 +16,9 @@
 
 ## Introduction
 
-Create-react-app is a command line utility script that creates a skeleton react project and configures is so that your JS files are run through Babel automatically. It also allows us to use some additional modern JavaScript features and makes testing and deployment much easier.
+Create-react-app is a command line utility script that creates a skeleton react project and configures it so that your JS files are run through Babel automatically. It also allows us to use some additional modern JavaScript features and makes testing and deployment much easier.
+
+So far though, my biggest complaint/frustration is that the skeleton project created (specifically the dependency tree in the node_modules directory) is an enormous ≈ 130 MB in size. This, in my opinion, is nuts.
 
 
 ## Install
@@ -38,8 +40,8 @@ npm start
 
 When you start the app you should be able to see it running at:
 
-Local:            http://localhost:3000/
-On Your Network:  http://10.0.0.2:3000/
+Local:            http://localhost:3000/  
+On Your Network:  http://10.0.0.2:3000/  
 
 The page will automatically reload if you make changes to the code and you will see the build errors and lint warnings in the console.
 
@@ -50,24 +52,24 @@ The page will automatically reload if you make changes to the code and you will 
 You'll end up with a structure that looks like this:
 
 my-app
-├─ .gitignore
-├─ package-lock.json
-├─ package.json
-├─ README.md
-├─ .git
-├─ node_modules
-├─ public
-│  ├─ favicon.ico
-│  ├─ index.html
-│  └─ manifest.json
-└─ src
-    ├─ App.css
-    ├─ App.js
-    ├─ App.test.js
-    ├─ index.css
-    ├─ index.js
-    ├─ logo.svg
-    └─ serviceWorker.js
+├─ .gitignore  
+├─ package-lock.json  
+├─ package.json  
+├─ README.md  
+├─ .git  
+├─ node_modules  
+├─ public  
+│  ├─ favicon.ico  
+│  ├─ index.html  
+│  └─ manifest.json  
+└─ src  
+    ├─ App.css  
+    ├─ App.js  
+    ├─ App.test.js  
+    ├─ index.css  
+    ├─ index.js  
+    ├─ logo.svg  
+    └─ serviceWorker.js  
 
 **package-lock.json** - lock file, do not edit directly
 **package.json** - edit as you normally would
