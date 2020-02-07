@@ -334,7 +334,7 @@ const todoItems = todos.map(todo =>
 
 ## Breaking code into chunks
 
-With map rendered components the `render()` method of the parent component can get pretty long. Feel free to pull any sections out into their own functions to help organize your code better. For example:
+With map rendered components the `render()` method of the parent component can get pretty long. Feel free to pull any sections out into their own functions or variables to help organize your code better. For example:
 
 ```javascript
 class TestComponent extends Component {
@@ -343,7 +343,7 @@ class TestComponent extends Component {
     this.state = {
       items: [
         {id: 1, name: 'cream', qty: '3 cartons'},
-        {id: 2, name: 'brocolli', qty: '1 bunch'},
+        {id: 2, name: 'broccoli', qty: '1 bunch'},
         {id: 3, name: 'cucumber', qty: '2'}
       ]
     };
@@ -352,9 +352,9 @@ class TestComponent extends Component {
   renderItems() {
     return (
       <ul>
-        {this.state.items.map(item => (
+        {this.state.items.map(item =>
           <li key={item.id}>{item.name} - {item.qty}</li>
-        ))}
+        )}
       </ul>
     );
   }
@@ -366,5 +366,78 @@ class TestComponent extends Component {
       </div>
     );
   }
+}
+```
+
+Alternatively:
+```javascript
+class TestComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: [
+        {id: 1, name: 'cream', qty: '3 cartons'},
+        {id: 2, name: 'broccoli', qty: '1 bunch'},
+        {id: 3, name: 'cucumber', qty: '2'}
+      ]
+    };
+  }
+
+  render() {
+    const listItems = this,state.items.map(item =>
+      <li key={item.id}>{item.name} - {item.qty}</li>
+    );
+    return (
+      <div>
+        <ul>
+          {listItems}
+        </ul>
+      </div>
+    );
+  }
+}
+```
+
+## Conditionally render content
+
+Style-wise, there's a number of ways to conditionally render elements. For example, you could render one or another variable using the conditional operator:
+
+```javascript
+render() {
+  const todo = (
+    <div className="Todo">
+      ...etc...
+    </div>
+  );
+  const todoEdit = (
+    <form className="Todo" onSubmit={this.handleSubmit}>
+      ...etc...
+    </form>
+  );
+
+  return this.props.editing === true ? todoEdit : todo;
+}
+```
+
+Or, you could use if/else to set a single variable:
+
+```javascript
+render() {
+  let result;
+  if (this.props.editing) {
+    result = (
+      <div className="Todo">
+        ...etc...
+      </div>
+    );
+  } else {
+    result = (
+      <form className="Todo" onSubmit={this.handleSubmit}>
+        ...etc...
+      </form>
+    );
+  }
+
+  return result;
 }
 ```
