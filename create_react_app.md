@@ -82,9 +82,9 @@ my-app
 
 ## Webpack
 
-Create react app is built on top of *Webpack* which is a JavaScript utility that does a number of things including:
+Create react app is built on top of [webpack](https://webpack.js.org/) which is a JavaScript utility that does a number of things including:
 - enables module importing/exporting
-- packages and minifies all our css, js and images for the browser (this reduces the number of http requests for a performance boost).
+- packages and minifies all the css, js and images for the browser (this reduces the number of http requests for a performance boost).
 - hot reloading (when you change a source file, it automatically reloads in the browser)
 - enables easy testing & deployment
 
@@ -166,16 +166,16 @@ doSomething();
 doAnother()
 ```
 
-Note that in the `... from './extras.js'`, the `./` indicates that the module is located in the same directory as this file. If you were exclude the `./`, the import would be looking for the module in the `node_modules` directory which is why, for example, we see React importing from `'react'`.
+Note that in the `... from './extras'`, the `./` indicates that the module is located in the same directory as this file. If you were exclude the `./`, the import would be looking for the module in the `node_modules` directory which is why, for example, we see React importing from just `'react'`.
 
 ## Conventions
 
 - each component should go in a separate file
-- the file name should match the component name (e.g. `src/Message.js` should contain `function Message()` or `class Message`)
-- css files should also be component-specific and named to match (e.g. src/Message.css)
+- the file name should match the component name, e.g. `src/Message.js` should contain `function Message()` or `class Message`
+- css files should also be component-specific and named to match, e.g. `src/Message.css`
 - file names and component names should be capitalized.
 - class components should extend `Component` which is imported from `'react'`
-- `App.js` should be your final top-level component. This should be imported into `index.js`
+- `App.js` should be your final top-level component and this should be imported into `index.js`
 
 
 ### CSS and image assets
@@ -203,7 +203,7 @@ class Message extends Component {
 }
 ```
 
-Note that when this all gets compiled by create react app, the CSS file will affect the whole app, it will not be contained to only the component where we imported it. It is our naming that will restrict the the classes to each component.
+Note that when this all gets compiled by create react app, the CSS file will affect the whole app, it will not be contained to only the component where we imported it. It is our selector naming that will restrict the the classes to each component.
 
 Images are also stored in the `src` directory. They can be in their own sub-directory obviously. Again, import them in the same way:
 
