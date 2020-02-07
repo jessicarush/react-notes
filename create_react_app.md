@@ -50,33 +50,34 @@ The page will automatically reload if you make changes to the code and you will 
 ## Files & Directories
 
 You'll end up with a structure that looks like this:
-
+```
 my-app
-├─ .gitignore  
-├─ package-lock.json  
-├─ package.json  
-├─ README.md  
-├─ .git  
-├─ node_modules  
-├─ public  
-│  ├─ favicon.ico  
-│  ├─ index.html  
-│  └─ manifest.json  
-└─ src  
-    ├─ App.css  
-    ├─ App.js  
-    ├─ App.test.js  
-    ├─ index.css  
-    ├─ index.js  
-    ├─ logo.svg  
-    └─ serviceWorker.js  
+├─ .gitignore
+├─ package-lock.json
+├─ package.json
+├─ README.md
+├─ .git
+├─ node_modules
+├─ public
+│  ├─ favicon.ico
+│  ├─ index.html
+│  └─ manifest.json
+└─ src
+    ├─ App.css
+    ├─ App.js
+    ├─ App.test.js
+    ├─ index.css
+    ├─ index.js
+    ├─ logo.svg
+    └─ serviceWorker.js
+```
 
-**package-lock.json** - lock file, do not edit directly
-**package.json** - edit as you normally would
-**README.md** - contains notes on the create react app commands that you can run. Edit or delete.
-**node_modules** - contains all of the dependencies
-**src** - this is where we create all our react components and css. Note that `index.css` is meant to be your site-wide css.
-**public** - contains your main `index.html`. They've also got some icon-related files in here and a `robots.txt`
+**package-lock.json** - lock file, do not edit directly  
+**package.json** - edit as you normally would  
+**README.md** - contains notes on the create react app commands that you can run. Edit or delete.  
+**node_modules** - contains all of the dependencies  
+**src** - this is where we create all our react components and css. Note that `index.css` is meant to be your site-wide css.  
+**public** - contains your main `index.html`. They've also got some icon-related files in here and a `robots.txt`  
 
 
 ## Webpack
