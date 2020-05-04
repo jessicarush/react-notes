@@ -48,7 +48,7 @@ React.createElement(
 ```
 Note at <https://babeljs.io/repl> you can type in your JSX code to see what it actually transpiles to.
 
-JSX is more strict than HTML in that if the html element doesn't have an explicit closing tag, you *must* include the `/` at the end of the standalone tag. e.g `<input type="text" />`.
+JSX is much more strict than HTML in that if the html element doesn't have an explicit closing tag, you *must* include the `/` at the end of the standalone tag. e.g `<input type="text" />`.
 
 We should also always stick with double quotes when typing attributes or properties (see [properties.md](properties.md)).
 
@@ -57,7 +57,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Welcome name="Jessica" day="Thursday"/>
+        <Welcome name="Jessica" day="Thursday" />
       </div>
     );
   }
@@ -98,7 +98,7 @@ class JSXDemo extends React.Component {
 }
 ```
 
-These curly braces can be used to call functions, run loops or conditionals.
+These curly braces can be used to call functions, run loops, conditionals, etc.
 
 ### Functions
 
@@ -178,7 +178,7 @@ class JSXDemo extends React.Component {
 ReactDOM.render(<JSXDemo />, document.getElementById('root'));
 ```
 
-This method uses an if/else to set a variable containing content. The content is then added at the end. Note that even in this variable (msg), we must return one element. In other words, multiple elements should be wrapped in one.
+This example uses an if/else to set a variable containing content. The content is then added at the end. Note that even in this variable (msg), we can return only one element. In other words, multiple elements should be wrapped in one.
 
 ```javascript
 function getNum() {
