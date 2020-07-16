@@ -7,7 +7,8 @@
 - [1. Place components in separate files](#1-place-components-in-separate-files)
 - [2. Create a top level component called App](#2-create-a-top-level-component-called-app)
 - [3. Render your App in an index.js](#3-render-your-app-in-an-indexjs)
-- [4. Add all the component scripts to your html](#4-add-all-the-component-scripts-to-your-html)
+- [4. Create an element to hold your rendered react app in your html](#4-create-an-element-to-hold-your-rendered-react-app-in-your-html)
+- [5. Add all the component scripts to your html](#5-add-all-the-component-scripts-to-your-html)
 - [5. Run your app on a server](#5-run-your-app-on-a-server)
 
 <!-- tocstop -->
@@ -55,8 +56,18 @@ class App extends React.Component {
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-## 4. Add all the component scripts to your html
+## 4. Create an element to hold your rendered react app in your html
 
+*index.html*
+```html
+<div id="root">
+  <!-- react app will go here will go in this div -->
+</div>
+```
+
+## 5. Add all the component scripts to your html
+
+*index.html*
 ```html
   <!-- React -->
   <script src="https://unpkg.com/react/umd/react.development.js"></script>
