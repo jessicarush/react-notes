@@ -1,4 +1,4 @@
-# Application Layout
+# React App Layout (Barebones)
 
 ## Table of Contents
 
