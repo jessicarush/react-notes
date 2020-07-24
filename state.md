@@ -12,6 +12,8 @@
 - [Updating existing state values](#updating-existing-state-values)
 - [Mutable data structures & state](#mutable-data-structures--state)
 - [State Design](#state-design)
+- [Updating state with map() vs for](#updating-state-with-map-vs-for)
+- [Toggling a true/false state](#toggling-a-truefalse-state)
 
 <!-- tocstop -->
 
