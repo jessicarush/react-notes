@@ -10,10 +10,14 @@
 - [Javascript in JSX](#javascript-in-jsx)
   * [Functions](#functions)
   * [Conditionals](#conditionals)
+    + [Ternary operator](#ternary-operator)
+    + [Short-circuiting](#short-circuiting)
+    + [is/else](#iselse)
   * [Loops](#loops)
 - [Keys](#keys)
   * [uuid](#uuid)
 - [Breaking code into chunks](#breaking-code-into-chunks)
+- [Conditionally render content](#conditionally-render-content)
 
 <!-- tocstop -->
 
@@ -131,7 +135,9 @@ ReactDOM.render(<JSXDemo />, document.getElementById('root'));
 
 ### Conditionals
 
-[This article](https://blog.logrocket.com/conditional-rendering-in-react-c6b0e5af381e/) looks at 8 different ways of rendering with conditionals (e.g if/else, ternary operator, short-circuiting, etc).
+[This article](https://blog.logrocket.com/conditional-rendering-in-react-c6b0e5af381e/) looks at 8 different ways of rendering with conditionals (e.g if/else, ternary operator, short-circuiting, etc). For example...
+
+#### Ternary operator
 
 Here's an example of the ternary operator:
 
@@ -155,6 +161,8 @@ class JSXDemo extends React.Component {
 ReactDOM.render(<JSXDemo />, document.getElementById('root'));
 ```
 
+#### Short-circuiting
+
 An example of short-circuiting, if we wanted to display an image only if the number if 7:
 
 ```javascript
@@ -177,6 +185,8 @@ class JSXDemo extends React.Component {
 
 ReactDOM.render(<JSXDemo />, document.getElementById('root'));
 ```
+
+#### is/else
 
 This example uses an if/else to set a variable containing content. The content is then added at the end. Note that even in this variable (msg), we can return only one element. In other words, multiple elements should be wrapped in one.
 
@@ -236,7 +246,7 @@ class App extends React.Component {
 ReactDOM.render(<App/>, document.getElementById('root'));
 ```
 
-In the component I could use map to loop through the msgs:
+In the component I could use map to loop through the `msgs`. Remember, `msgs` is just an array of objects. The outermost set of curly braces `{}` are there because of the syntax rules for 'JavaScript in JSX'.
 
 ```javascript
 class Messages extends React.Component {
@@ -315,7 +325,7 @@ npm install uuid
 Then import it using the id version type of your choice. For example, v1 is a timestamp, v4 is random.
 
 ```javascript
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 ```
 
 Then use the function call to generate it:
@@ -330,6 +340,8 @@ const todoItems = todos.map(todo =>
   <li key={todo.id}>{todo.text}</li>
 );
 ```
+
+> Note that the act of installing and importing a module like this assumes that you are using a tool like [create-react-app](create_react_app.md) or [webpack](app_layout_advanced.md). Specifically, to install, you would need a `package.json` and to use `import`, you would need to set the `<script>` element's attribute `type="module"`. Since React apps need the `type` attribute to be set to `text/jsx`, we use one of the aforementioned tools to sort it out.
 
 
 ## Breaking code into chunks
@@ -384,7 +396,7 @@ class TestComponent extends Component {
   }
 
   render() {
-    const listItems = this,state.items.map(item =>
+    const listItems = this.state.items.map(item =>
       <li key={item.id}>{item.name} - {item.qty}</li>
     );
     return (
