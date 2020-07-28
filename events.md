@@ -23,7 +23,7 @@ In React, every JSX element has built-in attributes representing every kind of b
 
 ## Event Types
 
-Any event that can be used in JavaScript exists in react. [See here for the complete list of supported events and related properties](https://reactjs.org/docs/events.html#supported-events).
+Any event that can be used in JavaScript exists in React. [See here for the complete list of supported events and related properties](https://reactjs.org/docs/events.html#supported-events).
 
 **Clipboard Events**  
 onCopy  
@@ -173,7 +173,7 @@ You can also access the JavaScript standard `e.target`, `e.target.value`, etc.
 
 ## this binding
 
-Because of the way event callbacks are handled by react, in order to use the `this` keyword within a callback function (for example to change state with `this.setState()`), we need to either bind `this` in the constructor or use arrow syntax and babel as discussed in [state.md](state.md).
+Because of the way event callbacks are handled by React, in order to use the `this` keyword within a callback function (for example to change state with `this.setState()`), we need to either bind `this` in the constructor or use arrow syntax and babel as discussed in [state.md](state.md).
 
 
 ```javascript
@@ -259,7 +259,7 @@ If you need to pass arguments to the handler, one quick and dirty way is to use 
 <button onClick={this.handleClick.bind(this, arg1, arg2)}>Click me</button>
 ```
 
-If the button (or whatever) were inside a child component, we could pass the whole function as a prop then do then reference the prop in the child's event attribute:
+If the button (or whatever) were inside a child component, we could pass the whole function as a prop then reference the prop in the child's event attribute:
 
 *ParentComponent.js*
 ```javascript
