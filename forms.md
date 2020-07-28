@@ -17,7 +17,7 @@
 >
 > We can combine the two by making the React state be the “single source of truth”. The React component that renders a form also controls what happens in that form on subsequent user input. An input form element whose value is controlled by React in this way is called a “controlled component”.
 
-When working with form elements we can create a function that both handles the form's submit and has access to the data entered. Unlike typical html form elements, react is aware anytime these elements are changed: the state will be updated. Components that are handled like this are referred to as controlled components.
+When working with form elements we can create a function that both handles the form's submit and has access to the data entered. Unlike typical html form elements, React is aware anytime these elements are changed: the state will be updated. Components that are handled like this are referred to as controlled components.
 
 ## Controlled Components
 
@@ -61,12 +61,25 @@ class FormComponent extends React.Component {
 }
 ```
 
-**NOTE:** the usual `for` attribute used with `<label>` elements is replaced with `htmlFor` in react.
+**NOTE:** the usual `for` attribute used with `<label>` elements is replaced with `htmlFor` in React.
 
 
 ## Multiple form elements
 
-Due to the requirements shown above, when you have multiple form fields and elements, the code can get pretty long. One thing we can do to trim things down is to use an ES6 syntax technique called *computed property names* in our change event handler. For example, if we wanted to add two more fields to the form above, we would need to add two new matching state properties but, **provided the `name` attributes match the state property names** we can do this:
+Due to the requirements shown above, when you have multiple form fields and elements, the code can get pretty long. One thing we can do to trim things down is to use an ES6 syntax technique called *computed property names* in our change event handler.
+
+```javascript
+let keyname = 'something';
+
+const myObject = {
+  [keyname]: 'whatever'
+}
+
+console.log(Object.keys(myObject));
+// [ 'something' ]
+```
+
+So, if we wanted to add two more fields to the form above, we would need to add two new matching state properties but, **provided the `name` attributes match the state property names** we can do this:
 
 ```javascript
 handleChange(e) {
