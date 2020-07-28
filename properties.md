@@ -11,7 +11,7 @@
 
 <!-- tocstop -->
 
-## Introduction/Example
+## Introduction example
 
 Properties are what we use to make a component configurable.
 
@@ -28,7 +28,7 @@ class App extends React.Component {
   }
 }
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
 You can access all the properties passed to a component via `this.props`:
@@ -107,7 +107,7 @@ class App extends React.Component {
 
 Note that for `true` values, you don't need to assign a value at all. For example `isSomething` is the same as `isSomething={true}`.
 
-To review, these properties can be places anywhere using the same curly brackets:
+To review; these properties can be placed anywhere using the same curly braces:
 
 ```javascript
 class Welcome extends React.Component {
@@ -130,6 +130,7 @@ To set default properties in a component:
 ```javascript
 class Welcome extends React.Component {
   static defaultProps = {
+    name: "human",
     color: "red",
     num: 5
   };

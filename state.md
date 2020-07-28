@@ -19,7 +19,7 @@
 
 ## Introduction
 
-State in a web application can describes when things need to change as a result of an event (clicking something, data changes, etc.). Examples are a logged-in user sees different content from an anonymous user, clicking an 'edit' button could open a modal window, sections could expand or collapse, etc.
+State in a web application can describe when things need to change as a result of an event (clicking something, data changes, etc.). Examples are a logged-in user sees different content from an anonymous user, clicking an 'edit' button could open a modal window, sections could expand or collapse, etc.
 
 In frontend/client-side, there are generally two types of things that state will track:
 - UI logic - the changing state of the interface, e.g. there is a model open
@@ -90,8 +90,6 @@ class Game2 extends Component {
     );
   }
 }
-
-export default Game2;
 ```
 
 
@@ -148,7 +146,8 @@ function randomScore() {
   let randomNum = Math.floor(Math.random() * 100);
   return {score: randomNum};
 }
-
+```
+```javascript
 // ... in the component
 changeState() {
   this.setState(randomScore);
@@ -364,7 +363,7 @@ class StateDemo extends Component {
 }
 ```
 
-Obviously creating copies of data structures comes with a processing efficiency penalty, but the gains in terms of ensuring your app doesn't have difficult to find bugs due to reacts handling of things under the hood is mostly worth it.
+Obviously creating copies of data structures comes with a processing efficiency penalty, but the gains in terms of ensuring your app doesn't have difficult to find bugs due to React's handling of things under the hood is mostly worth it.
 
 
 ## State Design
@@ -375,12 +374,12 @@ Designing components and deciding where states will go, takes time and practice.
 
 - **State on the parent** - in an attempt to support *downward data flow* we should, whenever possible, have our states be in the parent component.
 
-If for example I had a child components that I wanted to change state. While the child could, in theory, have it's own state, we could also do something like this:
+If, for example, I had a child component that I wanted to change state: While the child could, in theory, have it's own state, we could also do something like this:
 
 1. parent component defines a function
 2. the function is passed to the child component as a prop
-3. the child invoked the prop
-4. the parent function is called, often setting a new state
+3. the child invokes the prop
+4. the parent function is called, setting a new state
 5. the parent and children are re-rendered as a result of the state change.
 
 When you use this pattern, both the parent and the child need to bind their callback functions. For example:
@@ -443,7 +442,7 @@ That being said, when you have state properties that are mainly for presentation
 
 ## Updating state with map() vs for  
 
-I keep hearing that `for` loops are uncommon in the React world in favour of other iterators like `map()`. I can't seem to pinpoint a real reason for this beyond preference so here are two methods that achieving the same result.
+I keep hearing that `for` loops are uncommon in the React world in favour of iterators like `map()`. I can't seem to pinpoint a real reason for this beyond preference so here are two methods that achieving the same result.
 
 First, imagine I have a state that looks like this:
 
@@ -488,23 +487,23 @@ editTodo(id) {
 }
 ```
 
-## Toggling a true/false state
+## Toggling a true/false value
 
 This is more of a plain old JavaScript note, rather that a React-specific note but it came up so I'm making a note of it.
 
 When you want to toggle a state on and off, a very long way might be something like this;
 
 ```javascript
-if (state.todos[i].id === id) {
-  state.todos[i].completed = (state.todos[i].completed === true) ? false : true;
+if (currentState.todos[i].id === id) {
+  currentState.todos[i].completed = (currentState.todos[i].completed === true) ? false : true;
   break;
 }
 ```
 
 But I always forget, it's way simpler to use the `!` not operand:
 ```javascript
-if (state.todos[i].id === id) {
-  state.todos[i].completed = !state.todos[i].completed;
+if (currentState.todos[i].id === id) {
+  currentState.todos[i].completed = !currentState.todos[i].completed;
   break;
 }
 ```

@@ -40,8 +40,8 @@ npm start
 
 When you start the app you should be able to see it running at:
 
-Local:            http://localhost:3000/  
-On Your Network:  http://10.0.0.2:3000/  
+Local:                 http://localhost:3000/  
+On Your Network (eg):  http://10.0.0.2:3000/  
 
 The page will automatically reload if you make changes to the code and you will see the build errors and lint warnings in the console.
 
@@ -93,7 +93,7 @@ Normally there is a bit of a learning curve for working with webpack. There are 
 
 ## Modules
 
-Create react app uses ES6 modules see [javascript-notes/modules.md](https://github.com/jessicarush/javascript-notes/blob/master/modules.md). For example:
+Create react app allows the use of ES6 modules see [javascript-notes/modules.md](https://github.com/jessicarush/javascript-notes/blob/master/modules.md). For example:
 
 *extras.js:*
 ```javascript
