@@ -147,7 +147,7 @@ class FormComponent extends Component {
 
 ## Passing form data up
 
-This example is similar to what's shown in `state.md`.
+This example is similar to what's shown in [state.md](state.md#state-design).
 
 Parent component:
 ```javascript
