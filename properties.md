@@ -4,7 +4,7 @@
 
 <!-- toc -->
 
-- [Introduction/Example](#introductionexample)
+- [Introduction example](#introduction-example)
 - [Props are Immutable](#props-are-immutable)
 - [Props can be many types of data](#props-can-be-many-types-of-data)
 - [Default properties](#default-properties)

@@ -13,7 +13,7 @@
 - [Mutable data structures & state](#mutable-data-structures--state)
 - [State Design](#state-design)
 - [Updating state with map() vs for](#updating-state-with-map-vs-for)
-- [Toggling a true/false state](#toggling-a-truefalse-state)
+- [Toggling a true/false value](#toggling-a-truefalse-value)
 
 <!-- tocstop -->
 
@@ -172,6 +172,7 @@ Note that using a callback makes testing code much simpler, for example:
 expect(incrementScore({count: 0})).toEqual({count: 1});
 ```
 
+Not that you should never `setState()` in the constructor.
 
 ## React Events
 
