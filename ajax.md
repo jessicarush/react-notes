@@ -5,7 +5,10 @@
 <!-- toc -->
 
 - [Introduction](#introduction)
-- [Example](#example)
+- [Example - simple request to API](#example---simple-request-to-api)
+- [Example - Request with data](#example---request-with-data)
+- [Example - Adding a loading animation](#example---adding-a-loading-animation)
+- [Example - using an async function](#example---using-an-async-function)
 
 <!-- tocstop -->
 
@@ -21,9 +24,17 @@ To use Axios, you'll need yo install it:
 npm install axios
 ```
 
-## Example
+## Example - simple request to API
 
 This example makes a request to a simple github api.
+
+First, make sure to import axios:
+
+```javascript
+import axios from 'axios';
+```
+
+Then use `axios.get().then()`. Note that the `.then()` is a method of the standard built-in `Promise` object. It takes up to two arguments: callback functions for success and failure cases of the Promise.
 
 ```javascript
 class Test extends Component {
@@ -55,4 +66,150 @@ class Test extends Component {
 The response keys:
 ```
 [ "data", "status", "statusText", "headers", "config", "request" ]
+```
+
+Add another request:
+
+```javascript
+class Test extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: "",
+      colorName: "",
+      colorHex: ""
+    };
+  }
+  componentDidMount() {
+    // load data and set state with that data
+    axios.get("https://api.github.com/zen").then(response => {
+      this.setState({data: response.data});
+    });
+
+    axios.get("https://log.zebro.id/api_demo").then(response => {
+      this.setState({
+        colorName: Object.keys(response.data)[0],
+        colorHex: Object.values(response.data)[0]
+      });
+    });
+
+  }
+  render() {
+    const style = {color: this.state.colorHex};
+    return (
+      <div>
+        <h1>{this.state.data}</h1>
+        <h1 style={style}>{this.state.colorName} {this.state.colorHex}</h1>
+      </div>
+    )
+  }
+}
+```
+
+For reference, the python flask endpoint for the second api looks like this:
+
+```python
+@app.route('/api_demo', methods=['GET'])
+def api_demo():
+    '''Demo API returns a random html color'''
+    name, hex = random.choice(list(colors.items()))
+    response = jsonify({name: hex})
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+```
+
+Note the `Access-Control-Allow-Origin` header. In order for requests outside the response origin to access the response, this header must be set. `*` is a wildcard allowing any site to receive the response. You should only use this for public APIs. Private APIs should never use `*`, and should instead have a specific domain or domains set. In addition, the wildcard only works for requests made with the crossorigin attribute set to anonymous, and it prevents sending credentials like cookies in requests. [See MDN for more on this](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin).
+
+
+## Example - Request with data
+
+This example sends query parameters along with the get request:
+
+```javascript
+class Test extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      colorName: "",
+      colorHex: ""
+    };
+  }
+  componentDidMount() {
+    // load data and set state with that data
+    axios.get("http://127.0.0.1:5000/api_demo", {params: {value: 'rgb'}}).then(response => {
+      this.setState({
+        colorName: Object.keys(response.data)[0],
+        colorHex: Object.values(response.data)[0]
+      });
+    });
+
+  }
+  render() {
+    const style = {color: this.state.colorHex};
+    return (
+      <div>
+        <h1 style={style}>{this.state.colorName} {this.state.colorHex}</h1>
+      </div>
+    )
+  }
+}
+```
+
+## Example - Adding a loading animation
+
+For Ajax requests that may take some time, it's easy to add a loading animation using state.
+
+```javascript
+class Test extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoaded: false,
+      data: ""
+    };
+  }
+  componentDidMount() {
+    // load data and set state with that data
+    axios.get("https://api.github.com/zen").then(response => {
+      setTimeout(function () {
+          this.setState({data: response.data, isLoaded: true});
+        }.bind(this), 3000
+      );
+    });
+  }
+  render() {
+    return (
+      <div>
+        {this.state.isLoaded ? <h1>{this.state.data}</h1> : <Loader />}
+      </div>
+    )
+  }
+}
+```
+
+## Example - using an async function
+
+```javascript
+class GithubUser extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {imgUrl: '', name: ''};
+  }
+  async componentDidMount() {
+    const url = `https://api.github.com/users/${this.props.username}`;
+    let response = await axios.get(url);
+    // this code won't run until await has finished
+    let data = response.data;
+    this.setState({imgUrl: data.avatar_url, name: data.name})
+  }
+  render() {
+    return (
+      <div>
+        <h1>Github user info</h1>
+        <img src={this.state.imgUrl} alt={this.state.name} />
+        <p>{this.state.name}</p>
+      </div>
+    )
+  }
+}
 ```
