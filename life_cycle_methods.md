@@ -33,7 +33,7 @@ Mounting refers to the initial rendering of elements into the DOM.
 React has four built-in methods that get called, in this order, when mounting a component:
 
 1. `constructor()`
-2. `getDerivedStateFromProps()`
+2. static `getDerivedStateFromProps()`
 3. `render()`
 4. `componentDidMount()`
 
@@ -60,6 +60,8 @@ class Test extends React.Component {
 ### getDerivedStateFromProps
 
 The `getDerivedStateFromProps()` method is called right before rendering the element(s) in the DOM. This is the natural place to set the state object based on the initial props. It takes state as an argument, and returns an object with changes to the state.
+
+> This method exists for rare use cases where the state depends on changes in props over time. For example, it might be handy for implementing a <Transition> component that compares its previous and next children to decide which of them to animate in and out.
 
 The example below starts with the color being "red", but the `getDerivedStateFromProps()` method updates the  color based on the favcol attribute:
 
@@ -113,7 +115,7 @@ The next phase in the lifecycle is when a component is updated. A component is u
 
 React has five built-in methods that are called, in this order, when a component is updated:
 
-1. `getDerivedStateFromProps()`
+1. static `getDerivedStateFromProps()`
 2. `shouldComponentUpdate()`
 3. `render()`
 4. `getSnapshotBeforeUpdate()`
@@ -217,7 +219,12 @@ class Test extends Component {
 
 ### componentDidUpdate
 
-The `componentDidUpdate()` method is called after the component is updated in the DOM.
+The `componentDidUpdate()` method is called after the component is updated in the DOM. This can be a good place to perform any *side effect* operations like syncing to localStorage or a database, auto-saving or updating the DOM if working with [uncontrolled from components](https://reactjs.org/docs/uncontrolled-components.html). This method also has access to `prevProps` and `prevState`. Reminder, a component will update if:
+
+- `setState()` has been called
+- new `props` have been passed in from the parent component
+- `forceUpdate()` has been called
+
 
 ```javascript
 class Test extends Component {
@@ -225,8 +232,9 @@ class Test extends Component {
     super(props);
     this.state = {color: "red"};
   }
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     console.log('Updated!');
+    console.log(`previous color: ${prevState.color}`);
   }
   changeColor = () => {
     this.setState({color: "blue"});
@@ -253,7 +261,7 @@ React has only one built-in method that gets called when a component is unmounte
 
 ### componentWillUnmount
 
-The `componentWillUnmount()` method is called when the component is about to be removed from the DOM.
+The `componentWillUnmount()` method is called when the component is about to be removed from the DOM. This is a good place to perform *cleanup* actions such as invalidating timers, canceling network requests, or cleaning up any subscriptions that were created in `componentDidMount()`.
 
 *Parent component*
 ```javascript
