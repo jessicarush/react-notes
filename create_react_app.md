@@ -167,7 +167,7 @@ doSomething();
 doAnother()
 ```
 
-Note that in the `... from './extras'`, the `./` indicates that the module is located in the same directory as this file. If you were exclude the `./`, the import would be looking for the module in the `node_modules` directory which is why, for example, we see React importing from just `'react'`.
+Note that in the `... from './extras'`, the `./` indicates that the module is located in the same directory as this file. If you were to exclude the `./`, the import would be looking for the module in the `node_modules` directory which is why, for example, we see React importing from just `'react'`.
 
 ## Conventions
 

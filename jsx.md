@@ -44,12 +44,9 @@ For example, this JSX:
 
 compiles into this javascript:
 ```javascript
-React.createElement(
-  'div',
-  {className: 'sidebar'},
-  'Hello'
-)
+React.createElement('div', {className: 'sidebar'}, 'Hello');
 ```
+
 Note at <https://babeljs.io/repl> you can type in your JSX code to see what it actually transpiles to.
 
 JSX is much more strict than HTML in that if the html element doesn't have an explicit closing tag, you *must* include the `/` at the end of the standalone tag. e.g `<input type="text" />`.
@@ -70,7 +67,7 @@ class App extends React.Component {
 
 ## Commenting
 
-If you want to write comments in your components, JSX requires that you use multiline JS/css style but wrapped in curly braces like so `{/* comment */}`:
+If you want to write comments in your components, JSX requires that you use multiline JS/CSS style but wrapped in curly braces like so `{/* comment */}`:
 
 ```javascript
 class App extends React.Component {
@@ -91,7 +88,7 @@ class App extends React.Component {
 You can include JavaScript expressions in JSX by using curly braces, for example:
 
 ```javascript
-class JSXDemo extends React.Component {
+class Demo extends React.Component {
   render() {
     return (
       <div>
@@ -120,7 +117,7 @@ function getColor() {
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
-class JSXDemo extends React.Component {
+class Demo extends React.Component {
   render() {
     return (
       <div>
@@ -130,7 +127,7 @@ class JSXDemo extends React.Component {
   }
 }
 
-ReactDOM.render(<JSXDemo />, document.getElementById('root'));
+ReactDOM.render(<Demo />, document.getElementById('root'));
 ```
 
 ### Conditionals
@@ -146,7 +143,7 @@ function getNum() {
   return Math.floor(Math.random() * 10) + 1;
 }
 
-class JSXDemo extends React.Component {
+class Demo extends React.Component {
   render() {
     const num = getNum();
     return (
@@ -158,7 +155,7 @@ class JSXDemo extends React.Component {
   }
 }
 
-ReactDOM.render(<JSXDemo />, document.getElementById('root'));
+ReactDOM.render(<Demo />, document.getElementById('root'));
 ```
 
 #### Short-circuiting
@@ -170,7 +167,7 @@ function getNum() {
   return Math.floor(Math.random() * 10) + 1;
 }
 
-class JSXDemo extends React.Component {
+class Demo extends React.Component {
   render() {
     const num = getNum();
     return (
@@ -183,7 +180,7 @@ class JSXDemo extends React.Component {
   }
 }
 
-ReactDOM.render(<JSXDemo />, document.getElementById('root'));
+ReactDOM.render(<Demo />, document.getElementById('root'));
 ```
 
 #### is/else
@@ -195,7 +192,7 @@ function getNum() {
   return Math.floor(Math.random() * 10) + 1;
 }
 
-class JSXDemo extends React.Component {
+class Demo extends React.Component {
   render() {
     const num = getNum();
     let msg;
@@ -217,7 +214,7 @@ class JSXDemo extends React.Component {
   }
 }
 
-ReactDOM.render(<JSXDemo />, document.getElementById('root'));
+ReactDOM.render(<Demo />, document.getElementById('root'));
 ```
 
 ### Loops

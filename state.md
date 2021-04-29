@@ -17,6 +17,7 @@
 
 <!-- tocstop -->
 
+
 ## Introduction
 
 State in a web application can describe when things need to change as a result of an event (clicking something, data changes, etc.). Examples are a logged-in user sees different content from an anonymous user, clicking an 'edit' button could open a modal window, sections could expand or collapse, etc.
@@ -173,6 +174,7 @@ expect(incrementScore({count: 0})).toEqual({count: 1});
 ```
 
 Not that you should never `setState()` in the constructor.
+
 
 ## React Events
 
@@ -331,6 +333,7 @@ class Score extends Component {
 }
 ```
 
+
 ## Mutable data structures & state
 
 If a state value is a mutable data structure like an object or array, we also have to follow safe practices when updating or editing a value within those data structures. Once again, we don't assign a new value directly, but rather we make a copy of the data structure, make the changes, return the new data structure and then `setState()` with that new object.
@@ -364,7 +367,7 @@ class StateDemo extends Component {
 }
 ```
 
-Obviously creating copies of data structures comes with a processing efficiency penalty, but the gains in terms of ensuring your app doesn't have difficult to find bugs due to React's handling of things under the hood is mostly worth it.
+Obviously creating copies of data structures comes with a processing efficiency penalty, but the gains in terms of ensuring your app doesn't have difficult-to-find bugs, due to Reacts handling of things under the hood, is mostly worth it.
 
 
 ## State Design
