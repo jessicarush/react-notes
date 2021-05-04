@@ -34,7 +34,11 @@ First, make sure to import axios:
 import axios from 'axios';
 ```
 
-Then use `axios.get().then()`. Note that the `.then()` is a method of the standard built-in `Promise` object. It takes up to two arguments: callback functions for success and failure cases of the Promise.
+Then use `axios.get().then()`. Note that the `.then()` is a method of the standard built-in `Promise` object.
+
+> It takes up to two arguments: callback functions for success and failure cases of the Promise.
+
+Note: I can't find an example of this. In the meantime, here's a decent [discussion on error handling](https://www.intricatecloud.io/2020/03/how-to-handle-api-errors-in-your-web-app-using-axios/).
 
 ```javascript
 class Test extends Component {
