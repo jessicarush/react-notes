@@ -63,7 +63,7 @@ The `getDerivedStateFromProps()` method is called right before rendering the ele
 
 > This method exists for rare use cases where the state depends on changes in props over time. For example, it might be handy for implementing a <Transition> component that compares its previous and next children to decide which of them to animate in and out.
 
-The example below starts with the color being "red", but the `getDerivedStateFromProps()` method updates the  color based on the favcol attribute:
+The example below starts with the color being "red", but the `getDerivedStateFromProps()` method updates the  color based on the `favcol` attribute:
 
 ```javascript
 class Test extends React.Component {

@@ -77,7 +77,7 @@ console.log(Object.keys(myObject));
 // [ 'something' ]
 ```
 
-So, if we wanted to add two more fields to the form above, we would need to add two new matching state properties but, **provided the `name` attributes match the state property names** we can do this:
+So, if we wanted to add two more fields to the form above, we would need to add two new matching state properties but, **provided the `name` attributes match the state property names**, we can do this:
 
 ```javascript
 handleChange(e) {

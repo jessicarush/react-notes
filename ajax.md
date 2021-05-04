@@ -5,10 +5,10 @@
 <!-- toc -->
 
 - [Introduction](#introduction)
-- [Example - simple request to API](#example---simple-request-to-api)
+- [Example - Simple request to API](#example---simple-request-to-api)
 - [Example - Request with data](#example---request-with-data)
 - [Example - Adding a loading animation](#example---adding-a-loading-animation)
-- [Example - using an async function](#example---using-an-async-function)
+- [Example - Using an async function](#example---using-an-async-function)
 
 <!-- tocstop -->
 
@@ -16,15 +16,15 @@
 
 If you want to fetch data with an Ajax request, it is **always recommended that you do this in the `componentDidMount()` method** as opposed to the `constructor()`. In addition, you should also always avoid setting state in the constructor.
 
-[Axios](https://github.com/axios/axios) is a promise-based HTTP client that works both in the browser and in a node. js environment. It basically provides a single API for dealing with XMLHttpRequests and node's http interface. Besides that, it wraps the requests using a polyfill for ES6 new's promise syntax.
+[Axios](https://github.com/axios/axios) is a promise-based HTTP client that works both in the browser and in a node. js environment. It basically provides a single API for dealing with *XMLHttpRequests* and node's http interface. Besides that, it wraps the requests using a polyfill for ES6's new promise syntax.
 
-To use Axios, you'll need yo install it:
+To use Axios, you'll need to install it:
 
 ```
 npm install axios
 ```
 
-## Example - simple request to API
+## Example - Simple request to API
 
 This example makes a request to a simple github api.
 
@@ -187,7 +187,7 @@ class Test extends Component {
 }
 ```
 
-## Example - using an async function
+## Example - Using an async function
 
 ```javascript
 class GithubUser extends Component {
