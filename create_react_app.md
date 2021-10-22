@@ -31,6 +31,10 @@ node -v
 npm -v
 ```
 
+If you need to install or upgrade node, go to <https://nodejs.org/en/>
+
+If you need to install or upgrade npm, run ``npm install -g npm``.
+
 If you have npm 5.2 or higher, the library recommends you use `npx` to do the next steps but you can also use `npm`. See [the docs](https://create-react-app.dev/docs/getting-started) for more information.
 
 ```

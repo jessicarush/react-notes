@@ -12,7 +12,7 @@
   * [Conditionals](#conditionals)
     + [Ternary operator](#ternary-operator)
     + [Short-circuiting](#short-circuiting)
-    + [is/else](#iselse)
+    + [if/else](#ifelse)
   * [Loops](#loops)
 - [Keys](#keys)
   * [uuid](#uuid)
@@ -183,7 +183,7 @@ class Demo extends React.Component {
 ReactDOM.render(<Demo />, document.getElementById('root'));
 ```
 
-#### is/else
+#### if/else
 
 This example uses an if/else to set a variable containing content. The content is then added at the end. Note that even in this variable (msg), we can return only one element. In other words, multiple elements should be wrapped in one.
 
@@ -203,7 +203,7 @@ class Demo extends React.Component {
           <img src="img/photo.jpg" />
         </div>
     } else {
-      <p>'Meh.'</p>
+      msg = <p>'Meh.'</p>
     }
     return (
       <div>

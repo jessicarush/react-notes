@@ -3,9 +3,6 @@
 ## Table of Contents
 
 <!-- toc -->
-
-
-
 <!-- tocstop -->
 
 In a React component, you have a number of places you could be defining and accessing values from. These include `props` and `state`. Obviously, there will be many variables that don't need to be `props` or `state` and generally speaking, those can be defined wherever they are being used.
@@ -27,7 +24,7 @@ class Card extends Component {
         src={this.props.image}
         alt={this.props.name}
         className="Card"
-        style={{transform: transform}}/>
+        style={{transform: transform}} />
     )
   }
 }

@@ -90,7 +90,7 @@ class Test extends Component {
       this.setState({data: response.data});
     });
 
-    axios.get("https://log.zebro.id/api_demo").then(response => {
+    axios.get("https://log.zebro.id/api_demo_one").then(response => {
       this.setState({
         colorName: Object.keys(response.data)[0],
         colorHex: Object.values(response.data)[0]
@@ -113,7 +113,7 @@ class Test extends Component {
 For reference, the python flask endpoint for the second api looks like this:
 
 ```python
-@app.route('/api_demo', methods=['GET'])
+@app.route('/api_demo_one', methods=['GET'])
 def api_demo():
     '''Demo API returns a random html color'''
     name, hex = random.choice(list(colors.items()))
@@ -140,7 +140,7 @@ class Test extends Component {
   }
   componentDidMount() {
     // load data and set state with that data
-    axios.get("http://127.0.0.1:5000/api_demo", {params: {value: 'rgb'}}).then(response => {
+    axios.get("http://127.0.0.1:5000/api_demo_one", {params: {value: 'rgb'}}).then(response => {
       this.setState({
         colorName: Object.keys(response.data)[0],
         colorHex: Object.values(response.data)[0]
