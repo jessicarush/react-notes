@@ -111,7 +111,7 @@ export default doSomething;
 
 *app.js:*
 ```javascript
-import doSomething from './extras'
+import doSomething from './extras';
 
 doSomething();
 ```
@@ -137,10 +137,10 @@ export { doSomething, doOther, doAnother };
 
 *app.js:*
 ```javascript
-import { doSomething, doAnother } from './extras'
+import { doSomething, doAnother } from './extras';
 
 doSomething();
-doAnother()
+doAnother();
 ```
 
 Note, you can also mix the two:
@@ -165,10 +165,10 @@ export { doOther, doAnother };
 
 *app.js:*
 ```javascript
-import doSomething, { doAnother } from './extras'
+import doSomething, { doAnother } from './extras';
 
 doSomething();
-doAnother()
+doAnother();
 ```
 
 Note that in the `... from './extras'`, the `./` indicates that the module is located in the same directory as this file. If you were to exclude the `./`, the import would be looking for the module in the `node_modules` directory which is why, for example, we see React importing from just `'react'`.
@@ -190,7 +190,7 @@ As mentioned above, css should be component-specific and saved with the same nam
 *Message.js:*
 ```javascript
 import React, { Component } from 'react';
-import `./Message.css`
+import `./Message.css`;
 ```
 
 It is also conventional to add a `className` that is the same as the component name to the top-level html element that is being returned. All sub-item styles should be prefixed with this name. For example:

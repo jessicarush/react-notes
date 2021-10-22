@@ -18,14 +18,14 @@ class Card extends Component {
     let angle = Math.random() * 90 - 45;
     let xPos = Math.random() * 40 - 20;
     let yPos = Math.random() * 40 - 2;
-    let transform = `translate(${xPos}px, ${yPos}px) rotate(${angle}deg)`
+    let transform = `translate(${xPos}px, ${yPos}px) rotate(${angle}deg)`;
     return (
       <img
         src={this.props.image}
         alt={this.props.name}
         className="Card"
         style={{transform: transform}} />
-    )
+    );
   }
 }
 ```
@@ -41,7 +41,7 @@ class Card extends Component {
     let angle = Math.random() * 90 - 45;
     let xPos = Math.random() * 40 - 20;
     let yPos = Math.random() * 40 - 2;
-    this._transform = `translate(${xPos}px, ${yPos}px) rotate(${angle}deg)`
+    this._transform = `translate(${xPos}px, ${yPos}px) rotate(${angle}deg)`;
   }
   render() {
     return (
@@ -50,7 +50,7 @@ class Card extends Component {
         alt={this.props.name}
         className="Card"
         style={{transform: this._transform}}/>
-    )
+    );
   }
 }
 ```

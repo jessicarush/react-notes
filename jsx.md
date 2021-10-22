@@ -197,13 +197,14 @@ class Demo extends React.Component {
     const num = getNum();
     let msg;
     if (num === 7) {
-      msg =
+      msg = (
         <div>
           <p>'Woot!'</p>
           <img src="img/photo.jpg" />
         </div>
+      );
     } else {
-      msg = <p>'Meh.'</p>
+      msg = <p>'Meh.'</p>;
     }
     return (
       <div>
@@ -446,7 +447,6 @@ render() {
       </form>
     );
   }
-
   return result;
 }
 ```

@@ -62,7 +62,7 @@ class Test extends Component {
       <div>
         <h1>{this.state.data}</h1>
       </div>
-    )
+    );
   }
 }
 ```
@@ -105,7 +105,7 @@ class Test extends Component {
         <h1>{this.state.data}</h1>
         <h1 style={style}>{this.state.colorName} {this.state.colorHex}</h1>
       </div>
-    )
+    );
   }
 }
 ```
@@ -154,7 +154,7 @@ class Test extends Component {
       <div>
         <h1 style={style}>{this.state.colorName} {this.state.colorHex}</h1>
       </div>
-    )
+    );
   }
 }
 ```
@@ -186,7 +186,7 @@ class Test extends Component {
       <div>
         {this.state.isLoaded ? <h1>{this.state.data}</h1> : <Loader />}
       </div>
-    )
+    );
   }
 }
 ```
@@ -204,7 +204,7 @@ class GithubUser extends Component {
     let response = await axios.get(url);
     // this code won't run until await has finished
     let data = response.data;
-    this.setState({imgUrl: data.avatar_url, name: data.name})
+    this.setState({imgUrl: data.avatar_url, name: data.name});
   }
   render() {
     return (
@@ -213,7 +213,7 @@ class GithubUser extends Component {
         <img src={this.state.imgUrl} alt={this.state.name} />
         <p>{this.state.name}</p>
       </div>
-    )
+    );
   }
 }
 ```

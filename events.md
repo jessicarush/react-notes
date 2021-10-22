@@ -164,7 +164,7 @@ class TestComponent extends Component {
       <div className="TestComponent">
         <input onKeyUp={this.handleKeyUp} placeholder="type something" />
       </div>
-    )
+    );
   }
 }
 ```
@@ -297,7 +297,7 @@ class TestComponent extends Component {
         <button onClick={this.handleSetColor1}>Click me</button>
         <button onClick={this.handleSetColor2}>Click me</button>
       </div>
-    )
+    );
   }
 }
 ```
@@ -321,7 +321,7 @@ class TestComponent extends Component {
       <div className="TestComponent" style={styles}>
         <TestChildComponent setColor={this.setColor} />
       </div>
-    )
+    );
   }
 }
 ```
@@ -341,7 +341,7 @@ class TestChildComponent extends Component {
       <div className="TestChildComponent">
         <button onClick={this.handleSetColor}>Click me</button>
       </div>
-    )
+    );
   }
 }
 ```

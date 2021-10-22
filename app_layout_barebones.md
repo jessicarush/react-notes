@@ -60,9 +60,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 *index.html*
 ```html
-<div id="root">
-  <!-- react app will go here will go in this div -->
-</div>
+<div id="root"> <!-- react app will render here --> </div>
 ```
 
 ## 5. Add all the component scripts to your html

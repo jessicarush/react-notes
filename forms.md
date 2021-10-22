@@ -71,7 +71,7 @@ Due to the requirements shown above, when you have multiple form fields and elem
 ```javascript
 let keyname = 'something';
 
-const myObject = {[keyname]: 'whatever'}
+const myObject = {[keyname]: 'whatever'};
 
 console.log(Object.keys(myObject));
 // [ 'something' ]
@@ -230,7 +230,7 @@ class ChildComponent extends Component {
         />
         <input type="submit"/>
       </form>
-    )
+    );
   }
 }
 ```

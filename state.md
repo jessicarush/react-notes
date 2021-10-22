@@ -277,7 +277,7 @@ class Score extends Component {
         <h1>Score is: {this.state.score}</h1>
         <button onClick={this.addPoint}>add point</button>
       </div>
-    )
+    );
   }
 }
 ```
@@ -303,7 +303,7 @@ class Score extends Component {
         <h1>Score is: {this.state.score}</h1>
         <button onClick={this.addPoint}>add point</button>
       </div>
-    )
+    );
   }
 }
 ```
@@ -328,7 +328,7 @@ class Score extends Component {
         <h1>Score is: {this.state.score}</h1>
         <button onClick={this.addPoint}>add point</button>
       </div>
-    )
+    );
   }
 }
 ```
@@ -413,7 +413,7 @@ class TestComponent extends Component {
       <div className="TestComponent">
         <TestChildComponent color={this.state.color} setColor={this.setColor} />
       </div>
-    )
+    );
   }
 }
 ```
@@ -436,7 +436,7 @@ class TestChildComponent extends Component {
       <div style={styles} className="TestChildComponent">
         <button onClick={this.handleSetColor}>Click me</button>
       </div>
-    )
+    );
   }
 }
 ```
@@ -457,7 +457,7 @@ this.state = {
     { id: uuid(), task: 'shopping', editing: false, completed: false },
     { id: uuid(), task: 'recycling', editing: false, completed: false }
     // etc
-  ] };
+  ]};
 ```
 
 What I want to do, is update a property of one of the objects which I'm going to select by id.

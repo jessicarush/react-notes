@@ -99,7 +99,7 @@ class Test extends React.Component {
   componentDidMount() {
     setTimeout(() => {
       this.setState({color: "yellow"})
-    }, 2000)
+    }, 2000);
   }
   render() {
     return (
@@ -212,7 +212,7 @@ class Test extends Component {
         <p id="p1"></p>
         <p id="p2"></p>
       </div>
-    )
+    );
   }
 }
 ```
@@ -245,7 +245,7 @@ class Test extends Component {
         <h1>My favourite color is {this.state.color}</h1>
         <button type="button" onClick={this.changeColor}>Change color</button>
       </div>
-    )
+    );
   }
 }
 ```
@@ -276,14 +276,14 @@ class Test extends Component {
   render() {
     let child;
     if (this.state.showChild) {
-      child = <Child />
+      child = <Child />;
     }
     return (
       <div>
         {child}
         <button type="button" onClick={this.removeChild}>Remove child</button>
       </div>
-    )
+    );
   }
 }
 ```
@@ -297,7 +297,7 @@ class Child extends Component {
   render() {
     return (
       <h1>Child</h1>
-    )
+    );
   }
 }
 ```
