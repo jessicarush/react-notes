@@ -111,7 +111,7 @@ class Test extends React.Component {
 
 ## Updating
 
-The next phase in the lifecycle is when a component is updated. A component is updated whenever there is a change in the component's state or props.
+The next phase in the lifecycle is when a component is updated. A component is updated whenever there is a change in the component's *props*, *state* using `setState()`, or by using the `forceUpdate()` method.
 
 React has five built-in methods that are called, in this order, when a component is updated:
 

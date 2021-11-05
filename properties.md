@@ -79,7 +79,7 @@ class Welcome extends React.Component {
 
 ## Props are Immutable
 
-One major thing to note is that properties passed to components are immutable. In other words, you cannot assign a new value to them.
+One major thing to note is that properties passed to components are immutable. In other words, you cannot assign a new value to them, they are read-only.
 
 
 ## Props can be many types of data

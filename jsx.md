@@ -410,7 +410,7 @@ class TestComponent extends Component {
 
 ## Conditionally render content
 
-Style-wise, there's a number of ways to conditionally render elements. For example, you could render one or another variable using the conditional operator:
+Style-wise, there's a number of ways to conditionally render elements using the methods described above in the [Conditionals](#conditionals) section. For example, you could render one or another variable using the conditional operator:
 
 ```javascript
 render() {
