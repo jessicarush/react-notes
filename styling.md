@@ -59,6 +59,27 @@ class Machine extends React.Component {
 }
 ```
 
+To use string interpolation:
+
+```javascript
+class Machine extends React.Component {
+  let textClass;
+  if (this.someprop > 0) {
+    textClass = 'win';
+  } else if (this.someprop < 0) {
+    textClass = 'lose';
+  } else {
+    textClass = 'null';
+  }
+  render() {
+    return (
+      <div className="Machine">
+        <p className={`Machine__${textClass}`}> ... </p>
+      </div>
+    );
+  }
+}
+```
 
 ## Inline Styles
 
