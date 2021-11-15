@@ -217,3 +217,17 @@ class GithubUser extends Component {
   }
 }
 ```
+
+## Passing headers
+
+If you need to pass a header along with your axious request, it would look like this:
+
+```javascript
+async componentDidMount() {
+  const joke_url = 'https://icanhazdadjoke.com/';
+  // We need to pass in an Accept header to receive JSON
+  const headers = {Accept: 'application/json'};
+  let response = await axios.get(joke_url, {headers: headers});
+  console.log(response);
+}
+```
