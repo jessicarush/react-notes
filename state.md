@@ -1,5 +1,7 @@
 # React State
 
+<https://reactjs.org/docs/react-component.html#setstate>
+
 ## Table of Contents
 
 <!-- toc -->
@@ -490,6 +492,25 @@ editTodo(id) {
   this.setState({ todos: newTodos});
 }
 ```
+
+## setState optional callback
+
+A second parameter to `setState()` is an optional callback function that will be executed once setState is completed and the component is re-rendered. Noe that it's generally recommended to use `componentDidUpdate()` for such logic instead.
+
+`setState(stateChange[, callback])`
+
+That being said, this can be a good place for updating localStorage storage after a state change. For example:
+
+```javascript
+updateVotes(id, delta) {
+  this.setState(st => ({
+    jokes: st.jokes.map(j =>
+      j.id === id ? {...j, votes: j.votes + delta} : j
+    )
+  }), /* optional second callback */ () => localStorage.setItem('jokes', JSON.stringify(this.state.jokes)));
+}
+```
+
 
 ## Toggling a true/false value
 
