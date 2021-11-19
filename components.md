@@ -7,6 +7,7 @@
 - [Introduction](#introduction)
 - [Class-based components](#class-based-components)
 - [Function-based components](#function-based-components)
+- [Nested Components](#nested-components)
 
 <!-- tocstop -->
 
@@ -85,4 +86,59 @@ function Welcome() {
 }
 
 ReactDOM.render(<Welcome />, document.getElementById('root'));
+```
+
+## Nested Components
+
+In addition to rendering components as a standalone element (e.g. `<Box />`), you can take any component and give it an opening tag and closing tag. For example, the following two Boxes will render the same:
+
+```JavaScript
+render() {
+  return (
+    <div className="Contact">
+      <Box />
+      <Box></Box>
+    </div>
+  );
+```
+
+The benefit of using an opening and closing tag is you can next any additional content between those tags and have them render inside that component. For example:
+
+```JavaScript
+render() {
+  return (
+    <div className="Contact">
+      <Box />
+      <Box>
+        <h1 className="Contact-header">About... </h1>
+        <p>... </p>
+      </Box>
+    </div>
+  );
+```
+
+To display the nested content, you will need to render {this.props.children} somewhere in the component:
+
+```javascript
+class Box extends Component {
+  static defaultProps = {
+  };
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+  render() {
+    return (
+      <div className="Box">
+        <h1 className="Box-header">
+          This is my box component. The rest of the content in this box comes
+          from this.props.children.
+        </h1>
+        {this.props.children}
+      </div>
+    );
+  }
+}
+
+export default Box;
 ```
