@@ -15,6 +15,7 @@
 - [Mutable data structures & state](#mutable-data-structures--state)
 - [State Design](#state-design)
 - [Updating state with map() vs for](#updating-state-with-map-vs-for)
+- [setState optional callback](#setstate-optional-callback)
 - [Toggling a true/false value](#toggling-a-truefalse-value)
 
 <!-- tocstop -->

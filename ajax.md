@@ -9,6 +9,7 @@
 - [Example - Request with data](#example---request-with-data)
 - [Example - Adding a loading animation](#example---adding-a-loading-animation)
 - [Example - Using an async function](#example---using-an-async-function)
+- [Passing headers](#passing-headers)
 
 <!-- tocstop -->
 
