@@ -10,6 +10,7 @@ In the same spirit as my [python notes](https://github.com/jessicarush/python-no
 
 Some examples and notes come from the following:
 
+- [Complete React Developer in 2022 (w/ Redux, Hooks, GraphQL)](https://www.udemy.com/course/complete-react-developer-zero-to-mastery/) - *Andrei Neagoie*
 - [The Road to Learn React](https://eloquentjavascript.net) - *Robin Wieruch*  
 - [The Modern React Bootcamp (Hooks, Context,NextJS, Router)](https://www.udemy.com/course/modern-react-bootcamp/) - *Colt Steele*  
 
