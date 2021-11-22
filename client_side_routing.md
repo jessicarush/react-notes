@@ -7,10 +7,31 @@ The main drawback of server-side routing is the time it can take to display cont
 
 Client-side routing simply runs this process in the browser using JavaScript. As the user navigates around the application or website, no full page reloads take place, even when the page's URL changes. Instead, JavaScript is used to update the URL and fetch and display new content.
 
+
+## Table of Contents
+
+<!-- toc -->
+
+- [Pros](#pros)
+- [Cons](#cons)
+- [React Router](#react-router)
+  * [Define Routes](#define-routes)
+  * [404 Equivalent](#404-equivalent)
+  * [Links](#links)
+  * [Passing Props](#passing-props)
+  * [URL Params](#url-params)
+  * [Example: simple form for url params](#example-simple-form-for-url-params)
+  * [Redirects](#redirects)
+  * [Navigate](#navigate)
+  * [Summary notes](#summary-notes)
+
+<!-- tocstop -->
+
 ## Pros
 
 - Because less data is processed, routing between views (pages) is generally faster.
 - Smooth transitions and animations between views are easier to implement.
+
 
 ## Cons
 
@@ -18,6 +39,7 @@ Client-side routing simply runs this process in the browser using JavaScript. As
 - This means there is unnecessary data download time for unused views.
 - It generally requires an external library, which means more code and more dependency on external packages, unlike server-side routing.
 - Client-side routing and rendering converts JavaScript to HTML, making search engine crawling less optimized.
+
 
 ## React Router
 
@@ -33,7 +55,7 @@ npm install react-router-dom
 
 Include and enable the Router in your index.js:
 
-```JavaScript
+```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
@@ -57,11 +79,12 @@ Note there are [other Router types](https://reactrouter.com/docs/en/v6/api) too.
 - `<MemoryRouter>` which stores its locations internally in an array.
 - `<StaticRouter>` is used to render a React Router web app in node.
 
+
 ### Define Routes
 
 Define the routes by mapping URLs to components:
 
-```JavaScript
+```javascript
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import About from './About';
@@ -79,7 +102,7 @@ function App() {
 }
 ```
 
-You can also nest routes inside other routes to display both parent and child. To do this, you need to render an `<Outlet />` in the parent component. The <Outlet /> is like a placeholder or marker for where the child components will be rendered. For example:
+You can also *nest* routes inside other routes to display both parent and child. To do this, you need to render an `<Outlet />` in the parent component. The <Outlet /> is like a placeholder or marker for where the child components will be rendered. For example:
 
 ```javascript
 import React, { Component } from 'react';
@@ -121,6 +144,8 @@ function App() {
   );
 }
 ```
+
+Nested routes build their path by adding to the parent route's path.
 
 Now, when I navigate to */dashboard/messages* I will see both the Dashboard component and
 the DashboardMsg component. Similarly, */dashboard/tasks* will display Dashboard and DashboardTasks.
@@ -167,6 +192,14 @@ function App() {
     </div>
   );
 }
+```
+
+Note that Links are relative so in the DashboardMsg component:
+
+```javascript
+<Link to='.'>current route</Link>
+<Link to='..'>parent route</Link>
+<Link to='../about'>about route</Link>
 ```
 
 A `<NavLink>` is a special kind of <Link> that knows whether or not it's active. By default, an `active` class is added to a` <NavLink>` component when it is active, so all you need to do is create a style for it. For example:
@@ -219,7 +252,7 @@ If you wanted the active links to be different, you can pass a function to class
 
 You will notice that nested components will show the parent component as active too by default. If you don't want this then add the `end` property to the parent:
 
-```JavaScript
+```javascript
 <NavLink
   to="dashboard"
   className={({ isActive }) => isActive ? 'active2' : undefined} end>
@@ -236,8 +269,159 @@ Passing props into a component is easy:
 <Route path="/about" element={<About name="13 Down"/>} />
 ```
 
-
-
 Side note: Looks like React Router has hijacked the natural behaviour of `<a>` elements. If you have a number of them side by side and re-size your browser window, they won't wrap at all like inline elements should, and instead behave as if in a fixed width container. FFS!. Setting `display: inline-block;` puts them back to default.
 
+
 ### URL Params
+
+Route params give us a way to easily pass in properties where we want the property to be part of the URL. For example, we could create routes manually like this:
+
+```javascript
+<Route path="pics/one" element={<Pics id="one" />} />
+<Route path="pics/two" element={<Pics id="two" />} />
+<Route path="pics/three" element={<Pics id="three" />} />
+```
+
+Or we could pass in a URL parameter like this:
+
+```javascript
+<Route path="pics/:picId" element={<Pics />} />
+```
+
+As of react router v6, to access the parameter in the component, we need to use a *react hook*. To use a *hook* you need to be using a functional component rather than a class component. I could not find a way to get the url parameter in a class component in react router v6.
+
+> Route children components must use react hooks to access the route context, i.e. useParams, useLocation, useNavigate, etc... and therefore must be function components.
+
+For functional components we can use `useParams()` hook (introduced in React Router v5, requires also React 16.8 or higher).
+
+```javascript
+import { useParams } from 'react-router-dom';
+
+
+function Pics() {
+  let urlParams = useParams();
+  return (
+    <div className="Pics">
+      <h1>Pics {urlParams.picId}</h1>
+    </div>
+  );
+}
+
+export default Pics;
+```
+
+We can easily work with multiple URL params too:
+
+Or we could pass in a URL parameter like this:
+
+```javascript
+<Route path="pics/:picId/:picName" element={<Pics />} />
+```
+
+```javascript
+import { useParams } from 'react-router-dom';
+
+
+function Pics() {
+  let urlParams = useParams();
+  return (
+    <div className="Pics">
+      <h1>Pics {urlParams.picId}, {urlParams.picName}</h1>
+    </div>
+  );
+}
+
+export default Pics;
+```
+
+If you are looking to have an active link (as described above in Links) for all the urls with a param, you'll need to nest the route. You do not need to add an `<Outlet />` in the component.
+
+```javascript
+<Route path="/pics" element={<Pics />}>
+  <Route path=":picId/:picName" element={<Pics />} />
+</Route>
+```
+
+Note if you try to use `useParams()` outside of  functional component, you will get the following error:
+
+> React Hook "useParams" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function. (react-hooks/rules-of-hooks)
+
+In addition to the `useParams()` hook, there is also `useLocation()` and `useNavigate()`. The `useLocation()` hook will give you the current pathname and `useNavigate()` (introduced in React Router v6, replacing useHistory) allows you to:
+
+- Go to the previous or next pages
+- Redirect user to a specific Url
+
+More on `useNavigate()` below.
+
+
+### Example: simple form for url params
+
+If we wanted to receive input to pass into the URL params above we could simple use a link and form like so:
+
+```javascript
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+
+class PicInput extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {picId: '', picName: ''};
+    this.handleChange = this.handleChange.bind(this);
+  }
+  handleChange(e) {
+    this.setState({[e.target.name]: e.target.value});
+  }
+  render() {
+    return (
+      <div className="PicInput">
+        <h1 className="App-header">Pics input</h1>
+        <input
+          type='text'
+          placeholder='picId'
+          name='picId'
+          value={this.state.picId}
+          onChange={this.handleChange}
+        />
+        <input
+          type='text'
+          placeholder='picName'
+          name='picName'
+          value={this.state.picName}
+          onChange={this.handleChange}
+        />
+        {
+         // Note since <Link to> paths are relative, pics/ is automatically
+         // added to the start as soon as we start typing in the first field
+        }
+        <Link to={`${this.state.picId}/${this.state.picName}`}>Go to pic</Link>
+      </div>
+    );
+  }
+}
+```
+
+
+### Redirects
+
+React router lets us mimic a traditional server-side redirect. Redirects are useful in form handling (Post/Redirect/Get pattern). That being said, React Router appears to have changed its tune somewhat on client-side redirects:
+
+> Handling Redirects in React Router v6
+>
+> Our recommendation for redirecting in React Router v6 really doesn't have much to do with React or React Router at all. It is simply this: if you need to redirect, do it on the server before you render any React and send the right status code. That's it.
+
+With server-side redirects, you get:
+
+- better SEO for redirected URLs and
+- faster responses from your web server
+
+Read more about [react routers redirect recommendations here](https://gist.github.com/mjackson/b5748add2795ce7448a366ae8f8ae3bb).
+
+
+### Navigate
+
+The new `<Navigate>` element in v6 works like a declarative version of the `useNavigate()` hook. It's particularly handy in situations where you need a React element to declare your navigation intent, like `<Route element>`. It also replaces any uses that you had for a `<Redirect>` element in v5 outside of a `<Switch>`.
+
+
+### Summary notes
+
+All `<Route>`s and `<Link>`s inside a `<Routes>` are relative. This leads to leaner and more predictable code in `<Route path>` and `<Link to>`. This means that they automatically build on the parent route's path and URL.
