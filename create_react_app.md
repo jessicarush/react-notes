@@ -12,6 +12,7 @@
 - [Conventions](#conventions)
   * [CSS and image assets](#css-and-image-assets)
 - [Renaming root folder](#renaming-root-folder)
+- [React version](#react-version)
 
 <!-- tocstop -->
 
@@ -231,3 +232,12 @@ class Message extends Component {
 ## Renaming root folder
 
 If you want to rename the apps root folder (i.e. `myapp` from `npx create-react-app my-app`) rather than renaming the folder in your os gui, use the command line `mv my-app new_name`.
+
+
+## React version
+
+Note you can see what React version is installed by looking at the `package.json` or by running the following command:
+
+```
+npm view react version
+```
