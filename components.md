@@ -7,6 +7,7 @@
 - [Introduction](#introduction)
 - [Class-based components](#class-based-components)
 - [Function-based components](#function-based-components)
+- [Class and Functional component templates](#class-and-functional-component-templates)
 - [Nested Components](#nested-components)
 
 <!-- tocstop -->
@@ -87,6 +88,96 @@ function Welcome() {
 
 ReactDOM.render(<Welcome />, document.getElementById('root'));
 ```
+
+## Class and Functional component templates
+
+In these two examples, I want to demonstrate how to access/define the following:
+
+- props  
+- default props
+- state
+
+class:
+
+```javascript
+import React, { Component } from 'react';
+import './Example.css';
+
+
+class Example extends Component {
+  // default props
+  static defaultProps = {
+  };
+  constructor(props) {
+    super(props);
+    // state
+    this.state = {};
+  }
+  render() {
+    // props
+    let name = this.props.name;
+    return (
+      <div className="Example">{name}</div>
+    );
+  }
+}
+
+export default Example;
+```
+
+function:
+
+class:
+
+```javascript
+import './Example.css';
+
+
+function Example(props) {
+  // props
+  let name = props.name;
+  return (
+    <div className="Example">{name}</div>
+  );
+}
+
+export default Example;
+```
+
+Alternatively:
+
+```javascript
+import './Example.css';
+
+
+function Example({name}) {
+  return (
+    <div className="Example">{name}</div>
+  );
+}
+
+export default Example;
+```
+
+To define default props, use ES6 default parameters"
+
+```javascript
+import './Example.css';
+
+
+function Example({name='stranger', color='red'}) {
+  return (
+    <div className="Example">{name} and {color}</div>
+  );
+}
+
+export default Example;
+```
+
+
+TODO: functional component state example (hooks)
+
+
 
 ## Nested Components
 
