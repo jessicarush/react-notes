@@ -219,6 +219,37 @@ class GithubUser extends Component {
 }
 ```
 
+Even better, add try {} and catch {}:
+
+```javascript
+class GithubUser extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {imgUrl: '', name: ''};
+  }
+  async componentDidMount() {
+    const url = `https://api.github.com/users/${this.props.username}`;
+    try {
+      let response = await axios.get(url);
+      // this code won't run until await has finished
+      let data = response.data;
+      this.setState({imgUrl: data.avatar_url, name: data.name});
+    } catch (err) {
+      console.log(`something went wrong: ${err}`);
+    }
+  }
+  render() {
+    return (
+      <div>
+        <h1>Github user info</h1>
+        <img src={this.state.imgUrl} alt={this.state.name} />
+        <p>{this.state.name}</p>
+      </div>
+    );
+  }
+}
+```
+
 ## Passing headers
 
 If you need to pass a header along with your axious request, it would look like this:
