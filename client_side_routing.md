@@ -292,7 +292,7 @@ As of react router v6, to access the parameter in the component, we need to use 
 
 > Route children components must use react hooks to access the route context, i.e. useParams, useLocation, useNavigate, etc... and therefore must be function components.
 
-For functional components we can use `useParams()` hook (introduced in React Router v5, requires also React 16.8 or higher).
+For functional components we can use `useParams()` hook (introduced in React Router v5.1, requires React 16.8 or higher).
 
 ```javascript
 import { useParams } from 'react-router-dom';
@@ -302,7 +302,7 @@ function Pics() {
   let urlParams = useParams();
   return (
     <div className="Pics">
-      <h1>Pics {urlParams.picId}</h1>
+      <h1>Pics { urlParams.picId }</h1>
     </div>
   );
 }
@@ -310,13 +310,13 @@ function Pics() {
 export default Pics;
 ```
 
-We can easily work with multiple URL params too:
-
-Or we could pass in a URL parameter like this:
+We can easily work with multiple URL params too. We could pass in a URL parameter like this:
 
 ```javascript
 <Route path="pics/:picId/:picName" element={<Pics />} />
 ```
+
+An access them like this:
 
 ```javascript
 import { useParams } from 'react-router-dom';
@@ -326,7 +326,25 @@ function Pics() {
   let urlParams = useParams();
   return (
     <div className="Pics">
-      <h1>Pics {urlParams.picId}, {urlParams.picName}</h1>
+      <h1>Pics { urlParams.picId }, { urlParams.picName }</h1>
+    </div>
+  );
+}
+
+export default Pics;
+```
+
+Or you can also do this:
+
+```javascript
+import { useParams } from 'react-router-dom';
+
+
+function Pics() {
+  let { picId, picName } = useParams();
+  return (
+    <div className="Pics">
+      <h1>Pics { picId }, { picName }</h1>
     </div>
   );
 }
@@ -346,10 +364,27 @@ Note if you try to use `useParams()` outside of  functional component, you will 
 
 > React Hook "useParams" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function. (react-hooks/rules-of-hooks)
 
-In addition to the `useParams()` hook, there is also `useLocation()` and `useNavigate()`. The `useLocation()` hook will give you the current pathname and `useNavigate()` (introduced in React Router v6, replacing useHistory) allows you to:
+In addition to the `useParams()` hook, there is also `useLocation()` and `useNavigate()`. The `useLocation()` hook will give you the current pathname and `useNavigate()` (introduced in React Router v6, replacing useHistory) allows you to go previous, next pages or redirect user to a specific url (see below).
 
-- Go to the previous or next pages
-- Redirect user to a specific Url
+```javascript
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
+
+
+function Pics() {
+  let { picId, picName } = useParams();
+  let location = useLocation();
+  let navigate = useNavigate();
+  console.log(location);
+  console.log(navigate);
+  console.log(npicId, picName);
+  return (
+    <div className="Pics">
+    </div>
+  );
+}
+
+export default Pics;
+```
 
 More on `useNavigate()` below.
 
@@ -417,11 +452,103 @@ With server-side redirects, you get:
 Read more about [react routers redirect recommendations here](https://gist.github.com/mjackson/b5748add2795ce7448a366ae8f8ae3bb).
 
 
+### useNavigate, useLocation (formerly withRouter, useHistory)
+
+`useNavigate()` is a new hook introduced in React Router v6. Essentially it allows you to:
+
+- Go to the previous or next pages
+- Redirect the user to a specific Url
+
+`useLocation()` is another hook introduced in the 5.1 release which returns the current location object. It's useful any time you need to know the current URL.
+
+So, this was a bit of a shit show to figure out given the changes in React Router from v4 to v6. But basically, the old method of doing something like this was to use `withRouter`... it gave you access to location, and history props by wrapping a rendered component. It seemed pretty convoluted. In v5.1 `withRouter` was deprecated and replaced with `useHistory()` and `useLocation()`. `useHistory()` was then replaced with `useNavigate()` in v6. Thankfully, `useNavigate()` actually simplifies things but of course these are hooks so you need to be using a functional component instead of a class-based component.
+
+Here's examples of each method for comparison:
+
+#### withRouter (deprecated in v6)
+
+```javascript
+import { withRouter } from 'react-router-dom';
+
+class Example extends React.Component {
+  static propTypes = {
+    match: PropTypes.object.isRequired,
+    location: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired
+  };
+
+  render () {
+    const { match, location, history } = this.props;
+    return <p>You are at { location.pathname }</p>;
+  }
+}
+
+export default withRouter(Example);
+```
+
+#### useHistory (also deprecated in v6)
+
+```javascript
+import { useHistory, useLocation } from "react-router-dom";
+
+function Example() {
+  let history = useHistory();
+  let location = useLocation();
+
+  function handleClick() {
+    history.push('/home');
+  }
+
+  return (
+    <div>
+      <p>You are at { location.pathname }</p>
+      <button onClick={ handleClick }>go home</button>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+#### useNavigate (current in v6)
+
+Redirect user to another page with `navigate('/path')` or to the previous page with `navigate(-1)` or next page with `navigate(1)`:
+
+```javascript
+import { useNavigate, useLocation } from "react-router-dom";
+
+function Example() {
+  let navigate = useNavigate();
+  let location = useLocation();
+
+  function handleClick() {
+    // redirect to a Url
+    navigate('/home');
+    // go to the previous page
+    // navigate(-1);
+    // go to the next page
+    // navigate(1);
+  }
+  return (
+    <div>
+      <p>You are at { location.pathname }</p>
+      <button onClick={ handleClick }>go somewhere</button>
+    </div>
+  );
+}
+
+export default Example;
+```
+
+
 ### Navigate
 
 The new `<Navigate>` element in v6 works like a declarative version of the `useNavigate()` hook. It's particularly handy in situations where you need a React element to declare your navigation intent, like `<Route element>`. It also replaces any uses that you had for a `<Redirect>` element in v5 outside of a `<Switch>`.
 
 
-### Summary notes
+... TODO
+
+
+### Misc notes
 
 All `<Route>`s and `<Link>`s inside a `<Routes>` are relative. This leads to leaner and more predictable code in `<Route path>` and `<Link to>`. This means that they automatically build on the parent route's path and URL.
