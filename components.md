@@ -7,7 +7,9 @@
 - [Introduction](#introduction)
 - [Class-based components](#class-based-components)
 - [Function-based components](#function-based-components)
-- [Class and Functional component templates](#class-and-functional-component-templates)
+- [Class and Functional component examples](#class-and-functional-component-examples)
+  * [class component:](#class-component)
+  * [function component:](#function-component)
 - [Nested Components](#nested-components)
 
 <!-- tocstop -->
@@ -89,7 +91,7 @@ function Welcome() {
 ReactDOM.render(<Welcome />, document.getElementById('root'));
 ```
 
-## Class and Functional component templates
+## Class and Functional component examples
 
 In these two examples, I want to demonstrate how to access/define the following:
 
@@ -97,7 +99,7 @@ In these two examples, I want to demonstrate how to access/define the following:
 - default props
 - state
 
-class:
+### class component:
 
 ```javascript
 import React, { Component } from 'react';
@@ -125,9 +127,9 @@ class Example extends Component {
 export default Example;
 ```
 
-function:
+### function component:
 
-class:
+Let's start with props:
 
 ```javascript
 import './Example.css';
@@ -174,9 +176,38 @@ function Example({name='stranger', color='red'}) {
 export default Example;
 ```
 
+And now state (hooks)...
 
-TODO: functional component state example (hooks)
+```javascript
+import React, { useState } from 'react';
 
+function Example(props) {
+  // Initial state
+  const [name, setName] = useState('');
+  const [count, setCount] = useState(0);
+
+  function updateMyState() {
+    // Update state
+    setName('foo');
+    setCount(1);
+  }
+
+  return (
+    <div className="Example">
+      // Read State
+      <p>{ name }, { count }</p>
+      <button onClick={ updateMyState }>update state</button>
+    </div>
+
+  );
+}
+
+export default Example;
+```
+
+See <https://reactjs.org/docs/hooks-state.html> for a very good comparison between the two.
+
+See [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md) for my notes.
 
 
 ## Nested Components
