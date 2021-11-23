@@ -2,6 +2,10 @@
 
 <https://reactjs.org/docs/react-component.html#setstate>
 
+These notes cover state as used in **class** components. For working with state in **functional components** with *hooks* see: [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md).
+
+Also see <https://reactjs.org/docs/hooks-state.html> for a very good comparison between the two.
+
 ## Table of Contents
 
 <!-- toc -->
