@@ -20,10 +20,15 @@ Client-side routing simply runs this process in the browser using JavaScript. As
   * [Links](#links)
   * [Passing Props](#passing-props)
   * [URL Params](#url-params)
-  * [Example: simple form for url params](#example-simple-form-for-url-params)
   * [Redirects](#redirects)
+  * [useNavigate, useLocation (formerly withRouter, useHistory)](#usenavigate-uselocation-formerly-withrouter-usehistory)
+    + [withRouter (deprecated in v6)](#withrouter-deprecated-in-v6)
+    + [useHistory (also deprecated in v6)](#usehistory-also-deprecated-in-v6)
+    + [useNavigate (current in v6)](#usenavigate-current-in-v6)
+  * [Example 1: pass input values to a link](#example-1-pass-input-values-to-a-link)
+  * [Example 2: use input values to redirect](#example-2-use-input-values-to-redirect)
   * [Navigate](#navigate)
-  * [Summary notes](#summary-notes)
+  * [Misc notes](#misc-notes)
 
 <!-- tocstop -->
 
@@ -389,53 +394,6 @@ export default Pics;
 More on `useNavigate()` below.
 
 
-### Example: simple form for url params
-
-If we wanted to receive input to pass into the URL params above we could simple use a link and form like so:
-
-```javascript
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-
-class PicInput extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {picId: '', picName: ''};
-    this.handleChange = this.handleChange.bind(this);
-  }
-  handleChange(e) {
-    this.setState({[e.target.name]: e.target.value});
-  }
-  render() {
-    return (
-      <div className="PicInput">
-        <h1 className="App-header">Pics input</h1>
-        <input
-          type='text'
-          placeholder='picId'
-          name='picId'
-          value={this.state.picId}
-          onChange={this.handleChange}
-        />
-        <input
-          type='text'
-          placeholder='picName'
-          name='picName'
-          value={this.state.picName}
-          onChange={this.handleChange}
-        />
-        {
-         // Note since <Link to> paths are relative, pics/ is automatically
-         // added to the start as soon as we start typing in the first field
-        }
-        <Link to={`${this.state.picId}/${this.state.picName}`}>Go to pic</Link>
-      </div>
-    );
-  }
-}
-```
-
-
 ### Redirects
 
 React router lets us mimic a traditional server-side redirect. Redirects are useful in form handling (Post/Redirect/Get pattern). That being said, React Router appears to have changed its tune somewhat on client-side redirects:
@@ -538,6 +496,105 @@ function Example() {
 }
 
 export default Example;
+```
+
+
+### Example 1: pass input values to a link
+
+If we wanted to receive input to pass into the URL params above we could simple use a link and form like so:
+
+```javascript
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+
+
+class Pics extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {picId: '', picName: ''};
+    this.handleChange = this.handleChange.bind(this);
+  }
+  handleChange(e) {
+    this.setState({[e.target.name]: e.target.value});
+  }
+  render() {
+    return (
+      <div className="Pics">
+        <h1 className="Pics-header">Pics</h1>
+        <input
+          type='text'
+          placeholder='picId'
+          name='picId'
+          value={this.state.picId}
+          onChange={this.handleChange}
+        />
+        <input
+          type='text'
+          placeholder='picName'
+          name='picName'
+          value={this.state.picName}
+          onChange={this.handleChange}
+        />
+        {
+         // Note since <Link to> paths are relative, pics/ is automatically
+         // added to the start as soon as we start typing in the first field
+        }
+        <Link to={`${this.state.picId}/${this.state.picName}`}>Go to pic</Link>
+      </div>
+    );
+  }
+}
+```
+
+Now I'll rewrite this to use a proper redirect...
+
+
+### Example 2: use input values to redirect
+
+```javascript
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+
+function Pics(props) {
+  let navigate = useNavigate();
+
+  // Initial state
+  const [picId, setPicId] = useState('');
+  const [picName, setPicName] = useState('');
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    // Do Something e.g. save to a database
+    console.log(picId, picName);
+    // Redirect
+    navigate(`/pics/${picId}/${picName}`)
+  }
+
+  return (
+    <div className="Pics">
+      <h1 className="App-header">Pics { picId } { picName }</h1>
+
+      <form onSubmit={ handleSubmit }>
+        <input
+          type='text'
+          placeholder='picId'
+          name='picId'
+          value={ picId }
+          onChange={ e => setPicId(e.target.value) }
+        />
+        <input
+          type='text'
+          placeholder='picName'
+          name='picName'
+          value={ picName }
+          onChange={ e => setPicName(e.target.value) }
+        />
+      <input type="submit" value="Submit" />
+    </form>
+    </div>
+  );
+}
 ```
 
 
