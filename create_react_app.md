@@ -27,18 +27,18 @@ So far though, my biggest complaint/frustration is that the skeleton project cre
 
 You need *node* installed on your local machine (it’s not required on the server) in order to install Create React App. To test that it's installed:
 
-```
+```bash
 node -v
 npm -v
 ```
 
-If you need to install or upgrade node, go to <https://nodejs.org/en/>
+If you need to install or upgrade node, go to <https://nodejs.org/en/> or read some of the [other methods here](https://phoenixnap.com/kb/update-node-js-version).
 
 If you need to install or upgrade npm, run ``npm install -g npm``.
 
 If you have npm 5.2 or higher, the library recommends you use `npx` to do the next steps but you can also use `npm`. See [the docs](https://create-react-app.dev/docs/getting-started) for more information.
 
-```
+```bash
 npx create-react-app my-app
 cd my-app
 npm start
@@ -46,17 +46,19 @@ npm start
 
 When you start the app you should be able to see it running at:
 
-Local:                 http://localhost:3000/  
-On Your Network (eg):  http://10.0.0.2:3000/  
+Local:                 `http://localhost:3000/`  
+On Your Network (eg):  `http://10.0.0.2:3000/`  
 
 The page will automatically reload if you make changes to the code and you will see the build errors and lint warnings in the console.
 
 > Note that this development build is not optimized. To create a production build, use `npm run build`.
 
+
 ## Files & Directories
 
 You'll end up with a structure that looks like this:
-```
+
+```text
 my-app
 ├─ .gitignore
 ├─ package-lock.json
@@ -89,6 +91,7 @@ my-app
 ## Webpack
 
 Create react app is built on top of [webpack](https://webpack.js.org/) which is a JavaScript utility that does a number of things including:
+
 - enables module importing/exporting
 - packages and minifies all the css, js and images for the browser (this reduces the number of http requests for a performance boost).
 - hot reloading (when you change a source file, it automatically reloads in the browser)
@@ -102,6 +105,7 @@ Normally there is a bit of a learning curve for working with webpack. There are 
 Create react app allows the use of ES6 modules see [javascript-notes/modules.md](https://github.com/jessicarush/javascript-notes/blob/master/modules.md). For example:
 
 *extras.js:*
+
 ```javascript
 function doSomething() {
   console.log('Does something');
@@ -111,6 +115,7 @@ export default doSomething;
 ```
 
 *app.js:*
+
 ```javascript
 import doSomething from './extras';
 
@@ -120,6 +125,7 @@ doSomething();
 You can also export multiple specific variables:
 
 *extras.js:*
+
 ```javascript
 function doSomething() {
   console.log('Does something');
@@ -137,6 +143,7 @@ export { doSomething, doOther, doAnother };
 ```
 
 *app.js:*
+
 ```javascript
 import { doSomething, doAnother } from './extras';
 
@@ -147,6 +154,7 @@ doAnother();
 Note, you can also mix the two:
 
 *extras.js:*
+
 ```javascript
 function doSomething() {
   console.log('Does something');
@@ -165,6 +173,7 @@ export { doOther, doAnother };
 ```
 
 *app.js:*
+
 ```javascript
 import doSomething, { doAnother } from './extras';
 
@@ -189,6 +198,7 @@ Note that in the `... from './extras'`, the `./` indicates that the module is lo
 As mentioned above, css should be component-specific and saved with the same name as the component in the `src` directory. In the component file, you then import the css like it was a module. for example:
 
 *Message.js:*
+
 ```javascript
 import React, { Component } from 'react';
 import `./Message.css`;
@@ -238,6 +248,22 @@ If you want to rename the apps root folder (i.e. `myapp` from `npx create-react-
 
 Note you can see what React version is installed by looking at the `package.json` or by running the following command:
 
-```
+```bash
 npm view react version
 ```
+
+
+## React scripts
+
+Create-react-app installs the following scripts:
+
+```json
+"scripts": {
+  "start": "react-scripts start",
+  "build": "react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject"
+}
+```
+
+This allows us to run `npm start` for running the app during development, `npm build` for creating the optimized build version, `npm test` for running tests in `App.test.js` and `npm eject` is an advanced operation that allows you to customize the configuration under Create-react-app (e.g. webpack and babel).
