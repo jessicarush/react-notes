@@ -13,6 +13,7 @@
   * [CSS and image assets](#css-and-image-assets)
 - [Renaming root folder](#renaming-root-folder)
 - [React version](#react-version)
+- [React scripts](#react-scripts)
 
 <!-- tocstop -->
 
