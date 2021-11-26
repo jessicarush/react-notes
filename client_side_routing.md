@@ -435,9 +435,18 @@ class Example extends React.Component {
     history: PropTypes.object.isRequired
   };
 
-  render () {
+  handleClick() {
+    this.props.history.push('/home');
+  }
+
+  render() {
     const { match, location, history } = this.props;
-    return <p>You are at { location.pathname }</p>;
+    return (
+      <div>
+        <p>You are at { location.pathname }</p>
+        <button onClick={ handleClick }>go home</button>
+      </div>
+    );
   }
 }
 
