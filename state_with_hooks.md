@@ -136,4 +136,69 @@ input
 ```
 
 
-## ...
+## Filtering Example
+
+This example comes from [Dimitri](https://dmitripavlutin.com/controlled-inputs-using-react-hooks/), who seems like a pretty cool guy. It uses a state value in a `filter()`. As a result, whenever the state value changes, the `filter)` result get updated.
+
+For example in *App.js*:
+
+```javascript
+import FilterStudents from './FilterStudents';
+import './App.css';
+
+function App() {
+  const students = [
+    "Jennifer Pantano",
+    "Glen Legaspi",
+    "Meagan Whiteman",
+    "Matthew King",
+    "Cynthia Thomas",
+    "Ray Schaefer",
+    "Marco Rucker",
+    "Tim Howard",
+    "Rosalyn Tyson"
+  ];
+  return (
+    <div className="App">
+      <h1 className="App-header">Filter demo</h1>
+      <FilterStudents students={ students } />
+    </div>
+  );
+}
+
+export default App;
+```
+
+Then in *FilterStudents.js*
+
+```javascript
+import React, { useState } from 'react';
+// import './FilterStudents.css';
+
+
+function FilterStudents(props) {
+  const [query, setQuery] = useState('');
+  const updateQuery = e => setQuery(e.target.value);
+
+  const filteredStudents = props.students.filter(name => {
+    return name.toLowerCase().includes(query.toLowerCase());
+  });
+
+  return (
+    <div className="FilterStudents">
+      <input
+        type="text"
+        value={ query }
+        onChange={ updateQuery }
+      />
+      <h2>Student list</h2>
+      <div className="FilterStudents-list">
+        { filteredStudents.map(name => <div>{ name }</div>) }
+      </div>
+
+    </div>
+  );
+}
+
+export default FilterStudents;
+```
