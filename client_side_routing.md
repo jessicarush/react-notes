@@ -100,7 +100,7 @@ function App() {
     <div className="App">
       <h1 className="App-header">React Router demo</h1>
       <Routes>
-        <Route path="/about" element={<About />} />
+        <Route path="/" element={<Home />} />
       </Routes>
     </div>
   );
@@ -199,7 +199,7 @@ function App() {
 }
 ```
 
-Note that Links are relative so in the DashboardMsg component:
+Note that Links are relative so from the DashboardMsg component:
 
 ```javascript
 <Link to='.'>current route</Link>
@@ -207,7 +207,7 @@ Note that Links are relative so in the DashboardMsg component:
 <Link to='../about'>about route</Link>
 ```
 
-A `<NavLink>` is a special kind of <Link> that knows whether or not it's active. By default, an `active` class is added to a` <NavLink>` component when it is active, so all you need to do is create a style for it. For example:
+A `<NavLink>` is a special kind of <Link> that knows whether or not it's active. By default, an `active` class is added to a `<NavLink>` component when it is active, so all you need to do is create a style for it. For example:
 
 ```css
 .App-nav a.active {
@@ -216,7 +216,7 @@ A `<NavLink>` is a special kind of <Link> that knows whether or not it's active.
 ```
 
 ```javascript
-import { Route, Routes, Link, NavLink } from 'react-router-dom';
+import { Route, Routes, NavLink } from 'react-router-dom';
 
 // ...
 
@@ -274,7 +274,7 @@ Passing props into a component is easy:
 <Route path="/about" element={<About name="13 Down"/>} />
 ```
 
-Side note: Looks like React Router has hijacked the natural behaviour of `<a>` elements. If you have a number of them side by side and re-size your browser window, they won't wrap at all like inline elements should, and instead behave as if in a fixed width container. FFS!. Setting `display: inline-block;` puts them back to default.
+Side note: Looks like React Router has hijacked the natural behaviour of `<a>` elements. If you have a number of them side by side and re-size your browser window, they won't wrap at all like inline elements should, and instead behave as if in a fixed width container. FFS! Setting `display: inline-block;` puts them back to default.
 
 
 ### URL Params
@@ -369,7 +369,7 @@ Note if you try to use `useParams()` outside of  functional component, you will 
 
 > React Hook "useParams" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function. (react-hooks/rules-of-hooks)
 
-In addition to the `useParams()` hook, there is also `useLocation()` and `useNavigate()`. The `useLocation()` hook will give you the current pathname and `useNavigate()` (introduced in React Router v6, replacing useHistory) allows you to go previous, next pages or redirect user to a specific url (see below).
+In addition to the `useParams()` hook, there is also `useLocation()` and `useNavigate()`. The `useLocation()` hook will give you the current pathname and `useNavigate()` (introduced in React Router v6, replacing useHistory) allows you to go previous, next pages or redirect user to a specific url.
 
 ```javascript
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
@@ -381,7 +381,7 @@ function Pics() {
   let navigate = useNavigate();
   console.log(location);
   console.log(navigate);
-  console.log(npicId, picName);
+  console.log(picId, picName);
   return (
     <div className="Pics">
     </div>
@@ -391,7 +391,7 @@ function Pics() {
 export default Pics;
 ```
 
-More on `useNavigate()` below.
+For more on these, see below.
 
 
 ### Redirects
@@ -606,13 +606,20 @@ function Pics(props) {
 }
 ```
 
+### Example 3: passing data to /:pattern routes
+
+
+
+### useMatch
+
+
 
 ### Navigate
 
 The new `<Navigate>` element in v6 works like a declarative version of the `useNavigate()` hook. It's particularly handy in situations where you need a React element to declare your navigation intent, like `<Route element>`. It also replaces any uses that you had for a `<Redirect>` element in v5 outside of a `<Switch>`.
 
 
-... TODO
+TODO ...
 
 
 ### Misc notes
