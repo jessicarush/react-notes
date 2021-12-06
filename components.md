@@ -91,15 +91,16 @@ function Welcome() {
 ReactDOM.render(<Welcome />, document.getElementById('root'));
 ```
 
-## Class and Functional component examples
+## Class and Functional component comparison
 
 In these two examples, I want to demonstrate how to access/define the following:
 
 - props  
 - default props
 - state
+- lifecycle methods
 
-### class component:
+### class component
 
 ```javascript
 import React, { Component } from 'react';
@@ -115,6 +116,9 @@ class Example extends Component {
     // state
     this.state = {};
   }
+  // lifecycle method
+  componentDidMount() {
+  }
   render() {
     // props
     let name = this.props.name;
@@ -127,9 +131,9 @@ class Example extends Component {
 export default Example;
 ```
 
-### function component:
+### function component
 
-Let's start with props:
+Let's start with *props*:
 
 ```javascript
 import './Example.css';
@@ -161,12 +165,12 @@ function Example({name}) {
 export default Example;
 ```
 
-To define default props, use ES6 default parameters"
+Therefor, to define *default props*, use ES6 default parameters:
 
 ```javascript
 import './Example.css';
 
-
+// default props
 function Example({name='stranger', color='red'}) {
   return (
     <div className="Example">{name} and {color}</div>
@@ -176,7 +180,7 @@ function Example({name='stranger', color='red'}) {
 export default Example;
 ```
 
-And now state (hooks)...
+Use the `useState()` hooks for storing *state* in a function component:
 
 ```javascript
 import React, { useState } from 'react';
@@ -209,6 +213,10 @@ See <https://reactjs.org/docs/hooks-state.html> for a very good comparison betwe
 
 See [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md) for my notes.
 
+The `useEffect()` hook can be used to replicate lifecycle behavior:
+
+TODO ...
+
 
 ## Nested Components
 
@@ -224,7 +232,7 @@ render() {
   );
 ```
 
-The benefit of using an opening and closing tag is you can next any additional content between those tags and have them render inside that component. For example:
+The benefit of using an opening and closing tag is you can nest any additional content between those tags and have them render inside that component. For example:
 
 ```JavaScript
 render() {

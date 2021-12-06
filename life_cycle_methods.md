@@ -61,7 +61,7 @@ class Test extends React.Component {
 
 The `getDerivedStateFromProps()` method is called right before rendering the element(s) in the DOM. This is the natural place to set the state object based on the initial props. It takes state as an argument, and returns an object with changes to the state.
 
-> This method exists for rare use cases where the state depends on changes in props over time. For example, it might be handy for implementing a <Transition> component that compares its previous and next children to decide which of them to animate in and out.
+> This method exists for rare use cases where the state depends on changes in props over time. For example, it might be handy for implementing a `<Transition>` component that compares its previous and next children to decide which of them to animate in and out.
 
 The example below starts with the color being "red", but the `getDerivedStateFromProps()` method updates the  color based on the `favcol` attribute:
 
@@ -264,6 +264,7 @@ React has only one built-in method that gets called when a component is unmounte
 The `componentWillUnmount()` method is called when the component is about to be removed from the DOM. This is a good place to perform *cleanup* actions such as invalidating timers, canceling network requests, or cleaning up any subscriptions that were created in `componentDidMount()`.
 
 *Parent component*
+
 ```javascript
 class Test extends Component {
   constructor(props) {
@@ -289,6 +290,7 @@ class Test extends Component {
 ```
 
 *Child component*
+
 ```javascript
 class Child extends Component {
   componentWillUnmount() {
@@ -301,3 +303,10 @@ class Child extends Component {
   }
 }
 ```
+
+
+## Lifecycle methods in Function Components
+
+In functional components, the `useEffect()` hook can be used to replicate lifecycle behavior.
+
+TODO ...
