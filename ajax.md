@@ -17,11 +17,11 @@
 
 If you want to fetch data with an Ajax request, it is **always recommended that you do this in the `componentDidMount()` method** as opposed to the `constructor()`. In addition, you should also always avoid setting state in the constructor.
 
-[Axios](https://github.com/axios/axios) is a promise-based HTTP client that works both in the browser and in a node. js environment. It basically provides a single API for dealing with *XMLHttpRequests* and node's http interface. Besides that, it wraps the requests using a polyfill for ES6's new promise syntax.
+[Axios](https://github.com/axios/axios) is a promise-based HTTP client that works both in the browser and in a node js environment. It basically provides a single API for dealing with *XMLHttpRequests* and node's http interface. Besides that, it wraps the requests using a polyfill for ES6's new promise syntax.
 
 To use Axios, you'll need to install it:
 
-```
+```bash
 npm install axios
 ```
 
@@ -69,7 +69,8 @@ class Test extends Component {
 ```
 
 The response keys:
-```
+
+```bash
 [ "data", "status", "statusText", "headers", "config", "request" ]
 ```
 
@@ -252,7 +253,7 @@ class GithubUser extends Component {
 
 ## Passing headers
 
-If you need to pass a header along with your axious request, it would look like this:
+If you need to pass a header along with your axios request, it would look like this:
 
 ```javascript
 async componentDidMount() {

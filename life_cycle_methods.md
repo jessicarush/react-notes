@@ -18,6 +18,7 @@
   * [componentDidUpdate](#componentdidupdate)
 - [Unmounting](#unmounting)
   * [componentWillUnmount](#componentwillunmount)
+- [Lifecycle methods in Function Components](#lifecycle-methods-in-function-components)
 
 <!-- tocstop -->
 

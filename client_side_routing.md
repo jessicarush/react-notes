@@ -27,6 +27,8 @@ Client-side routing simply runs this process in the browser using JavaScript. As
     + [useNavigate (current in v6)](#usenavigate-current-in-v6)
   * [Example 1: pass input values to a link](#example-1-pass-input-values-to-a-link)
   * [Example 2: use input values to redirect](#example-2-use-input-values-to-redirect)
+  * [Example 3: passing data to /:pattern routes](#example-3-passing-data-to-pattern-routes)
+  * [useMatch](#usematch)
   * [Navigate](#navigate)
   * [Misc notes](#misc-notes)
 
@@ -54,7 +56,7 @@ True client-side routing handles mapping between the URL and content the user is
 
 There are many [routing tools](https://github.com/markerikson/react-redux-links/blob/master/react-routing.md) available. [React Router](https://reactrouter.com/docs/en/v6) is one of them. To install:
 
-```
+```bash
 npm install react-router-dom
 ```
 
@@ -107,7 +109,7 @@ function App() {
 }
 ```
 
-You can also *nest* routes inside other routes to display both parent and child. To do this, you need to render an `<Outlet />` in the parent component. The <Outlet /> is like a placeholder or marker for where the child components will be rendered. For example:
+You can also *nest* routes inside other routes to display both parent and child. To do this, you need to render an `<Outlet />` in the parent component. The `<Outlet />` is like a placeholder or marker for where the child components will be rendered. For example:
 
 ```javascript
 import React, { Component } from 'react';
@@ -207,7 +209,7 @@ Note that Links are relative so from the DashboardMsg component:
 <Link to='../about'>about route</Link>
 ```
 
-A `<NavLink>` is a special kind of <Link> that knows whether or not it's active. By default, an `active` class is added to a `<NavLink>` component when it is active, so all you need to do is create a style for it. For example:
+A `<NavLink>` is a special kind of `<Link>` that knows whether or not it's active. By default, an `active` class is added to a `<NavLink>` component when it is active, so all you need to do is create a style for it. For example:
 
 ```css
 .App-nav a.active {
@@ -609,15 +611,12 @@ function Pics(props) {
 ### Example 3: passing data to /:pattern routes
 
 
-
 ### useMatch
-
 
 
 ### Navigate
 
 The new `<Navigate>` element in v6 works like a declarative version of the `useNavigate()` hook. It's particularly handy in situations where you need a React element to declare your navigation intent, like `<Route element>`. It also replaces any uses that you had for a `<Redirect>` element in v5 outside of a `<Switch>`.
-
 
 TODO ...
 

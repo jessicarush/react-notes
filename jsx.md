@@ -43,6 +43,7 @@ For example, this JSX:
 ```
 
 compiles into this javascript:
+
 ```javascript
 React.createElement('div', {className: 'sidebar'}, 'Hello');
 ```
@@ -269,10 +270,9 @@ The reason for this is...
 > Keys help React identify which items have changed, are added, or are removed. Keys should be given to the elements inside the array to give the elements a stable identity
 
 Using the example above, the solution is:
+
 ```javascript
-// ...
-        { msgs.map(m => <li key={m.id}>{m.text}</li>) }
-// ...
+{ msgs.map(m => <li key={m.id}>{m.text}</li>) }
 ```
 
 Note that this seems to happen as a result of using `map()`. In the following example I received the same warning:
@@ -380,6 +380,7 @@ class TestComponent extends Component {
 ```
 
 Alternatively:
+
 ```javascript
 class TestComponent extends Component {
   constructor(props) {

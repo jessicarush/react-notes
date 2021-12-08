@@ -1,4 +1,4 @@
-# React State with hooks
+# State with hooks
 
 <https://reactjs.org/docs/hooks-state.html>
 
@@ -11,7 +11,7 @@
 - [Read state](#read-state)
 - [Update state](#update-state)
 - [Form handling (controlled inputs)](#form-handling-controlled-inputs)
-- [...](#)
+- [Filtering Example](#filtering-example)
 
 <!-- tocstop -->
 
@@ -21,7 +21,7 @@ These notes for working with state in functional components using hooks, follow 
 
 ## Set initial state
 
-In functional components, you set the initial state of each item using `useSate()`.
+In functional components, you set the initial state of each item using `useSate()` (the *only* argument to `useState` is the initial state). The `useState` hook returns a pair: the current state value and a function that lets you update it.
 
 ```javascript
 import React, { useState } from 'react';
@@ -59,7 +59,7 @@ function Example(props) {
 
 ## Update state
 
-To update the state, use the function assigned from `useState()`:
+To update the state, use the function assigned from `useState()`. You can call this function from an event handler or somewhere else. It’s similar to `this.setState` in a class, except it doesn’t merge the old and new state together.
 
 ```javascript
 import React, { useState } from 'react';
@@ -72,7 +72,7 @@ function Example(props) {
   function updateMyState() {
     // Update state
     setName('Bob');
-    setCount(1);
+    setCount(count + 1);
   }
 
   return (

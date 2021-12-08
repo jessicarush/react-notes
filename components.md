@@ -7,9 +7,9 @@
 - [Introduction](#introduction)
 - [Class-based components](#class-based-components)
 - [Function-based components](#function-based-components)
-- [Class and Functional component examples](#class-and-functional-component-examples)
-  * [class component:](#class-component)
-  * [function component:](#function-component)
+- [Class and Functional component comparison](#class-and-functional-component-comparison)
+  * [class component](#class-component)
+  * [function component](#function-component)
 - [Nested Components](#nested-components)
 
 <!-- tocstop -->
