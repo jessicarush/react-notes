@@ -8,6 +8,7 @@
 - [Props are Immutable](#props-are-immutable)
 - [Props can be many types of data](#props-can-be-many-types-of-data)
 - [Default properties](#default-properties)
+- [Passing object as props with `...`](#passing-object-as-props-with-)
 
 <!-- tocstop -->
 
@@ -161,4 +162,26 @@ class App extends React.Component {
 }
 
 ReactDOM.render(<App/>, document.getElementById('root'));
+```
+
+## Passing object as props with `...`
+
+Note if you have an object like:
+
+```javascript
+let palette = {
+  paletteName: "Material UI Colors",
+  id: "material-ui-colors",
+  colors: [
+    { name: "red", color: "#F44336" },
+    { name: "pink", color: "#E91E63" },
+    { name: "purple", color: "#9C27B0" },
+  ]
+};
+```
+
+You can pass it in as individual properties like:
+
+```javascript
+<Palette {...palette} />
 ```
