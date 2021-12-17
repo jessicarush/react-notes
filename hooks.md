@@ -10,6 +10,10 @@
 
 <!-- toc -->
 
+- [Introduction](#introduction)
+- [Rules](#rules)
+
+<!-- tocstop -->
 
 ## Introduction
 
