@@ -19,6 +19,7 @@
 
 These notes for working with state in functional components using hooks, follow the notes in [state.md](https://github.com/jessicarush/react-notes/blob/master/state.md). As such, I'll skip the explanations of what state is and instead focus on how to do the same things with functions and hooks.
 
+
 ## Set initial state
 
 In functional components, you set the initial state of each item using `useSate()` (the *only* argument to `useState` is the initial state). The `useState` hook returns a pair: the current state value and a function that lets you update it.
@@ -36,6 +37,7 @@ function Example(props) {
   );
 }
 ```
+
 
 ## Read state
 
@@ -85,7 +87,6 @@ function Example(props) {
 
 
 ## Form handling (controlled inputs)
-
 
 To create controlled form elements:
 
