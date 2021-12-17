@@ -8,6 +8,7 @@
 - [Controlled Components](#controlled-components)
 - [Multiple form elements](#multiple-form-elements)
 - [Passing form data up](#passing-form-data-up)
+- [Controlled Components in Function Components](#controlled-components-in-function-components)
 
 <!-- tocstop -->
 
@@ -19,9 +20,11 @@
 
 When working with form elements we can create a function that both handles the form's submit and has access to the data entered. Unlike typical html form elements, React is aware anytime these elements are changed: the state will be updated. Components that are handled like this are referred to as controlled components.
 
+
 ## Controlled Components
 
 To create basic controlled components:
+
 - create a state property in the component for the form element
 - set the value on the form element to that state property in the component
 - create a callback to handle `onChange` that will update the state and thus constantly display the new value
@@ -145,11 +148,13 @@ class FormComponent extends Component {
 }
 ```
 
+
 ## Passing form data up
 
 This example is similar to what's shown in [state.md](state.md#state-design).
 
 Parent component:
+
 ```javascript
 class ParentComponent extends Component {
   constructor(props) {
@@ -190,6 +195,7 @@ class ParentComponent extends Component {
 ```
 
 Child component:
+
 ```javascript
 class ChildComponent extends Component {
   constructor(props) {
@@ -234,3 +240,8 @@ class ChildComponent extends Component {
   }
 }
 ```
+
+
+## Controlled Components in Function Components
+
+See [state_with_hooks.md](state_with_hooks.md).
