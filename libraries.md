@@ -11,13 +11,16 @@ A list of react packages/libraries that I've used.
 - [uuid](#uuid)
 - [react-router-dom](#react-router-dom)
 - [Material UI](#material-ui)
-- [chroma.ja](#chromaja)
+- [chroma.js](#chromajs)
 - [React sortable](#react-sortable)
 - [dnd-kit](#dnd-kit)
 - [react-copy-to-clipboard](#react-copy-to-clipboard)
 - [react-form-validator-core](#react-form-validator-core)
 - [react-transition-group](#react-transition-group)
 - [react-jss](#react-jss)
+- [rc-slider](#rc-slider)
+- [Bootstrap](#bootstrap)
+  * [reactstrap](#reactstrap)
 
 <!-- tocstop -->
 
@@ -82,10 +85,18 @@ See: [client_side_routing.md](client_side_routing.md)
 
 ## Material UI
 
-[Material UI](https://mui.com)
+[Material UI](https://mui.com) is a library that allows you to import and use customizable, [pre-built components]((https://mui.com/components/)) in React applications.
 
 ```bash
-npm install
+npm install @mui/material @emotion/react @emotion/styled
+```
+
+Note there are additional installs for working with their svg icons. They also want you to use Roboto and link to their icon font at google fonts.
+
+They also recommend adding the following meta tag for responsive viewport sizing. Note that if using `create-react-app`, this will already be done.
+
+```html
+<meta name="viewport" content="initial-scale=1, width=device-width" />
 ```
 
 Example:
@@ -106,6 +117,11 @@ Example:
 
 ```javascript
 import chroma from 'chroma-js';
+
+let hexColor = '#eb3d30';
+const darkerColor = chroma(hexColor).darken(1.75).hex();  // a30000
+const rgb = chroma(hexValue).rgb();  // [235, 61, 48]
+const css = chroma(hexValue).css();  // rgb(235,61,48)
 ```
 
 
@@ -227,3 +243,61 @@ Example:
 ```javascript
 ```
 
+## rc-slider
+
+- [rc-slider](https://github.com/react-component/slider)
+
+```bash
+npm install rc-slider
+```
+
+Example:
+
+```javascript
+import Slider, { Range } from 'rc-slider';
+import 'rc-slider/assets/index.css';
+
+function Demo(props) {
+
+  return (
+    <div>
+      <Slider />
+      <Range />
+    </div>
+  )
+}
+```
+
+*Caution*: It looks like this package is not being maintained. There is a deprecation warning that comes up in the console regarding `findDOMNode is deprecated in StrictMode`. No movement on this open issue <https://github.com/react-component/slider/issues/613>. Also, it is very poorly documented.
+
+
+## Bootstrap
+
+<https://getbootstrap.com/docs/5.1/getting-started/introduction/>
+
+Install bootstrap:
+
+```bash
+npm install bootstrap
+```
+
+Import bootstrap scripts and css in your *index.js:*
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './index.css';
+import App from './App';
+// ...
+```
+
+Then find the components or systems you want to use. If doing a copy/paste, be sure to change all instances of `class` to `className` and `for` to `htmlFor` and close any non-wrapping tags like `<input />` and `<hr />`.
+
+For example: see their [instructions for working with CSS grid here](https://getbootstrap.com/docs/5.1/layout/grid/).
+
+
+### reactstrap
+
+The [reactstrap](https://reactstrap.github.io/) library basically lets you import pre-made react components that are styled with bootstrap.
