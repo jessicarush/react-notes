@@ -20,6 +20,8 @@ Client-side routing simply runs this process in the browser using JavaScript. As
   * [Links](#links)
   * [Passing Props](#passing-props)
   * [URL Params](#url-params)
+    + [Conditional content from URL params](#conditional-content-from-url-params)
+    + [Active Links with URL Params](#active-links-with-url-params)
   * [Redirects](#redirects)
   * [useNavigate, useLocation (formerly withRouter, useHistory)](#usenavigate-uselocation-formerly-withrouter-usehistory)
     + [withRouter (deprecated in v6)](#withrouter-deprecated-in-v6)
@@ -323,7 +325,7 @@ We can easily work with multiple URL params too. We could pass in a URL paramete
 <Route path="pics/:picId/:picName" element={<Pics />} />
 ```
 
-An access them like this:
+And access them like this:
 
 ```javascript
 import { useParams } from 'react-router-dom';
@@ -359,14 +361,6 @@ function Pics() {
 export default Pics;
 ```
 
-If you are looking to have an active link (as described above in Links) for all the urls with a param, you'll need to nest the route. You do not need to add an `<Outlet />` in the component.
-
-```javascript
-<Route path="/pics" element={<Pics />}>
-  <Route path=":picId/:picName" element={<Pics />} />
-</Route>
-```
-
 Note if you try to use `useParams()` outside of  functional component, you will get the following error:
 
 > React Hook "useParams" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function. (react-hooks/rules-of-hooks)
@@ -393,7 +387,73 @@ function Pics() {
 export default Pics;
 ```
 
-For more on these, see below.
+For more on these, see further below.
+
+#### Conditional content from URL params
+
+If we're showing content based on a URL param, we need a way to handle situations where the thing is not found. Since there are almost no examples of how to handle this in the [React Router docs](https://reactrouter.com/docs/en/v6/getting-started/overview#reading-url-parameters), the best I can come up with are these two similar approaches... but I'm not sure this is the best solution.
+
+1. conditionally return component content or something else:
+
+```javascript
+import { useParams } from "react-router-dom";
+import { getPic } from "./data";
+import NotFound from "./NotFound";
+
+function Pics(props) {
+  let params = useParams();
+  let pic = getPic(params.id);
+
+  if (pic) {
+    return (
+      <div className="Pics">
+        {/* Component Stuff */}
+      </div>
+    );
+  } else {
+    return <NotFound />;
+  }
+}
+
+export default Pics;
+```
+
+2. conditionally assign the returned value (helpful for if you need to do additional work with the data retrieved using the param):
+
+```javascript
+import { useParams } from "react-router-dom";
+import { getPic } from "./data";
+import NotFound from "./NotFound";
+
+function Pics(props) {
+  let params = useParams();
+  let pic = getPic(params.id);
+  let renderElements;
+
+  if (pic) {
+    {/* Do some stuff with pic */}
+    renderElements = (
+      <div className="Pics">
+        {/* Component Stuff */}
+      </div>
+    );
+  }
+
+  return renderElements || <NotFound />;
+}
+
+export default Pics;
+```
+
+#### Active Links with URL Params
+
+If you are looking to have an active link (as described above in Links) for all the urls with a param, you'll need to nest the route. You do not need to add an `<Outlet />` in the component.
+
+```javascript
+<Route path="/pics" element={<Pics />}>
+  <Route path=":picId/:picName" element={<Pics />} />
+</Route>
+```
 
 
 ### Redirects
@@ -612,6 +672,15 @@ function Pics(props) {
 
 
 ### useMatch
+
+TODO...
+
+```javascript
+let match = useMatch('/palette/:id');
+  if (match) {
+    console.log(match.params);
+  }
+```
 
 
 ### Navigate
