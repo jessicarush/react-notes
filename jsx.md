@@ -18,6 +18,7 @@
   * [uuid](#uuid)
 - [Breaking code into chunks](#breaking-code-into-chunks)
 - [Conditionally render content](#conditionally-render-content)
+- [React Fragments](#react-fragments)
 
 <!-- tocstop -->
 
@@ -451,3 +452,78 @@ render() {
   return result;
 }
 ```
+
+
+## React Fragments
+
+A common pattern in React is to return multiple elements. As we know, multiple elements must be wrapped in a single element. Usually, you will have something that makes sense (e.g. `<div>`), but other times you may not want an element to be rendered. For these situations you can use `<React.Fragment>` which will not render anything in the DOM. For example:
+
+```javascript
+class Table extends React.Component {
+  render() {
+    return (
+      <table>
+        <tr>
+          <Columns />
+        </tr>
+      </table>
+    );
+  }
+}
+```
+
+In this case if we wrap the `<td>` elements in anything, we'll get invalid HTML rendered in the DOM.
+
+```javascript
+class Columns extends React.Component {
+  render() {
+    return (
+      <div>
+        <td>Hello</td>
+        <td>World</td>
+      </div>
+    );
+  }
+}
+```
+
+The above would result in:
+
+```html
+<table>
+  <tr>
+    <div>
+      <td>Hello</td>
+      <td>World</td>
+    </div>
+  </tr>
+</table>
+```
+
+This is were `<React.Fragment>` is useful:
+
+```javascript
+class Columns extends React.Component {
+  render() {
+    return (
+      <React.Fragment>
+        <td>Hello</td>
+        <td>World</td>
+      </React.Fragment>
+    );
+  }
+}
+```
+
+Gives us what we want:
+
+```html
+<table>
+  <tr>
+    <td>Hello</td>
+    <td>World</td>
+  </tr>
+</table>
+```
+
+
