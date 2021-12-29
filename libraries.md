@@ -89,6 +89,7 @@ See: [client_side_routing.md](client_side_routing.md)
 
 ```bash
 npm install @mui/material @emotion/react @emotion/styled
+npm install @mui/icons-material
 ```
 
 Note there are additional installs for working with their svg icons. They also want you to use Roboto and link to their icon font at google fonts.
@@ -99,10 +100,7 @@ They also recommend adding the following meta tag for responsive viewport sizing
 <meta name="viewport" content="initial-scale=1, width=device-width" />
 ```
 
-Example:
-
-```javascript
-```
+Some components are very simple (e.g. Button) and others are a little more involved in that they're modular and will require event handlers. These are pretty well documented though. Use both the *Components* and *Component API* sections. The first shows the examples and code, the second explains all the properties.
 
 
 ## chroma.js
