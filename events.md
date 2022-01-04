@@ -10,6 +10,7 @@
 - [this binding](#this-binding)
 - [Passing arguments to handlers](#passing-arguments-to-handlers)
 - [Naming event handlers](#naming-event-handlers)
+- [stopPropagation](#stoppropagation)
 
 <!-- tocstop -->
 
@@ -25,116 +26,116 @@ In React, every JSX element has built-in attributes representing every kind of b
 
 Any event that can be used in JavaScript exists in React. [See here for the complete list of supported events and related properties](https://reactjs.org/docs/events.html#supported-events).
 
-**Clipboard Events**  
-onCopy  
-onCut  
-onPaste  
+**Clipboard Events**
+onCopy
+onCut
+onPaste
 
-**Composition Events**  
-onCompositionEnd  
-onCompositionStart  
-onCompositionUpdate  
+**Composition Events**
+onCompositionEnd
+onCompositionStart
+onCompositionUpdate
 
-**Keyboard Events**  
-onKeyDown  
-onKeyPress  
-onKeyUp  
+**Keyboard Events**
+onKeyDown
+onKeyPress
+onKeyUp
 
-**Focus Events**  
-onFocus  
-onBlur  
+**Focus Events**
+onFocus
+onBlur
 
-**Form Events**  
-onChange  
-onInput  
-onInvalid  
-onSubmit  
+**Form Events**
+onChange
+onInput
+onInvalid
+onSubmit
 
-**Mouse Events**  
-onClick  
-onContextMenu  
-onDoubleClick  
-onDrag  
-onDragEnd  
-onDragEnter  
-onDragExit  
-onDragLeave  
-onDragOver  
-onDragStart  
-onDrop  
-onMouseDown  
-onMouseEnter  
-onMouseLeave  
-onMouseMove  
-onMouseOut  
-onMouseOver  
-onMouseUp  
+**Mouse Events**
+onClick
+onContextMenu
+onDoubleClick
+onDrag
+onDragEnd
+onDragEnter
+onDragExit
+onDragLeave
+onDragOver
+onDragStart
+onDrop
+onMouseDown
+onMouseEnter
+onMouseLeave
+onMouseMove
+onMouseOut
+onMouseOver
+onMouseUp
 
-**Pointer Events**  
-onPointerDown  
-onPointerMove  
-onPointerUp  
-onPointerCancel  
-onGotPointerCapture  
-onLostPointerCapture  
-onPointerEnter  
-onPointerLeave  
-onPointerOver  
-onPointerOut  
+**Pointer Events**
+onPointerDown
+onPointerMove
+onPointerUp
+onPointerCancel
+onGotPointerCapture
+onLostPointerCapture
+onPointerEnter
+onPointerLeave
+onPointerOver
+onPointerOut
 
-**Selection Events**  
-onSelect  
+**Selection Events**
+onSelect
 
-**Touch Events**  
-onTouchCancel  
-onTouchEnd  
-onTouchMove  
-onTouchStart  
+**Touch Events**
+onTouchCancel
+onTouchEnd
+onTouchMove
+onTouchStart
 
-**UI Events**  
-onScroll  
+**UI Events**
+onScroll
 
-**Wheel Events**  
-onWheel  
+**Wheel Events**
+onWheel
 
-**Media Events**  
-onAbort  
-onCanPlay  
-onCanPlayThrough  
-onDurationChange  
-onEmptied  
-onEncrypted  
-onEnded  
-onError  
-onLoadedData  
-onLoadedMetadata  
-onLoadStart  
-onPause  
-onPlay  
-onPlaying  
-onProgress  
-onRateChanged  
-onSeeking  
-onStalled  
-onSuspend  
-onTimeUpdate  
-onVolumeChange  
-onWaiting  
+**Media Events**
+onAbort
+onCanPlay
+onCanPlayThrough
+onDurationChange
+onEmptied
+onEncrypted
+onEnded
+onError
+onLoadedData
+onLoadedMetadata
+onLoadStart
+onPause
+onPlay
+onPlaying
+onProgress
+onRateChanged
+onSeeking
+onStalled
+onSuspend
+onTimeUpdate
+onVolumeChange
+onWaiting
 
-**Image Events**  
-onLoad  
-onError  
+**Image Events**
+onLoad
+onError
 
-**Animation Events**  
-onAnimationStart  
-onAnimationEnd  
-onAnimationIteration  
+**Animation Events**
+onAnimationStart
+onAnimationEnd
+onAnimationIteration
 
-**Transition Events**  
-onTransitionEnd  
+**Transition Events**
+onTransitionEnd
 
-**Other Events**  
-onToggle  
+**Other Events**
+onToggle
 
 
 ## Event Data
@@ -364,3 +365,25 @@ handleUpdateThing() {
   this.props.updateThing(arg);
 }
 ```
+
+## stopPropagation
+
+Sometimes you will find that you have events triggering when you don't wan them to. For example, the code below uses a component from the `react-copy-to-clipboard` library. The `onCopy` event triggers a callback function. If though we wanted to have something inside that element that also has an event-related action (e.g. a link), we may want to stop that event from bubbling up. This can be done with `stopPropagation()`:
+
+```javascript
+<CopyToClipboard onCopy={ updateCopied }>
+  <div className="ColorChip">
+
+    {/* content */}
+
+    <Link to="/" className="info-more" onClick={e => {e.stopPropagation()}}>
+      More
+    </Link>
+  </div>
+</CopyToClipboard>
+```
+
+Note that in this particular case, without the `onClick={e => {e.stopPropagation()}`, the console will actually give us a warning:
+
+> Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
+
