@@ -569,6 +569,8 @@ function Example() {
 export default Example;
 ```
 
+Keep in mind, `useNavigate` will sometimes be a better choice over `<Link>` for linking to another page. Just remember that `<Link>` converts to the `<a>` anchor tag, so if you have say a `<div>` card type component that you want to be clickable, it *may* be better to use an `onClick` event, as opposed to wrapping everything in `<a>`.
+
 
 ### Example 1: pass input values to a link
 
