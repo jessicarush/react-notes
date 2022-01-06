@@ -77,7 +77,7 @@ class App extends React.Component {
     return (
       <div>
         {/* Here's my comment */}
-        <Welcome name="Jessica" day="Thursday"/>
+        <Welcome name="Jessica" day="Thursday" />
       </div>
     );
   }
@@ -231,7 +231,7 @@ class App extends React.Component {
       <div>
         <Messages
           name="Jessica"
-          msgs = {[
+          msgs={[
             {id: 1, text: 'Great'},
             {id: 2, text: 'Awesome'},
             {id: 3, text: 'Fantastic'},
@@ -284,7 +284,6 @@ Note that this seems to happen as a result of using `map()`. In the following ex
   {this.props.pokemon.map(p => (
     <Pokecard name={p.name} type={p.type} exp={p.base_experience} />
   ))}
-
 </div>
 ```
 
@@ -292,11 +291,14 @@ When I add a key property, provided the key is unique, react will be satisfied. 
 
 ```javascript
 <div className="Pokedex">
-
   {this.props.pokemon.map(p => (
-    <Pokecard key={p.name} name={p.name} type={p.type} exp={p.base_experience} />
+    <Pokecard
+      key={p.name}
+      name={p.name}
+      type={p.type}
+      exp={p.base_experience}
+    />
   ))}
-
 </div>
 ```
 
@@ -305,10 +307,10 @@ When I add a key property, provided the key is unique, react will be satisfied. 
 In the event that you don't have any obvious, easy id or name to use for keys, there are a couple of options. The first is to use the index number of the item. This index number can be accessed automatically as the second argument to the `map()` method:
 
 ```javascript
-const todoItems = todos.map((todo, index) =>
+const todoItems = todos.map((todo, index) => (
   // Only do this as a last resort
   <li key={index}>{todo.text}</li>
-);
+));
 ```
 
 > We don’t recommend using indexes for keys if the order of items may change. This can negatively impact performance and may cause issues with component state.
@@ -335,9 +337,9 @@ let todos = [
   {id: uuid(), text: 'Get milk'}
 ]
 
-const todoItems = todos.map(todo =>
+const todoItems = todos.map(todo => (
   <li key={todo.id}>{todo.text}</li>
-);
+));
 ```
 
 > Note that the act of installing and importing a module like this assumes that you are using a tool like [create-react-app](create_react_app.md) or [webpack](app_layout_advanced.md). Specifically, to install, you would need a `package.json` and to use `import`, you would need to set the `<script>` element's attribute `type="module"`. Since React apps need the `type` attribute to be set to `text/jsx`, we use one of the aforementioned tools to sort it out.
@@ -363,9 +365,9 @@ class TestComponent extends Component {
   renderItems() {
     return (
       <ul>
-        {this.state.items.map(item =>
+        {this.state.items.map(item => (
           <li key={item.id}>{item.name} - {item.qty}</li>
-        )}
+        ))}
       </ul>
     );
   }
@@ -396,14 +398,12 @@ class TestComponent extends Component {
   }
 
   render() {
-    const listItems = this.state.items.map(item =>
+    const listItems = this.state.items.map(item => (
       <li key={item.id}>{item.name} - {item.qty}</li>
-    );
+    ));
     return (
       <div>
-        <ul>
-          {listItems}
-        </ul>
+        <ul>{listItems}</ul>
       </div>
     );
   }
@@ -525,5 +525,3 @@ Gives us what we want:
   </tr>
 </table>
 ```
-
-

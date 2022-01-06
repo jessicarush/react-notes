@@ -455,6 +455,32 @@ If you are looking to have an active link (as described above in Links) for all 
 </Route>
 ```
 
+#### Optional URL Param
+
+If you have optional URL Params, you can do something like this:
+
+```javascript
+<Route path="/palette/:paletteId/:colorId">
+  {/* Optional URL param for color format */}
+  <Route path=":format" element={<ColorShades />} />
+  <Route path="" element={<ColorShades />} />
+</Route>
+```
+
+With this, both of the following URLs will work:
+
+/palette/rainbow-colors/red
+/palette/rainbow-colors/red/rgb
+
+In my component, I would have something like:
+
+```javascript
+const params = useParams();
+  const format = params.format || 'default';
+```
+
+Note that in previous versions of react router you used to be able to do something like: ``path="/path/:format?"`` to indicate optional URL Params but they have removed support for this feature in favour of teh above.
+
 
 ### Redirects
 
