@@ -89,3 +89,7 @@ If you try to open your `index.html`, you'll have issues because of the [CORS](h
 ```bash
 python3 -m http.server
 ```
+
+## Final note
+
+Though we can create a react app using this barebones structure, most of teh time it will make more sense to use `create-react-app`. See [create_react_app.md](create_react_app.md).
