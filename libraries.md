@@ -12,12 +12,12 @@ A list of react packages/libraries that I've used.
 - [react-router-dom](#react-router-dom)
 - [Material UI](#material-ui)
 - [chroma.js](#chromajs)
-- [React sortable](#react-sortable)
-- [dnd-kit](#dnd-kit)
 - [react-copy-to-clipboard](#react-copy-to-clipboard)
 - [react-form-validator-core](#react-form-validator-core)
 - [react-transition-group](#react-transition-group)
 - [react-jss](#react-jss)
+- [React sortable](#react-sortable)
+- [dnd-kit](#dnd-kit)
 - [rc-slider](#rc-slider)
 - [Bootstrap](#bootstrap)
   * [reactstrap](#reactstrap)
@@ -100,7 +100,72 @@ They also recommend adding the following meta tag for responsive viewport sizing
 <meta name="viewport" content="initial-scale=1, width=device-width" />
 ```
 
-Some components are very simple (e.g. Button) and others are a little more involved in that they're modular and will require event handlers. These are pretty well documented though. Use both the *Components* and *Component API* sections. The first shows the examples and code, the second explains all the properties.
+Some components are very simple (e.g. Button) and others are a little more involved in that they're modular and will require event handlers. These are pretty well documented though. Use both the [Components](https://mui.com/components/buttons/) and [Component API](https://mui.com/api/button/) sections. The first shows the examples and code, the second explains all the properties.
+
+Things get a little more difficult when it comes to styling and most tutorials out there seem to have out-of-date information. The idea is that you work with themes and then do overrides when needed. Overall the learning curve is steep.
+
+The simplest way to apply custom styles would appear as a one-off customization:
+
+> The easiest way to add style overrides for a one-off situation is to use the sx prop available on all MUI components.
+
+```javascript
+<Slider
+  defaultValue={30}
+  sx={{
+    width: 300,
+    color: '#000',
+  }}
+/>
+```
+
+Nested components can be styled like:
+
+```javascript
+<Slider
+  defaultValue={30}
+  sx={{
+    width: 300,
+    color: '#000',
+    '& .MuiSlider-thumb': {
+      borderRadius: '1px',
+    },
+  }}
+/>
+```
+
+You can also use the `className` prop available on each component to override styles.
+
+You can also use the `styled` function:
+
+```javascript
+import { styled } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+
+const SaveButton = styled(Button)(({ theme }) => ({
+  color: '#fff',
+  backgroundColor: 'rgb(56,193,114)',
+  boxShadow: 'none',
+  '&:hover': {
+    backgroundColor: 'rgb(37,157,88)',
+  },
+  '&:active': {
+    backgroundColor: 'rgb(37,157,88)',
+  },
+  '&:focus': {
+    boxShadow: '0 0 0 0.2rem rgba(0,123,255,.5)',
+  },
+}));
+```
+
+Then:
+
+```javascript
+<SaveButton size="small" variant="contained">Save</SaveButton>
+```
+
+For more information see [How to customize](https://mui.com/customization/how-to-customize/).
+
+Side note, it looks like they are currently working on *MUI Base*, a set of [unstyled components](https://mui.com/customization/unstyled-components/). These could be used to implement a custom design system that is not based on Material Design.
 
 
 ## chroma.js
@@ -120,34 +185,6 @@ let hexColor = '#eb3d30';
 const darkerColor = chroma(hexColor).darken(1.75).hex();  // a30000
 const rgb = chroma(hexValue).rgb();  // [235, 61, 48]
 const css = chroma(hexValue).css();  // rgb(235,61,48)
-```
-
-
-## React sortable
-
-[React Sortable](https://github.com/clauderic/react-sortable-hoc)
-
-```bash
-npm install
-```
-
-Example:
-
-```javascript
-```
-
-
-## dnd-kit
-
-[dnd-kit](https://github.com/clauderic/dnd-kit)
-
-```bash
-npm install
-```
-
-Example:
-
-```javascript
 ```
 
 
@@ -241,6 +278,35 @@ Example:
 ```javascript
 ```
 
+
+## React sortable
+
+[React Sortable](https://github.com/clauderic/react-sortable-hoc)
+
+```bash
+npm install
+```
+
+Example:
+
+```javascript
+```
+
+
+## dnd-kit
+
+[dnd-kit](https://github.com/clauderic/dnd-kit)
+
+```bash
+npm install
+```
+
+Example:
+
+```javascript
+```
+
+
 ## rc-slider
 
 - [rc-slider](https://github.com/react-component/slider)
@@ -267,6 +333,39 @@ function Demo(props) {
 ```
 
 *Caution*: It looks like this package is not being maintained. There is a deprecation warning that comes up in the console regarding `findDOMNode is deprecated in StrictMode`. No movement on this open issue <https://github.com/react-component/slider/issues/613>. Also, it is very poorly documented.
+
+
+##
+
+[React Color](https://casesandberg.github.io/react-color/)
+
+```bash
+npm install react-color
+```
+
+Example:
+
+```javascript
+import React, { useState } from 'react';
+import { SketchPicker } from 'react-color';
+
+function Demo(props) {
+  const [color, setColor] = useState(false);
+
+  const handlePickerChange = (color) => {
+    setColor(color.hex);
+  };
+
+  return (
+    <div>
+      <SketchPicker
+        color={color}
+        onChangeComplete={ handlePickerChange }
+      />
+    </div>
+  )
+}
+```
 
 
 ## Bootstrap
