@@ -22,6 +22,7 @@ Client-side routing simply runs this process in the browser using JavaScript. As
   * [URL Params](#url-params)
     + [Conditional content from URL params](#conditional-content-from-url-params)
     + [Active Links with URL Params](#active-links-with-url-params)
+    + [Optional URL Param](#optional-url-param)
   * [Redirects](#redirects)
   * [useNavigate, useLocation (formerly withRouter, useHistory)](#usenavigate-uselocation-formerly-withrouter-usehistory)
     + [withRouter (deprecated in v6)](#withrouter-deprecated-in-v6)
