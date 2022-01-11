@@ -10,6 +10,7 @@
 - [4. Create an element to hold your rendered react app in your html](#4-create-an-element-to-hold-your-rendered-react-app-in-your-html)
 - [5. Add all the component scripts to your html](#5-add-all-the-component-scripts-to-your-html)
 - [5. Run your app on a server](#5-run-your-app-on-a-server)
+- [Final note](#final-note)
 
 <!-- tocstop -->
 
@@ -92,4 +93,4 @@ python3 -m http.server
 
 ## Final note
 
-Though we can create a react app using this barebones structure, most of teh time it will make more sense to use `create-react-app`. See [create_react_app.md](create_react_app.md).
+Though we can create a react app using this barebones structure, most of the time it will make more sense to use `create-react-app`. See [create_react_app.md](create_react_app.md).
