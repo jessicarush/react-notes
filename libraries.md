@@ -309,7 +309,7 @@ Example:
 
 ## rc-slider
 
-- [rc-slider](https://github.com/react-component/slider)
+[rc-slider](https://github.com/react-component/slider) is an under-documented slider component.
 
 ```bash
 npm install rc-slider
@@ -335,9 +335,9 @@ function Demo(props) {
 *Caution*: It looks like this package is not being maintained. There is a deprecation warning that comes up in the console regarding `findDOMNode is deprecated in StrictMode`. No movement on this open issue <https://github.com/react-component/slider/issues/613>. Also, it is very poorly documented.
 
 
-##
+## React color
 
-[React Color](https://casesandberg.github.io/react-color/)
+[React Color](https://casesandberg.github.io/react-color/) is a collection of color pickers components like those found in Sketch, Photoshop, Chrome, Github, Twitter, Material Design & more.
 
 ```bash
 npm install react-color
@@ -366,6 +366,11 @@ function Demo(props) {
   )
 }
 ```
+
+Note: the component will not function properly until you have these set up:
+
+1. the components color attribute is set to a state value
+2. the onChangeComplete attribute is given a callback that updates said state value
 
 
 ## Bootstrap
