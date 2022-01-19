@@ -22,7 +22,7 @@ These notes for working with state in functional components using hooks, follow 
 
 ## Set initial state
 
-In functional components, you set the initial state of each item using `useSate()` (the *only* argument to `useState` is the initial state). The `useState` hook returns a pair: the current state value and a function that lets you update it.
+In functional components, you can set the initial state of each item using `useSate()` (the *only* argument to `useState` is the initial state). The `useState` hook returns a pair: the current state value and a function that lets you update it.
 
 ```javascript
 import React, { useState } from 'react';
@@ -37,6 +37,32 @@ function Example(props) {
   );
 }
 ```
+
+Declaring state variables as a pair of `[something, setSomething]` is handy because it lets us give different names to different state variables.
+
+That being said...
+
+> You **don’t have to** use many state variables. State variables can hold objects and arrays just fine, so you can still group related data together. However, unlike `this.setState` in a class, updating a state variable always replaces it instead of merging it.
+
+For example:
+
+```javascript
+import React, { useState } from 'react';
+
+function Example(props) {
+  // Initial state
+  const [state, setState] = useState({
+    name: 'guest',
+    count: 0
+  });
+
+  return (
+    <div className="Example"></div>
+  );
+}
+```
+
+The "replaces it instead of merging it" part is described below in [Update state](#update-state).
 
 
 ## Read state
@@ -58,6 +84,23 @@ function Example(props) {
 }
 ```
 
+or...
+
+```javascript
+import React, { useState } from 'react';
+
+function Example(props) {
+  // Initial state
+  const [state, setState] = useState({
+    name: 'guest',
+    count: 0
+  });
+
+  return (
+    <div className="Example">{ state.name } { state.count }</div>
+  );
+}
+```
 
 ## Update state
 
@@ -80,6 +123,43 @@ function Example(props) {
   return (
     // Read State
     <div className="Example">{ name } { count }</div>
+    <button onClick={ updateMyState }>update state</button>
+  );
+}
+```
+
+As mentioned above, if you are using a single state object to mimic `this.setState` in a class, remember that **updating a state variable always replaces it instead of merging it**. What this means is with classes you could just pass in a new state `key: value` and it would *merge* it in with the rest:
+
+```javascript
+handleChange(e) {
+    this.setState({count: 1});
+  }
+```
+
+So, if we were to put all our state values into one object, we would need to use the spread operator on `...state` to ensure we don;t loose our other values:
+
+
+```javascript
+import React, { useState } from 'react';
+
+function Example(props) {
+  // Initial state
+  const [state, setState] = useState({
+    name: 'guest',
+    count: 0
+  });
+
+  function updateMyState() {
+    // Update state
+    setState({
+      ...state,
+      name: 'Bob'
+    });
+  }
+
+  return (
+    // Read State
+    <div className="Example">{ state.name } { state.count }</div>
     <button onClick={ updateMyState }>update state</button>
   );
 }
@@ -135,6 +215,29 @@ input
   onChange={ e => setName(e.target.value) }
 />
 ```
+
+With classes we would typically see controlled inputs all handled by one method like so:
+
+```javascript
+handleChange(e) {
+    this.setState({[e.target.name]: e.target.value});
+  }
+```
+
+If we were to put all our state values in one object called state, we could still do this, just remember to add `..state`:
+
+```javascript
+handleChange(e) {
+    setState({...state, [e.target.name]: e.target.value});
+  }
+```
+
+
+## One or many state variables?
+
+If you’re coming from classes, you might be tempted to always call `useState()` once and put all state into a single object. You can do it if you’d like. However, the React docs recommend you split **state into multiple state variables based on which values tend to change together**.
+
+> Both putting all state in a single useState call, and having a useState call per each field can work. Components tend to be most readable when you find a balance between these two extremes, and group related state into a few independent state variables
 
 
 ## Filtering Example
