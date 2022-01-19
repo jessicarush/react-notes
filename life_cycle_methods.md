@@ -308,6 +308,33 @@ class Child extends Component {
 
 ## Lifecycle methods in Function Components
 
-In functional components, the `useEffect()` hook can be used to replicate lifecycle behavior.
+In functional components, the `useEffect()` hook can be used to replicate lifecycle behavior. [See this thread on SO](https://stackoverflow.com/questions/53945763/componentdidmount-equivalent-on-a-react-function-hooks-component).
 
-TODO ...
+```javascript
+import React, { useState, useEffect } from 'react';
+
+useEffect(() => {
+  console.log('I have been mounted')
+}, [])
+```
+
+If you need the function/code to update when a state value is updated, pass that value in as a dependency:
+
+```javascript
+import React, { useState, useEffect } from 'react';
+
+function Example(props) {
+  const [name, setName] = useState('');
+
+  useEffect(() => {
+    console.log('I will run whenever name changes')
+  }, [name])
+
+  return (
+    <div className="Example"></div>
+  );
+}
+
+
+```
+
