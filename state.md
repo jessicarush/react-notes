@@ -66,7 +66,7 @@ class Game extends Component {
   }
 
   render() {
-    console.log(this.state);  
+    console.log(this.state);
     // Object { score: 0, player: "New player" }
     return (
       <div className="Game">
@@ -116,7 +116,7 @@ Passing a regular object to `setState()`:
 class StateDemo extends Component {
   constructor(props) {
     super(props);
-    this.state = { score: 0};
+    this.state = {score: 0};
     this.changeState();  // for demonstration only!
   }
 
@@ -451,7 +451,7 @@ class TestChildComponent extends Component {
 That being said, when you have state properties that are mainly for presentation, that state information could be stored in the component where it is being used. For the "core" data in an app, try to centralize the data in a parent component.  It can be helpful to frame it through the question: "what data would I want to send off to a database?".  In cases where we're only using a state/function for display purpose and wouldn't need to store that in a database, it might be preferable to keep it in the child component.
 
 
-## Updating state with map() vs for  
+## Updating state with map() vs for
 
 I keep hearing that `for` loops are uncommon in the React world in favour of iterators like `map()`. I can't seem to pinpoint a real reason for this beyond preference so here are two methods that achieving the same result.
 
