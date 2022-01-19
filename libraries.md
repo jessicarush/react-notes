@@ -11,6 +11,7 @@ A list of react packages/libraries that I've used.
 - [uuid](#uuid)
 - [react-router-dom](#react-router-dom)
 - [Material UI](#material-ui)
+- [react-material-ui-form-validator](#react-material-ui-form-validator)
 - [chroma.js](#chromajs)
 - [react-copy-to-clipboard](#react-copy-to-clipboard)
 - [react-form-validator-core](#react-form-validator-core)
@@ -19,6 +20,7 @@ A list of react packages/libraries that I've used.
 - [React sortable](#react-sortable)
 - [dnd-kit](#dnd-kit)
 - [rc-slider](#rc-slider)
+- [React color](#react-color)
 - [Bootstrap](#bootstrap)
   * [reactstrap](#reactstrap)
 
@@ -166,6 +168,42 @@ Then:
 For more information see [How to customize](https://mui.com/customization/how-to-customize/).
 
 Side note, it looks like they are currently working on *MUI Base*, a set of [unstyled components](https://mui.com/customization/unstyled-components/). These could be used to implement a custom design system that is not based on Material Design.
+
+
+## react-material-ui-form-validator
+
+[react-material-ui-form-validator](https://github.com/NewOldMax/react-material-ui-form-validator) is a validation component for material-ui forms.
+
+```bash
+npm install react-material-ui-form-validator
+```
+
+Example:
+
+```javascript
+import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
+```
+
+```javascript
+<ValidatorForm
+  ref="form"
+  onSubmit={handleSubmit}
+  onError={errors => console.log(errors)}
+>
+  <TextValidator
+    label="Email"
+    onChange={handleChange}
+    name="email"
+    value={email}
+    validators={['required', 'isEmail']}
+    errorMessages={['this field is required', 'email is not valid']}
+  />
+  <Button type="submit">Submit</Button>
+</ValidatorForm>
+```
+
+Looks like this is built off of [react-form-validator-core](https://www.npmjs.com/package/react-form-validator-core). This link provides the list of included validation rules.
+
 
 
 ## chroma.js
