@@ -1,4 +1,4 @@
-# Ajax Requests with Axios
+# Requests with Axios
 
 ## Table of Contents
 
@@ -15,8 +15,6 @@
 
 ## Introduction
 
-If you want to fetch data with an Ajax request, it is **always recommended that you do this in the `componentDidMount()` method** as opposed to the `constructor()`. In addition, you should also always avoid setting state in the constructor.
-
 [Axios](https://github.com/axios/axios) is a promise-based HTTP client that works both in the browser and in a node js environment. It basically provides a single API for dealing with *XMLHttpRequests* and node's http interface. Besides that, it wraps the requests using a polyfill for ES6's new promise syntax.
 
 To use Axios, you'll need to install it:
@@ -24,6 +22,8 @@ To use Axios, you'll need to install it:
 ```bash
 npm install axios
 ```
+
+If you want to fetch data with an asychronous request, it is **always recommended that you do this in the `componentDidMount()` method** as opposed to the `constructor()`. In addition, you should also always avoid setting state in the constructor.
 
 ## Example - Simple request to API
 
