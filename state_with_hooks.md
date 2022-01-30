@@ -241,6 +241,32 @@ If you’re coming from classes, you might be tempted to always call `useState()
 > Both putting all state in a single useState call, and having a useState call per each field can work. Components tend to be most readable when you find a balance between these two extremes, and group related state into a few independent state variables
 
 
+## setState callbacks
+
+In class component you could optionally pass a callback to run after the state has been updated. For example:
+
+```javascript
+setState(
+  { counter: 123},
+  () => console.log('Do something after counter has changed')
+);
+```
+
+With react hooks, you would use the `useEffect()` hook instead, passing in the state value as a dependency. For example:
+
+```javascript
+const [counter, setCounter] = useState(0);
+
+const doSomething = () => {
+  setCounter(123);
+}
+
+useEffect(() => {
+   console.log('Do something after counter has changed', counter);
+}, [counter]);
+```
+
+
 ## Filtering Example
 
 This example comes from [Dimitri](https://dmitripavlutin.com/controlled-inputs-using-react-hooks/), who seems like a pretty cool guy. It uses a state value in a `filter()`. As a result, whenever the state value changes, the `filter)` result get updated.
