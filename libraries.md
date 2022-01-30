@@ -165,9 +165,26 @@ Then:
 <SaveButton size="small" variant="contained">Save</SaveButton>
 ```
 
-For more information see [How to customize](https://mui.com/customization/how-to-customize/).
+For more information see [How to customize](https://mui.com/customization/how-to-customize/) and [Style Library Interoperability](https://mui.com/guides/interoperability/).
 
 Side note, it looks like they are currently working on *MUI Base*, a set of [unstyled components](https://mui.com/customization/unstyled-components/). These could be used to implement a custom design system that is not based on Material Design.
+
+### CSS injection order
+
+Note: Most CSS-in-JS solutions inject their styles at the bottom of the HTML <head>, which gives MUI precedence over your custom styles. To remove the need for !important, you need to change the CSS injection order. To do so, you need to have the StyledEngineProvider with the injectFirst option at the top of your component tree.
+
+```javascript
+import * as React from 'react';
+import { StyledEngineProvider } from '@mui/material/styles';
+
+export default function GlobalCssPriority() {
+  return (
+    <StyledEngineProvider injectFirst>
+      {/* Your component tree. Now you can override MUI's styles. */}
+    </StyledEngineProvider>
+  );
+}
+```
 
 
 ## react-material-ui-form-validator
@@ -303,40 +320,22 @@ Example:
 ```
 
 
-## react-jss
-
-[react-jss](https://cssinjs.org/)
-
-```bash
-npm install
-```
-
-Example:
-
-```javascript
-```
-
-
 ## React sortable
 
-[React Sortable](https://github.com/clauderic/react-sortable-hoc)
+[React Sortable](https://github.com/clauderic/react-sortable-hoc) is set of higher-order components to turn any list into an animated, sortable list. **Note: this library will soon be dead. Recommended replacement is [dnd-kit](#dnd-kit).**
 
 ```bash
-npm install
-```
-
-Example:
-
-```javascript
+npm install react-sortable-hoc
 ```
 
 
 ## dnd-kit
 
-[dnd-kit](https://github.com/clauderic/dnd-kit)
+[dnd-kit](https://github.com/clauderic/dnd-kit) is a lightweight, modular, performant, accessible and  extensible drag & drop toolkit for React.
 
 ```bash
-npm install
+npm install @dnd-kit/core
+npm install @dnd-kit/sortable
 ```
 
 Example:
