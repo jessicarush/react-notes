@@ -95,7 +95,7 @@ ReactDOM.render(<Welcome />, document.getElementById('root'));
 
 In these two examples, I want to demonstrate how to access/define the following:
 
-- props  
+- props
 - default props
 - state
 - lifecycle methods
@@ -179,6 +179,22 @@ function Example({name='stranger', color='red'}) {
 
 export default Example;
 ```
+
+You can also do it this way:
+```javascript
+import './Example.css';
+
+// default props
+function Example(props) {
+  const {someProp, anotherProp, name='stranger', color='red'} = props;
+  return (
+    <div className="Example">{name} and {color}</div>
+  );
+}
+
+export default Example;
+```
+
 
 Use the `useState()` hooks for storing *state* in a function component:
 
