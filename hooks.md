@@ -43,3 +43,73 @@ Additional built-in hooks:
 2. Only call Hooks from React function components. Don’t call Hooks from regular JavaScript functions.
 
 > Call Hooks from React function components or call Hooks from custom Hooks. By following this rule, you ensure that all stateful logic in a component is clearly visible from its source code.
+
+
+## useState
+
+See my notes [state_with_hooks.md](state_with_hooks.md) and [Using the State Hook](https://reactjs.org/docs/hooks-state.html) (React docs).
+
+## useEffect
+
+The [Effect Hook](https://reactjs.org/docs/hooks-effect.html) lets you perform *side effects* in function components. For example:
+
+```javascript
+import React, { useState, useEffect } from 'react';
+
+function Example() {
+  const [count, setCount] = useState(0);
+
+  // Similar to componentDidMount and componentDidUpdate:
+  useEffect(() => {
+    // Update the document title using the browser API
+    document.title = `You clicked ${count} times`;
+  });
+
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>
+        Click me
+      </button>
+    </div>
+  );
+}
+```
+
+### used for componentDidMount
+
+In class components, you have the componentDidMount lifecycle method, where you can run code after everything has mounted. With react hooks, you can use `useEffect()` to accomplish the same thing. For example:
+
+```javascript
+import React, { useState, useEffect } from 'react';
+
+useEffect(() => {
+  console.log('I have been mounted')
+}, [])
+```
+
+### used for setState callbacks
+
+In class components you can optionally pass a callback to run after the state has been updated with `this.setState`. With react hooks, you can use `useEffect()` to accomplish the same thing. For example:
+
+```javascript
+const [counter, setCounter] = useState(0);
+
+const doSomething = () => {
+  setCounter(123);
+}
+
+useEffect(() => {
+   console.log('Do something after counter has changed', counter);
+}, [counter]);
+```
+
+
+## useContext
+
+TODO
+
+
+## Building your own hooks
+
+TODO
