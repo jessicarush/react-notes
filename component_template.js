@@ -30,6 +30,9 @@ import './Example.css';
 
 
 function Example(props) {
+  // props
+  // const {} =  props;
+  // state
   const [name, setName] = useState('');
 
   function updateMyState() {
