@@ -75,6 +75,8 @@ ReactDOM.render(<Welcome />, document.getElementById('root'));
 
 Historically these were used for simpler components as there were some things you couldn't do with function components that you could only do with classes including *state* and *lifecycle methods*. React v16.8 (released September, 2017) introduced *hooks*, which allow function-based components to have all the same features as class-based ones. More on hooks later.
 
+> We intend for Hooks to cover all existing use cases for classes, but we will keep supporting class components for the foreseeable future. At Facebook, we have tens of thousands of components written as classes, and we have absolutely no plans to rewrite them. Instead, we are starting to use Hooks in the new code side by side with classes.
+
 Note, there is no render method in the function, we just return whatever it is we need to be rendered.
 
 ```javascript
@@ -288,3 +290,5 @@ class Box extends Component {
 
 export default Box;
 ```
+
+Note in a functional component you would just use `{props.children}`.
