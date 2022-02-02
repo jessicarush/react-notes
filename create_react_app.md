@@ -45,10 +45,12 @@ cd my-app
 npm start
 ```
 
+> NOTE: I've had the issue [described here](https://stackoverflow.com/questions/70358474/error-while-creating-new-react-app-you-are-running-create-react-app-4-0-3-w). Who knows how it happended but the steps of clearing the cache and letting it install again fixed it.
+
 When you start the app you should be able to see it running at:
 
-Local:                 `http://localhost:3000/`  
-On Your Network (eg):  `http://10.0.0.2:3000/`  
+Local:                 `http://localhost:3000/`
+On Your Network (eg):  `http://10.0.0.2:3000/`
 
 The page will automatically reload if you make changes to the code and you will see the build errors and lint warnings in the console.
 
@@ -81,12 +83,12 @@ my-app
     └─ serviceWorker.js
 ```
 
-**package-lock.json** - lock file, do not edit directly  
-**package.json** - edit as you normally would  
-**README.md** - contains notes on the create react app commands that you can run. Edit or delete.  
-**node_modules** - contains all of the dependencies  
-**src** - this is where we create all our react components and css. Note that `index.css` is meant to be your site-wide css.  
-**public** - contains your main `index.html`. They've also got some icon-related files in here and a `robots.txt`  
+**package-lock.json** - lock file, do not edit directly
+**package.json** - edit as you normally would
+**README.md** - contains notes on the create react app commands that you can run. Edit or delete.
+**node_modules** - contains all of the dependencies
+**src** - this is where we create all our react components and css. Note that `index.css` is meant to be your site-wide css.
+**public** - contains your main `index.html`. They've also got some icon-related files in here and a `robots.txt`
 
 
 ## Webpack
