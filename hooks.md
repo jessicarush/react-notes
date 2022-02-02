@@ -112,4 +112,49 @@ TODO
 
 ## Building your own hooks
 
-TODO
+Building your own Hooks lets you extract component logic into reusable functions.
+
+This simple example creates a toggle hook that will toggle a boolean state value. Good practice is to create your custom hools in separate files in a `hooks` directory. It's also customary to name your hooh `use...` to follow React's built-in hooks.
+
+
+```javascript
+import { useState } from 'react';
+
+function useToggle(initialValue=false) {
+  // Set up state with initial value
+  const [state, setState] = useState(initialValue);
+  // Create a function that sets the value to something else
+  // In this case, a toggle between true/false
+  const toggleState = () => {
+    setState(!state);
+  };
+  // return the state value and the function that changes it
+  return [state, toggleState];
+}
+
+export default useToggle;
+```
+
+To use the custom hook, import it and use it like you would `useState`:
+
+```javascript
+import useToggle from './hooks/useToggle';
+
+function Demo() {
+  const [mode, toggleMode] = useToggle(true);
+  const [display, toggleDisplay] = useToggle(false);
+
+  return (
+    <div>
+      <p onClick={toggleMode}>{mode ? 'light': 'dark'}</p>
+      <p onClick={toggleDisplay}>{display ? 'open': 'closed'}</p>
+    </div>
+
+  )
+}
+
+export default Demo;
+```
+
+
+For more see the [React docs on building your own hooks](https://reactjs.org/docs/hooks-custom.html).
