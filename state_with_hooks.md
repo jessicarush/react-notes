@@ -12,6 +12,7 @@
 - [Update state](#update-state)
 - [Form handling (controlled inputs)](#form-handling-controlled-inputs)
 - [One or many state variables?](#one-or-many-state-variables)
+- [setState callbacks](#setstate-callbacks)
 - [Filtering Example](#filtering-example)
 
 <!-- tocstop -->
