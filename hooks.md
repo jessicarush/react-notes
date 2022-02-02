@@ -12,6 +12,12 @@
 
 - [Introduction](#introduction)
 - [Rules](#rules)
+- [useState](#usestate)
+- [useEffect](#useeffect)
+  * [used for componentDidMount](#used-for-componentdidmount)
+  * [used for setState callbacks](#used-for-setstate-callbacks)
+- [useContext](#usecontext)
+- [Building your own hooks](#building-your-own-hooks)
 
 <!-- tocstop -->
 
