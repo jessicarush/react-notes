@@ -10,6 +10,7 @@
 - [Example - Adding a loading animation](#example---adding-a-loading-animation)
 - [Example - Using an async function](#example---using-an-async-function)
 - [Passing headers](#passing-headers)
+- [axios in functional components](#axios-in-functional-components)
 
 <!-- tocstop -->
 
@@ -264,3 +265,7 @@ async componentDidMount() {
   console.log(response);
 }
 ```
+
+## axios in functional components
+
+See the `useEffect` section in [hooks.md](hooks.md).
