@@ -14,10 +14,10 @@
 - [Rules](#rules)
 - [useState](#usestate)
 - [useEffect](#useeffect)
-  * [used for componentDidMount](#used-for-componentdidmount)
   * [used for setState callbacks](#used-for-setstate-callbacks)
 - [useContext](#usecontext)
 - [Building your own hooks](#building-your-own-hooks)
+  * [Custom hook example: localStorage](#custom-hook-example-localstorage)
 
 <!-- tocstop -->
 
@@ -55,9 +55,14 @@ Additional built-in hooks:
 
 See my notes [state_with_hooks.md](state_with_hooks.md) and [Using the State Hook](https://reactjs.org/docs/hooks-state.html) (React docs).
 
+
 ## useEffect
 
-The [Effect Hook](https://reactjs.org/docs/hooks-effect.html) lets you perform *side effects* in function components. For example:
+See also: [life_cycle_methods.md](https://github.com/jessicarush/react-notes/blob/master/life_cycle_methods.md#lifecycle-methods-in-function-components)
+
+The [Effect Hook](https://reactjs.org/docs/hooks-effect.html) lets you perform *side effects* in function components. If comparing to class component lifecycle methods, you can think of `useEffect` as `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` combined.
+
+For example:
 
 ```javascript
 import React, { useState, useEffect } from 'react';
@@ -73,26 +78,105 @@ function Example() {
 
   return (
     <div>
-      <p>You clicked {count} times</p>
-      <button onClick={() => setCount(count + 1)}>
-        Click me
-      </button>
+      <button onClick={() => setCount(count + 1)}>Count</button>
     </div>
   );
 }
 ```
 
-### used for componentDidMount
+Note that is the lack of an optional second argument passed to `useEffect` that causes it to run on every update. If you only wanted code to run on the initial mount, pass an empty array as the second argument.
 
-In class components, you have the componentDidMount lifecycle method, where you can run code after everything has mounted. With react hooks, you can use `useEffect()` to accomplish the same thing. For example:
+For example, if we want a one-time api call:
 
 ```javascript
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-useEffect(() => {
-  console.log('I have been mounted')
-}, [])
+function Demo() {
+  const [zen, setZen] = useState('');
+
+  // componentDidMount
+  useEffect(() => {
+    console.log('I have been mounted');
+    axios.get("https://api.github.com/zen").then(response => {
+      setZen(response.data);
+    });
+  }, []);
+
+  return (
+    <div className="Demo">
+      <p>{zen}</p>
+    </div>
+  );
+}
+
+export default Demo;
 ```
+
+Note that in the above example, if I didn't pass the empty array argument, the `setZen()` function would create and endless looping trigger of `useEffect` because, without that second arg, it gets called anytime there's an update, in this case to a state value.
+
+If you want to use async/await, you need to define a function inside `useEffect`:
+
+```javascript
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function Demo() {
+  const [zen, setZen] = useState('');
+
+  // componentDidMount
+  useEffect(() => {
+    console.log('I have been mounted');
+    async function getZen() {
+      let response = await axios.get('https://api.github.com/zen');
+      setZen(response.data);
+    }
+    getZen();
+  }, []);
+
+  return (
+    <div className="Demo">
+      <p>{zen}</p>
+    </div>
+  );
+}
+
+export default Demo;
+```
+
+To be thorough... here's with the try/catch included:
+
+```javascript
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function Demo() {
+  const [zen, setZen] = useState('');
+
+  // componentDidMount
+  useEffect(() => {
+    console.log('I have been mounted');
+    async function getZen() {
+      try {
+        let response = await axios.get('https://api.github.com/zen');
+        setZen(response.data);
+      } catch (err) {
+        console.log(`something went wrong: ${err}`);
+      }
+    }
+    getZen();
+  }, []);
+
+  return (
+    <div className="Demo">
+      <p>{zen}</p>
+    </div>
+  );
+}
+
+export default Demo;
+```
+
 
 ### used for setState callbacks
 
@@ -120,7 +204,7 @@ TODO
 
 Building your own Hooks lets you extract component logic into reusable functions.
 
-This simple example creates a toggle hook that will toggle a boolean state value. Good practice is to create your custom hools in separate files in a `hooks` directory. It's also customary to name your hooh `use...` to follow React's built-in hooks.
+This simple example creates a toggle hook that will toggle a boolean state value. Good practice is to create your custom hooks in separate files in a `hooks` directory. It's also customary to name your hook `use...` to follow React's built-in hooks.
 
 
 ```javascript
@@ -162,5 +246,52 @@ function Demo() {
 export default Demo;
 ```
 
+### Custom hook example: localStorage
+
+This custom hook will automatcally update localStorage whenever a state value changes. When initializing the state value, it will check first to see if there is a local storage item.
+
+```javascript
+import { useState, useEffect } from 'react';
+
+function useLocalStorage(key, defaultValue) {
+  // Set up state
+  const [state, setState] = useState(() => {
+    // Check if anything exists in localStorage, if not, use defaultValue
+    let value = window.localStorage.getItem(key);
+    return value ? JSON.parse(value) : defaultValue;
+  });
+
+  // update localStorage when state changes
+  useEffect(() => {
+    window.localStorage.setItem(key, JSON.stringify(state));
+  }, [state]);
+
+  // return state value and a function to toggle it
+  return [state, setState];
+}
+
+export default useLocalStorage;
+```
+
+```javascript
+import useLocalStorage from './hooks/useLocalStorage';;
+
+function Demo() {
+  const [format, setFormat] = useLocalStorage('format', 'hex');
+  const [colors, setColors] = useLocalStorage('colors', ['red', 'green', 'blue']);
+
+  return (
+    <div>
+      <p>{colors}</p>
+      <p>{format}</p>
+      <button onClick={() => setFormat('rgb')}>change format</button>
+    </div>
+  )
+}
+
+export default Demo;
+```
+
+For another example of custom hooks, see the form handling example in [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md#custom-hook-for-forms).
 
 For more see the [React docs on building your own hooks](https://reactjs.org/docs/hooks-custom.html).

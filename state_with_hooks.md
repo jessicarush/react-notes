@@ -11,6 +11,7 @@
 - [Read state](#read-state)
 - [Update state](#update-state)
 - [Form handling (controlled inputs)](#form-handling-controlled-inputs)
+  * [Custom hook for forms](#custom-hook-for-forms)
 - [One or many state variables?](#one-or-many-state-variables)
 - [setState callbacks](#setstate-callbacks)
 - [Filtering Example](#filtering-example)
@@ -222,16 +223,79 @@ With classes we would typically see controlled inputs all handled by one method 
 
 ```javascript
 handleChange(e) {
-    this.setState({[e.target.name]: e.target.value});
-  }
+  this.setState({[e.target.name]: e.target.value});
+}
 ```
 
 If we were to put all our state values in one object called state, we could still do this, just remember to add `..state`:
 
 ```javascript
-handleChange(e) {
+import React, { useState } from 'react';
+
+function Form() {
+  const [state, setState] = useState({
+    user: '',
+    email: ''
+  });
+
+  const handleChange = (e) => {
     setState({...state, [e.target.name]: e.target.value});
-  }
+  };
+
+  return (
+    <div className="Form">
+      <input type="text" name="user" value={state.user} onChange={handleChange} />
+      <input type="email" name="email" value={state.email} onChange={handleChange} />
+    </div>
+  )
+}
+
+export default Form;
+```
+
+### Custom hook for forms
+
+Form handling can also be elegantly handled with a custom hook:
+
+```javascript
+import { useState } from 'react';
+
+function useInput(initialValue = '') {
+  // Set up state
+  const [value, setValue] = useState(initialValue);
+  // A function to handle input change
+  const handleChange = (e) => {
+    setValue(e.target.value);
+  };
+  // A function to clear the input
+  const reset = () => {
+    setValue('');
+  };
+  return [value, handleChange, reset];
+}
+
+export default useInput;
+
+```
+
+This make sour form code a little tidier:
+
+```javascript
+import useInput from './hooks/useInput';
+
+function Form() {
+  const [email, updateEmail, resetEmail] = useInput('');
+  const [user, updateUser, resetUser] = useInput('');
+
+  return (
+    <div className="Form">
+      <input type="text" name="user" value={user} onChange={updateUser} />
+      <input type="email" name="email" value={email} onChange={updateEmail} />
+    </div>
+  )
+}
+
+export default Form;
 ```
 
 

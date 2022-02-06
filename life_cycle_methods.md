@@ -308,14 +308,44 @@ class Child extends Component {
 
 ## Lifecycle methods in Function Components
 
-In functional components, the `useEffect()` hook can be used to replicate lifecycle behavior. [See this thread on SO](https://stackoverflow.com/questions/53945763/componentdidmount-equivalent-on-a-react-function-hooks-component).
+In functional components, the `useEffect()` hook can be used to replicate lifecycle behavior.
+
+> If you’re familiar with React class lifecycle methods, you can think of useEffect Hook as componentDidMount, componentDidUpdate, and componentWillUnmount combined.
+
+See [Using the Effect hook](https://reactjs.org/docs/hooks-effect.html) in the React docs.
 
 ```javascript
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
-useEffect(() => {
-  console.log('I have been mounted')
-}, [])
+function Example(props) {
+
+  // componentDidMount (note the empty array)
+  useEffect(() => {
+    console.log('I have been mounted')
+  }, [])
+
+  return (
+    <div className="Example"></div>
+  );
+}
+```
+
+If you wanted the useEffect code to run whenever there was an update of any kind, you would pass nothing as the dependency:
+
+```javascript
+import React, { useEffect } from 'react';
+
+function Example(props) {
+
+  // componentDidMount and componentDidUpdate
+  useEffect(() => {
+    console.log('I will run whenever anything changes')
+  })
+
+  return (
+    <div className="Example"></div>
+  );
+}
 ```
 
 If you need the function/code to update when a state value is updated, pass that value in as a dependency:
@@ -326,6 +356,7 @@ import React, { useState, useEffect } from 'react';
 function Example(props) {
   const [name, setName] = useState('');
 
+  // componentDidUpdate
   useEffect(() => {
     console.log('I will run whenever name changes')
   }, [name])
@@ -334,7 +365,28 @@ function Example(props) {
     <div className="Example"></div>
   );
 }
-
-
 ```
+
+Lastly...
+
+```javascript
+import React, { useState, useEffect } from 'react';
+
+function Example(props) {
+  const [name, setName] = useState('');
+
+  // componentWillUnmount
+  useEffect(() => {
+    return () => {
+     console.log('I am unmounting')
+    }
+  }, [name])
+
+  return (
+    <div className="Example"></div>
+  );
+}
+```
+
+See also: [hooks.md]
 
