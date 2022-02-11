@@ -13,9 +13,9 @@
 - [Introduction](#introduction)
 - [Rules](#rules)
 - [useState](#usestate)
+- [useContext](#usecontext)
 - [useEffect](#useeffect)
   * [used for setState callbacks](#used-for-setstate-callbacks)
-- [useContext](#usecontext)
 - [Building your own hooks](#building-your-own-hooks)
   * [Custom hook example: localStorage](#custom-hook-example-localstorage)
 
@@ -53,14 +53,19 @@ Additional built-in hooks:
 
 ## useState
 
-See my notes [state_with_hooks.md](state_with_hooks.md) and [Using the State Hook](https://reactjs.org/docs/hooks-state.html) (React docs).
+The `useState` hook returns a stateful value, and a function to update it. See my notes [state_with_hooks.md](state_with_hooks.md) and [Using the State Hook](https://reactjs.org/docs/hooks-state.html) (React docs).
+
+
+## useContext
+
+Context provides a way to pass data through the component tree without having to pass props down manually at every level. See my notes in [context.md](context.md) and the [Hook API Reference](https://reactjs.org/docs/hooks-reference.html#usecontext) (React docs).
 
 
 ## useEffect
 
-See also: [life_cycle_methods.md](https://github.com/jessicarush/react-notes/blob/master/life_cycle_methods.md#lifecycle-methods-in-function-components)
-
 The [Effect Hook](https://reactjs.org/docs/hooks-effect.html) lets you perform *side effects* in function components. If comparing to class component lifecycle methods, you can think of `useEffect` as `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` combined.
+
+See also: [life_cycle_methods.md](https://github.com/jessicarush/react-notes/blob/master/life_cycle_methods.md#lifecycle-methods-in-function-components)
 
 For example:
 
@@ -193,11 +198,6 @@ useEffect(() => {
    console.log('Do something after counter has changed', counter);
 }, [counter]);
 ```
-
-
-## useContext
-
-TODO
 
 
 ## Building your own hooks
