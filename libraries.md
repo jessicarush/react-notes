@@ -87,7 +87,7 @@ See: [client_side_routing.md](client_side_routing.md)
 
 ## Material UI
 
-[Material UI](https://mui.com) is a library that allows you to import and use customizable, [pre-built components]((https://mui.com/components/)) in React applications.
+[Material UI](https://mui.com) is a library that allows you to import and use customizable, [pre-built components](https://mui.com/components/) in React applications.
 
 ```bash
 npm install @mui/material @emotion/react @emotion/styled
