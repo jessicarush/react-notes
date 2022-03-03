@@ -173,6 +173,8 @@ Rendered D TestPureChild.js:29
 
 So, to prevent this, in the Child component, I can simply extend wrap my component in `React.memo`.
 
+> Note: Don't mistake React's memo API with React's useMemo Hook. While React memo is used to wrap React components to prevent re-renderings, useMemo is used to memoize values
+
 ```javascript
 import React from 'react';
 
@@ -229,6 +231,8 @@ export default TestComponent;
 ```
 
 I'm guessing it has something to do with `useState` but I have not been able to figure out how to do this with both components being functions in my use case.
+
+> React.memo only checks for prop changes. If your function component wrapped in React.memo has a useState, useReducer or useContext Hook in its implementation, it will still rerender when state or context change.
 
 See also [Robin Wieruch's example](https://www.robinwieruch.de/react-memo/).
 
