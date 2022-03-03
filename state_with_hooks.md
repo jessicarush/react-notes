@@ -227,7 +227,7 @@ handleChange(e) {
 }
 ```
 
-If we were to put all our state values in one object called state, we could still do this, just remember to add `..state`:
+If we were to put all our state values in one object called state, we could still do this, just remember to add `...state`:
 
 ```javascript
 import React, { useState } from 'react';
