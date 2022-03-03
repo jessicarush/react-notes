@@ -13,6 +13,7 @@ Context can be used with or without hooks.
 - [When to use context](#when-to-use-context)
 - [In class components](#in-class-components)
 - [In function components (UseContext hook)](#in-function-components-usecontext-hook)
+- [useReducer](#usereducer)
 
 <!-- tocstop -->
 
@@ -29,7 +30,7 @@ If you only want to avoid passing some props through many levels, [component com
 
 To define a context we'll need to create a new file.
 
-**Tip:** Create a new directory called *contexts*, then create a javascript file in that directory for each content. For example: `ThemeContext.js`.
+**Tip:** Create a new directory called *contexts*, then create a javascript file in that directory for each context. For example: `ThemeContext.js`.
 
 In this new file:
 
@@ -308,3 +309,98 @@ export default withLanguageContext(Navbar);
 
 ## In function components (UseContext hook)
 
+
+To create the context provider as a function:
+
+```javascript
+import React, { useState, createContext } from 'react';
+
+const ThemeContext = createContext();
+
+function ThemeProvider(props) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+
+  return (
+    <ThemeContext.Provider value={{isDarkMode, toggleTheme}}>
+      {props.children}
+    </ThemeContext.Provider>
+  )
+}
+
+export {ThemeContext, ThemeProvider};
+```
+
+And...
+
+```javascript
+import React, { useState, createContext } from 'react';
+
+const LanguageContext = createContext();
+
+function LanguageProvider(props) {
+  const [language, setLanguage] = useState('english');
+  const changeLanguage = (e) => setLanguage(e.target.value);
+
+  return (
+    <LanguageContext.Provider value={{language, changeLanguage}}>
+      {props.children}
+    </LanguageContext.Provider>
+  )
+}
+
+export {LanguageContext, LanguageProvider};
+```
+
+You import the context providers and wrap them around your app components exactly the same as with classes:
+
+```javascript
+// ...
+import { ThemeProvider } from './contexts/ThemeContext';
+
+function App() {
+  return (
+    <div className="App">
+      <ThemeProvider>
+        <LanguageProvider>
+          <PageContent>
+            <Navbar />
+            <Form />
+          </PageContent>
+        </LanguageProvider>
+      </ThemeProvider>
+    </div>
+  );
+}
+
+export default App;
+```
+
+To use (consume) the context in the components is easier using `useContext`:
+
+```javascript
+import React, { useContext } from 'react';
+// ...
+import { ThemeContext } from './contexts/ThemeContext';
+import { LanguageContext } from './contexts/LanguageContext';
+
+function Navbar() {
+  const { isDarkMode } = useContext(ThemeContext);
+  const { language, setLanguage } = useContext(LanguageContext);
+
+  return (
+    <div className="Navbar">
+      {/* ... */}
+    </div>
+  );
+}
+
+export default Navbar;
+```
+
+Note that when working with `useContext`, whenever the context providers value changes, any component consuming that context will be re-rendered. This is true even if components are using different methods or parameters from the context... the thing to remember is the context provider always outputs a single value, even if that value happens to be an object.
+
+
+## useReducer
+
+To improve performance, `useReducer` is often used in combination with context. See [useReducer.md](useReducer.md).
