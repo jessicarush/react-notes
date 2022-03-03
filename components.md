@@ -108,7 +108,6 @@ In these two examples, I want to demonstrate how to access/define the following:
 import React, { Component } from 'react';
 import './Example.css';
 
-
 class Example extends Component {
   // default props
   static defaultProps = {
@@ -140,7 +139,6 @@ Let's start with *props*:
 ```javascript
 import './Example.css';
 
-
 function Example(props) {
   // props
   let name = props.name;
@@ -157,8 +155,22 @@ Alternatively:
 ```javascript
 import './Example.css';
 
-
 function Example({name}) {
+  return (
+    <div className="Example">{name}</div>
+  );
+}
+
+export default Example;
+```
+
+or...
+
+```javascript
+import './Example.css';
+
+function Example(props) {
+  const {name} = props;
   return (
     <div className="Example">{name}</div>
   );
@@ -182,7 +194,8 @@ function Example({name='stranger', color='red'}) {
 export default Example;
 ```
 
-You can also do it this way:
+or...
+
 ```javascript
 import './Example.css';
 
