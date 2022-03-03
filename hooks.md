@@ -16,7 +16,8 @@
 - [useContext](#usecontext)
 - [useEffect](#useeffect)
   * [used for setState callbacks](#used-for-setstate-callbacks)
-- [Building your own hooks](#building-your-own-hooks)
+- [useLayoutEffect](#uselayouteffect)
+- [Custom hooks](#custom-hooks)
   * [Custom hook example: localStorage](#custom-hook-example-localstorage)
 
 <!-- tocstop -->
@@ -200,7 +201,12 @@ useEffect(() => {
 ```
 
 
-## Building your own hooks
+## useLayoutEffect
+
+TODO
+
+
+## Custom hooks
 
 Building your own Hooks lets you extract component logic into reusable functions.
 
@@ -248,7 +254,7 @@ export default Demo;
 
 ### Custom hook example: localStorage
 
-This custom hook will automatcally update localStorage whenever a state value changes. When initializing the state value, it will check first to see if there is a local storage item.
+This custom hook will automatically update localStorage whenever a state value changes. When initializing the state value, it will check first to see if there is a local storage item.
 
 ```javascript
 import { useState, useEffect } from 'react';
