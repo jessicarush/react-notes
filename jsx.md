@@ -525,3 +525,18 @@ Gives us what we want:
   </tr>
 </table>
 ```
+
+As of React v16.2.0, you can also use the shorthand `<></>` syntax.
+
+```javascript
+function Columns() {
+  return (
+    <>
+      <td>Hello</td>
+      <td>World</td>
+    </>
+  );
+}
+```
+
+Keep in mind though, if you have to pass a `key=uuid()`, you'll need to use the normal `<Fragment>` syntax.
