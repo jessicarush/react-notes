@@ -31,7 +31,7 @@ import './Example.css';
 
 function Example(props) {
   // props
-  // const {} =  props;
+  // const {} = props;
   // state
   const [name, setName] = useState('');
 
