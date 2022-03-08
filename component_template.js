@@ -1,26 +1,26 @@
 // Class component -----------------------------------------------------------
 
-import React, { Component } from 'react';
-import './Example.css';
+// import React, { Component } from 'react';
+// import './Example.css';
 
 
-class Example extends Component {
-  static defaultProps = {
-  };
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-  render() {
-    return (
-      <div className="Example">
+// class Example extends Component {
+//   static defaultProps = {
+//   };
+//   constructor(props) {
+//     super(props);
+//     this.state = {};
+//   }
+//   render() {
+//     return (
+//       <div className="Example">
 
-      </div>
-    );
-  }
-}
+//       </div>
+//     );
+//   }
+// }
 
-export default Example;
+// export default Example;
 
 
 // Functional component ------------------------------------------------------
