@@ -9,7 +9,7 @@
 - [3. Render your App in an index.js](#3-render-your-app-in-an-indexjs)
 - [4. Create an element to hold your rendered react app in your html](#4-create-an-element-to-hold-your-rendered-react-app-in-your-html)
 - [5. Add all the component scripts to your html](#5-add-all-the-component-scripts-to-your-html)
-- [5. Run your app on a server](#5-run-your-app-on-a-server)
+- [6. Run your app on a server](#6-run-your-app-on-a-server)
 - [Final note](#final-note)
 
 <!-- tocstop -->
@@ -19,6 +19,7 @@
 Usually you'll have many components. Standard practice is that each should be in their own file.
 
 *welcome.js*
+
 ```javascript
 class Welcome extends React.Component {
   render() {
@@ -37,6 +38,7 @@ class Welcome extends React.Component {
 This will be where we bring together all the other components. This will be the one thing we render into the DOM.
 
 *app.js*
+
 ```javascript
 class App extends React.Component {
   render() {
@@ -53,6 +55,7 @@ class App extends React.Component {
 ## 3. Render your App in an index.js
 
 *index.js*
+
 ```javascript
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
@@ -60,6 +63,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 ## 4. Create an element to hold your rendered react app in your html
 
 *index.html*
+
 ```html
 <div id="root"> <!-- react app will render here --> </div>
 ```
@@ -67,6 +71,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 ## 5. Add all the component scripts to your html
 
 *index.html*
+
 ```html
   <!-- React -->
   <script src="https://unpkg.com/react/umd/react.development.js"></script>
@@ -83,7 +88,35 @@ ReactDOM.render(<App />, document.getElementById('root'));
 </body>
 ```
 
-## 5. Run your app on a server
+Note: The React Docs do it a little different:
+
+```html
+  <!-- ... other HTML ... -->
+
+  <!-- Load React -->
+  <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+
+  <!-- Load Babel to transpile JSX -->
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <!-- Load our React components -->
+  <script src="like_button.js" type="text/babel"></script>
+</body>
+```
+
+
+**Tip: Minify JavaScript for Production**
+
+Before deploying your website to production, be mindful that unminified JavaScript can significantly slow down the page for your users.
+
+```html
+<script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+```
+
+## 6. Run your app on a server
 
 If you try to open your `index.html`, you'll have issues because of the [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) stuff. Instead, navigate to the directory and run it on a python server:
 
