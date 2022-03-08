@@ -62,7 +62,9 @@ function Counter() {
 }
 ```
 
-Many (most?) `useReducer` examples out there seem to use `switch` statements. Apparently these are typically used as a remnant from reducers in Redux.
+Note that the reducer function is defined *outside* of the component. This is intentional and recommended as it ensures the reducer is a *pure* function (which is better for testing).
+
+Many `useReducer` examples out there seem to use `switch` statements. Apparently these are typically used as a remnant from reducers in Redux. You do not need to use switch statements though.
 
 The above reducer function could also be written as:
 
@@ -97,20 +99,20 @@ function reducer(state, action) {
   };
 }
 
-function Footer(props) {
+function Counter() {
   const { someOtherValue } = useContext(LanguageContext);
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  console.log('Footer render');
   return (
-    <div className="Footer">
+    <>
       Count: {state.count}
       <button onClick={() => dispatch({type: 'decrement', amount: 1})}>-</button>
       <button onClick={() => dispatch({type: 'increment', amount: 1})}>+</button>
-    </div>
+    </>
   );
 }
 ```
+
+Note: if you are using switch statements in your reducer, React recommends you wrap each case block in curly braces `{...}` so that variables declared inside different cases don’t clash with each other. Also, a case should usually end with a return. If you forget to return, the code will “fall through” to the next case, which can lead to mistakes.
 
 
 ## Initial State
@@ -141,7 +143,15 @@ This lets you extract the logic for calculating the initial state outside the re
 
 ## When to use
 
-Most of the time, you are well covered with just `useState()` method, which is built on top of `useReducer()`. But there cases when `useReducer()` is preferable.
+Most of the time, you are well covered with just `useState()` method, which is built on top of `useReducer()`. But there cases when `useReducer()` is preferable. The latest React docs say useReducer is good for *complex state logic* or when *the next state depends on the previous one*.
+
+The React Beta docs however seem to shift the reasoning: *To reduce complexity and keep all your logic in one easy-to-access place*.
+
+Some community comments:
+
+> I use useReducer when I have multiple states that change at the same time or when you have any states that depend on each other.
+
+> Basically use reducer to avoid any situation where you could have multiple useState calls in row.
 
 ### Next state depends on the previous
 
@@ -189,3 +199,4 @@ const [state, dispatch] = useReducer(
 ### Easy to test
 
 Reducers are pure functions which means they have no side effects and must return the same outcome given the same arguments. It is easier to test them because they do not depend on React.
+
