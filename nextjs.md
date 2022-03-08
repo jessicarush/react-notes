@@ -2,12 +2,15 @@
 
 > Next.js is an open-source development framework built on top of Node.js enabling React based web applications functionalities such as server-side rendering and generating static websites. React documentation mentions Next.js among "Recommended Toolchains" advising it to developers as a solution when "Building a server-rendered website with Node.js". Where traditional React apps render all their content in the client-side browser, Next.js is used to extend this functionality to include applications rendered on the server side.
 
-It's important to underline the fact that Next.js is a framework (as opposed to just a library). It enforces a structure and allows for advances features like server *side rendering* and *automatic code splitting*. It replaces `create-react-app` and has its own routing features, analytics, static file serving and more.
+It's important to underline the fact that Next.js is a framework (as opposed to just a library). It enforces a structure and allows for advanced features like hybrid *server side + client side rendering*. It replaces `create-react-app` and has its own routing features, analytics, static file serving and more.
+
+Also noteworthy is the documentation looks very good and includes a [nice tutorial section](https://nextjs.org/learn/foundations/about-nextjs?utm_source=next-site&utm_medium=nav-cta&utm_campaign=next-website).
 
 ## Table of Contents
 
 <!-- toc -->
 
+- [Next.js vs React](#nextjs-vs-react)
 - [Getting started](#getting-started)
   * [Manual setup](#manual-setup)
   * [Automatic setup](#automatic-setup)
@@ -20,6 +23,12 @@ It's important to underline the fact that Next.js is a framework (as opposed to 
 - [pages/_app.js](#pages_appjs)
 
 <!-- tocstop -->
+
+## Next.js vs React
+
+React is a "JavaScript library for building user interfaces".
+
+Next.js is a production framework for React. It is used on top of React, expanding its capabilities and streamlining the development process. React doesn't need to work with Next.js, but Next.js uses React to deploy apps.
 
 ## Getting started
 
@@ -91,7 +100,7 @@ About render
 
 Any `.js`, `.jsx`, `.ts`, or `.tsx` file in the pages directory will automatically be mapped to a (server-side) route based on their file name. For example pages/about.js is mapped to /about. You can even add dynamic route parameters with the filename (e.g. /pic/:id).
 
-It is recommended that other (non page) components be placed in a compoennts directory.
+It is recommended that other (non page) components be placed in a components directory.
 
 
 ## Client side routing with Link
