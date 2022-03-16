@@ -84,7 +84,9 @@ Alternatively, if you'd prefer to put the react build files in its own directory
 "homepage": "/static/react",
 ```
 
-...where 'static' is the flask static dir and 'react' is the new dir that we'll dump the build files into. Adding this line ensures that the react app has the proper paths. When we do it this way, you don't need to add the `static_url_path=''`.
+...where 'static' is the flask static dir and 'react' is the new dir that we'll dump the build files into. Adding this line ensures that the react app has the proper paths. See the [create-react-app docs](https://create-react-app.dev/docs/deployment/#building-for-relative-paths for better explanation. According to this doc, I may be able to use `"homepage": ".",` to have relative paths. Should test this.
+
+When we do it this way, you don't need to add the `static_url_path=''`.
 
 ```python
 app = Flask(__name__)
@@ -103,6 +105,7 @@ def test():
 ### Does this still work wth react-router stuff?
 
 hashrouter?
+<https://create-react-app.dev/docs/deployment/>
 
 WIP...
 
