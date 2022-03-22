@@ -9,9 +9,23 @@
 - [Design Decisions](#design-decisions)
 - [Learning Questions](#learning-questions)
   * [Are all React.js apps SPAs?](#are-all-reactjs-apps-spas)
-  * [How would you integrate/deploy/link your React SPA with an existing website?](#how-would-you-integratedeploylink-your-react-spa-with-an-existing-website)
+  * [How would you integrate your React component/SPA into an existing website?](#how-would-you-integrate-your-react-componentspa-into-an-existing-website)
   * [Can I have flask serve the build/index.html created from create-react-app?](#can-i-have-flask-serve-the-buildindexhtml-created-from-create-react-app)
-  * [Does this still work wth react-router stuff?](#does-this-still-work-wth-react-router-stuff)
+  * [Does the above still work with react-router stuff?](#does-the-above-still-work-with-react-router-stuff)
+  * [Does Next.js produce separate pages when using /pages?](#does-nextjs-produce-separate-pages-when-using-pages)
+  * [Demonstrate working with Flask backed as an API for database stuff.](#demonstrate-working-with-flask-backed-as-an-api-for-database-stuff)
+  * [What are the most common solutions for database with React? Is there a solution built-in to Next.js?](#what-are-the-most-common-solutions-for-database-with-react-is-there-a-solution-built-in-to-nextjs)
+  * [How do I handle authentication (logins) using Flask backend?](#how-do-i-handle-authentication-logins-using-flask-backend)
+  * [What is the common solution for handling auth in React? Is there a solution built-in to Next.js?](#what-is-the-common-solution-for-handling-auth-in-react-is-there-a-solution-built-in-to-nextjs)
+  * [Demonstrate email from React to Flask](#demonstrate-email-from-react-to-flask)
+  * [What is the common solution for handling email in React? Is there a solution built-in to Next.js?](#what-is-the-common-solution-for-handling-email-in-react-is-there-a-solution-built-in-to-nextjs)
+  * [Can I do socket.io between Flask and React?](#can-i-do-socketio-between-flask-and-react)
+  * [If building a flask backend and react frontend, how are these two seemingly independent things deployed/served?](#if-building-a-flask-backend-and-react-frontend-how-are-these-two-seemingly-independent-things-deployedserved)
+  * [Would a digitalocean PaaS be more appropriate/easier than a droplet? Would it allow for the Flask backend too?](#would-a-digitalocean-paas-be-more-appropriateeasier-than-a-droplet-would-it-allow-for-the-flask-backend-too)
+  * [What exactly is the deal with Firebase? Is it worth learning?](#what-exactly-is-the-deal-with-firebase-is-it-worth-learning)
+  * [What exactly is the deal with GraphQL? Is it worth learning?](#what-exactly-is-the-deal-with-graphql-is-it-worth-learning)
+  * [What else do I need to know about Next.js? Do the tutorial.](#what-else-do-i-need-to-know-about-nextjs-do-the-tutorial)
+  * [How to learn more about end to end testing? Is Cypress the best tool?](#how-to-learn-more-about-end-to-end-testing-is-cypress-the-best-tool)
 
 <!-- tocstop -->
 
@@ -28,7 +42,7 @@ In the past, web developers turned to libraries like jQuery to manage the variou
 
 The downside to all this was complexity. Despite these frameworks organization, data was flowing everywhere and bugs became harder to find. It became harder to understand how each part of the app was affecting another. As a result, in 2013-2014 AngularJS realized they need to re-structure their library. Around the same time, React came out; so many AngularJS devs moved over to React.
 
-In terms of DOM manipulation, React takes a *declarative* as opposed to *imperative* approach. Specifically, it uses *state* to do this and results in less complexity and overll better code quality. Some key React concepts:
+In terms of DOM manipulation, React takes a *declarative* as opposed to *imperative* approach. Specifically, it uses *state* to do this and results in less complexity and overall better code quality. Some key React concepts:
 
 - Don't manipulate the DOM directly, React will handle it (using its VirtualDOM)
 - Build websites/apps like lego blocks (components)
@@ -143,7 +157,7 @@ TODO...
 
 TODO...
 
-### If building a flask backend and react frontent, how are these two seemingly independent things deployed/served? 
+### If building a flask backend and react frontend, how are these two seemingly independent things deployed/served? 
 
 What is the actual nginx setup? Do the two get to use the same domain name? What does the proxy line in the package.json have to say? Is it just that they're running on different ports? So nginx would serve the frontend port and the package.json proxy would point to the backend port?
 
