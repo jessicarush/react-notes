@@ -1,4 +1,4 @@
-# React
+# React notes
 
 ## Table of Contents
 
@@ -24,16 +24,16 @@ There are a tonne of additional (optional) react-specific tools that you can cho
 
 ## Why React
 
-In the past, web developers turned to libraries like jQuery to manage the various browsers implementing DOM things slightly differently. As websites evolved into bigger and bigger web applications the focus shifted away from separate HTMl pages and more heavily on JavaScript. The application would load all at the front (like a desktop app) and instead of making new HTML page requests, the web app would use JavaScript to update the page content with new content. This led to the rise of single-page-applications and web frameworks like AngularJS where JavaScript code was organized into "containers" like controllers, views and models. Organizing code into these logical sections made projects easier to work on in Teams.
+In the past, web developers turned to libraries like jQuery to manage the various browsers implementing DOM things slightly differently. As websites evolved into bigger and bigger web applications the focus shifted away from separate HTML pages and more heavily on JavaScript. The application would load all at the front (like a desktop app) and instead of making new HTML page requests, the web app would use JavaScript to update the page content with new content. This led to the rise of single-page-applications and web frameworks like AngularJS where JavaScript code was organized into "containers" like controllers, views and models. Organizing code into these logical sections made projects easier to work on in Teams.
 
-The downside to all this was complexity. Despite these frameworks organization, data was flowing everywhere and bugs became harder to find. It became harder to understand how each part of the app was affecting another. As a result, in 2013-2014 AngularJS realized they need to re-structure their library (Angular), At the same time React came out so many AngularJS devs moved over to React.
+The downside to all this was complexity. Despite these frameworks organization, data was flowing everywhere and bugs became harder to find. It became harder to understand how each part of the app was affecting another. As a result, in 2013-2014 AngularJS realized they need to re-structure their library. Around the same time, React came out; so many AngularJS devs moved over to React.
 
-In terms of DOM manipulation, React takes a *declarative* as opposed to *imperative* approach. Specifically, it uses *state* to do this and results in less complexity, better code quality. Some key React concepts:
+In terms of DOM manipulation, React takes a *declarative* as opposed to *imperative* approach. Specifically, it uses *state* to do this and results in less complexity and overll better code quality. Some key React concepts:
 
 - Don't manipulate the DOM directly, React will handle it (using its VirtualDOM)
 - Build websites/apps like lego blocks (components)
 - Uni-directional data flow (events trigger > state change triggers > Components change and DOM change)
-- React is just the UI, the rest is up to you (its a library not an opinionated framework)
+- React is just the UI, the rest is up to you (it's a library not an opinionated framework)
 
 
 ## Design Decisions
@@ -53,15 +53,17 @@ From the [React Docs](https://reactjs.org/docs/glossary.html):
 
 > Though you may build a single-page application in React, it is not a requirement. React can also be used for enhancing small parts of existing websites with additional interactivity. Code written in React can coexist peacefully with markup rendered on the server by something like PHP, or with other client-side libraries. In fact, this is exactly how React is being used at Facebook.
 
-### How would you integrate/deploy/link your React SPA with an existing website?
+### How would you integrate your React component/SPA into an existing website?
 
-See <https://reactjs.org/docs/add-react-to-a-website.html>
+See the React docs: <https://reactjs.org/docs/add-react-to-a-website.html>
+
+TODO... create a demo of a component (with nested components) using their instructions for working with JSX.
 
 ### Can I have flask serve the build/index.html created from create-react-app?
 
 Yes. You need to:
 
-1. Copy all the files from the build directory (created from `npm run build`) and place them in the static directory of the flask app.
+1. Copy all the files from inside the build directory (created from `npm run build`) and place them inside the static directory of the flask app.
 
 2. Create a route the serves a static file from the static directory:
 
@@ -78,7 +80,7 @@ def test():
 app = Flask(__name__, static_url_path='')
 ```
 
-Alternatively, if you'd prefer to put the react build files in its own directory within the static dir, you could modify the package.json to have the following line:
+Alternatively, if you'd prefer to have the react build files in their own directory within the flask static dir, you could modify the package.json to have the following line:
 
 ```json
 "homepage": "/static/react",
@@ -102,28 +104,65 @@ def test():
 ```
 
 
-### Does this still work wth react-router stuff?
+### Does the above still work with react-router stuff?
 
+TODO...
 hashrouter?
 <https://create-react-app.dev/docs/deployment/>
 
-WIP...
+### Does Next.js produce separate pages when using /pages? 
 
-- Does Next.js produce separate pages when using /pages? Using <Link> makes it like an SPA, but what would I do if I wanted it to link like separate pages.
-- Demonstrate working with Flask backed as an API for database stuff.
-- What are the most common solutions for database with React? Is there a solution built-in to Next.js?
-- How do I handle authentication (logins) using Flask backend?
-- What is the common solution for handling auth in React? Is there a solution built-in to Next.js?
-- Demonstrate email from React to Flask
-- What is the common solution for handling email in React? Is there a solution built-in to Next.js?
-- Can I do socket.io between Flask and React?
-- How are these two seemingly independent things deployed/served? What is the actual nginx setup? Do the two get to use the same domain name? What does the proxy line in the package.json have to say? Is it just that they're running on different ports? So nginx would serve the frontend port and the package.json proxy would point to the backend port?
-- Would a digitalocean PaaS be more appropriate/easier than a droplet? Would it allow for the Flask backend too?
-- What exactly is the deal with Firebase? Is it worth learning?
-- What exactly is the deal with GraphQL? Is it worth learning?
-- What else do I need to know about Next.js? Do the tutorial.
-- How to learn more about end to end testing? Is Cypress the best tool?
+TODO...
+Using <Link> makes it like an SPA, but what would I do if I wanted it to link like separate pages?
 
+### Demonstrate working with Flask backed as an API for database stuff.
 
+TODO...
 
+### What are the most common solutions for database with React? Is there a solution built-in to Next.js?
 
+TODO...
+
+### How do I handle authentication (logins) using Flask backend?
+
+TODO...
+
+### What is the common solution for handling auth in React? Is there a solution built-in to Next.js?
+
+TODO...
+
+### Demonstrate email from React to Flask
+
+TODO...
+
+### What is the common solution for handling email in React? Is there a solution built-in to Next.js?
+
+TODO...
+
+### Can I do socket.io between Flask and React?
+
+TODO...
+
+### If building a flask backend and react frontent, how are these two seemingly independent things deployed/served? 
+
+What is the actual nginx setup? Do the two get to use the same domain name? What does the proxy line in the package.json have to say? Is it just that they're running on different ports? So nginx would serve the frontend port and the package.json proxy would point to the backend port?
+
+### Would a digitalocean PaaS be more appropriate/easier than a droplet? Would it allow for the Flask backend too?
+
+TODO...
+
+### What exactly is the deal with Firebase? Is it worth learning?
+
+TODO...
+
+### What exactly is the deal with GraphQL? Is it worth learning?
+
+TODO...
+
+### What else do I need to know about Next.js? Do the tutorial.
+
+TODO...
+
+### How to learn more about end to end testing? Is Cypress the best tool?
+
+TODO...
