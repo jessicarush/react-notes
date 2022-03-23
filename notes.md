@@ -159,15 +159,23 @@ TODO...
 
 ### If building a flask backend and react frontend, how are these two seemingly independent things deployed/served? 
 
+The two things are the *web server* which serves the React SPA and the *application server* which serves all the JSON data through APIs.
+
 What is the actual nginx setup? Do the two get to use the same domain name? What does the proxy line in the package.json have to say? Is it just that they're running on different ports? So nginx would serve the frontend port and the package.json proxy would point to the backend port?
 
 ### Would a digitalocean PaaS be more appropriate/easier than a droplet? Would it allow for the Flask backend too?
 
 TODO...
 
-### What exactly is the deal with Firebase? Is it worth learning?
+### What exactly is the deal with Firebase? Is it worth learning? 
 
 TODO...
+
+Firebase is a platform developed by Google for creating mobile and web applications. It was originally an independent company founded in 2011 and acquired by Google in 2014.
+
+Firebase is considered a *Backend-as-a-Service* (BaaS). It offers a database, authentication and authorization as a backend out of the box. The frontend interacts with Firebase via APIs. Most BaaS, including Firebase, also offer hosting.
+
+
 
 ### What exactly is the deal with GraphQL? Is it worth learning?
 
