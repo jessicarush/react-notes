@@ -210,6 +210,27 @@ function Example(props) {
 export default Example;
 ```
 
+Note that you can also use *rest destructing* and the spread operator:
+
+```javascript
+import React from 'react';
+import Card from './Card';
+
+function Demo(props) {
+  const { id, ...rest } = props;
+
+  console.log(id);
+
+  return (
+    <div className="Demo">
+      <Card {...rest} />
+    </div>
+  );
+}
+
+export default Demo;
+```
+
 
 Use the `useState()` hooks for storing *state* in a function component:
 
@@ -244,9 +265,7 @@ See <https://reactjs.org/docs/hooks-state.html> for a very good comparison betwe
 
 See [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md) for my notes.
 
-The `useEffect()` hook can be used to replicate lifecycle behavior:
-
-TODO ...
+The `useEffect()` hook can be used to replicate lifecycle behavior. See: [hooks.md](hooks.md)
 
 
 ## Nested Components
