@@ -90,7 +90,7 @@ function Example() {
 }
 ```
 
-Note that is the lack of an optional second argument passed to `useEffect` that causes it to run on every update. If you only wanted code to run on the initial mount, pass an empty array as the second argument.
+Note that it's the lack of an optional second argument passed to `useEffect` that causes it to run on every update. If you only wanted code to run on the initial mount, pass an empty array as the second argument.
 
 For example, if we want a one-time api call:
 
