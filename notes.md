@@ -12,7 +12,6 @@
   * [How would you integrate your React component/SPA into an existing website?](#how-would-you-integrate-your-react-componentspa-into-an-existing-website)
   * [Can I have flask serve the build/index.html created from create-react-app?](#can-i-have-flask-serve-the-buildindexhtml-created-from-create-react-app)
   * [Does the above still work with react-router stuff?](#does-the-above-still-work-with-react-router-stuff)
-  * [Does Next.js produce separate pages when using /pages?](#does-nextjs-produce-separate-pages-when-using-pages)
   * [Demonstrate working with Flask backed as an API for database stuff.](#demonstrate-working-with-flask-backed-as-an-api-for-database-stuff)
   * [What are the most common solutions for database with React? Is there a solution built-in to Next.js?](#what-are-the-most-common-solutions-for-database-with-react-is-there-a-solution-built-in-to-nextjs)
   * [How do I handle authentication (logins) using Flask backend?](#how-do-i-handle-authentication-logins-using-flask-backend)
@@ -71,7 +70,17 @@ From the [React Docs](https://reactjs.org/docs/glossary.html):
 
 See the React docs: <https://reactjs.org/docs/add-react-to-a-website.html>
 
-TODO... create a demo of a component (with nested components) using their instructions for working with JSX.
+My summary notes are here: [add_react_to_html.md](add_react_to_html.md). I'm assuming you could have nested components, you would just need to src them in the right order. You would also need to add `type=module` to the component `<script>` tags (assuming we're using import/export). 
+
+That being said, with this very simplistic approach, you wouldn't get to import css files or any other node packages into your components. Overall, the usefulness of this approach seems pretty slim. 
+
+It seems to me that if you really needed to embed a react project into and existing website, the best approach would still be to use create-react-app or webpack. 
+
+With create-react-app, we can use the `npm run build` command and serve all the static files it creates. This is explained step-by-step in the second half of [add_react_to_html.md](add_react_to_html.md).
+
+Lastly, we can create our own webpack configuration...
+
+TODO..
 
 ### Can I have flask serve the build/index.html created from create-react-app?
 
@@ -124,11 +133,6 @@ TODO...
 hashrouter?
 <https://create-react-app.dev/docs/deployment/>
 
-### Does Next.js produce separate pages when using /pages? 
-
-TODO...
-Using <Link> makes it like an SPA, but what would I do if I wanted it to link like separate pages?
-
 ### Demonstrate working with Flask backed as an API for database stuff.
 
 TODO...
@@ -175,8 +179,6 @@ Firebase is a platform developed by Google for creating mobile and web applicati
 
 Firebase is considered a *Backend-as-a-Service* (BaaS). It offers a database, authentication and authorization as a backend out of the box. The frontend interacts with Firebase via APIs. Most BaaS, including Firebase, also offer hosting.
 
-
-
 ### What exactly is the deal with GraphQL? Is it worth learning?
 
 TODO...
@@ -184,6 +186,9 @@ TODO...
 ### What else do I need to know about Next.js? Do the tutorial.
 
 TODO...
+
+Does Next.js produce separate pages when using /pages? 
+Using <Link> makes it like an SPA, but what would I do if I wanted it to link like separate pages?
 
 ### How to learn more about end to end testing? Is Cypress the best tool?
 
