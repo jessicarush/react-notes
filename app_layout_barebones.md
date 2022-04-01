@@ -8,7 +8,7 @@
 - [2. Create a top level component called App](#2-create-a-top-level-component-called-app)
 - [3. Render your App in an index.js](#3-render-your-app-in-an-indexjs)
 - [4. Create an element to hold your rendered react app in your html](#4-create-an-element-to-hold-your-rendered-react-app-in-your-html)
-- [5. Add all the component scripts to your html](#5-add-all-the-component-scripts-to-your-html)
+- [5. Add all the scripts to your html](#5-add-all-the-scripts-to-your-html)
 - [6. Run your app on a server](#6-run-your-app-on-a-server)
 - [Final note](#final-note)
 
@@ -60,6 +60,33 @@ class App extends React.Component {
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
+> :warning: As of React v18, the `ReactDOM.render` API is considered 'legacy'. The new API is `ReactDOM.createRoot`...
+
+```javascript
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(<App />);
+```
+
+See: <https://github.com/reactwg/react-18/discussions/5>  
+
+You may still get a warning though:
+
+> Warning: You are importing createRoot from "react-dom" which is not supported. You should instead import it from "react-dom/client".
+
+What they're saying is that they want you to import it like so: 
+
+```javascript
+import * as ReactDOMClient from 'react-dom/client';
+
+const container = document.getElementById('root');
+const root = ReactDOMClient.createRoot(container);
+root.render(<App />);
+```
+
+But this type of import is a node_modules thing. With this barebones approach, we aren't using imports, just adding the two react scripts as shown below so it's not clear how you'd avoid that warning. 
+
+
 ## 4. Create an element to hold your rendered react app in your html
 
 *index.html*
@@ -68,7 +95,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 <div id="root"> <!-- react app will render here --> </div>
 ```
 
-## 5. Add all the component scripts to your html
+## 5. Add all the scripts to your html
 
 *index.html*
 
@@ -95,8 +122,7 @@ Note: The React Docs do it a little different:
 
   <!-- Load React -->
   <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
-  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
 
   <!-- Load Babel to transpile JSX -->
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
@@ -106,14 +132,15 @@ Note: The React Docs do it a little different:
 </body>
 ```
 
+I'm guessing if you don't include the @version number, it will just grab the latest.
 
 **Tip: Minify JavaScript for Production**
 
 Before deploying your website to production, be mindful that unminified JavaScript can significantly slow down the page for your users.
 
 ```html
-<script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 ```
 
 ## 6. Run your app on a server
@@ -121,7 +148,7 @@ Before deploying your website to production, be mindful that unminified JavaScri
 If you try to open your `index.html`, you'll have issues because of the [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) stuff. Instead, navigate to the directory and run it on a python server:
 
 ```bash
-python3 -m http.server
+python -m http.server
 ```
 
 ## Final note
