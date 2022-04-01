@@ -10,6 +10,19 @@ The second example comes from various searches so I'm not certain of its reliabi
 
 <!-- toc -->
 
+- [Add a simple component](#add-a-simple-component)
+  * [1: Add a DOM Container to the HTML](#1-add-a-dom-container-to-the-html)
+  * [2: Add the Scripts](#2-add-the-scripts)
+  * [3. Set up a JSX Preprocessor](#3-set-up-a-jsx-preprocessor)
+  * [4: Create a React Component](#4-create-a-react-component)
+- [Add a create-react-app build](#add-a-create-react-app-build)
+  * [1. Add a DOM Container to the HTML](#1-add-a-dom-container-to-the-html)
+  * [2. Update `index.js` with the new container id](#2-update-indexjs-with-the-new-container-id)
+  * [3. Add `"homepage": "."` to package.json](#3-add-homepage--to-packagejson)
+  * [4. `npm run build`](#4-npm-run-build)
+- [Build your own Webpack configuration](#build-your-own-webpack-configuration)
+
+<!-- tocstop -->
 
 ## Add a simple component
 
