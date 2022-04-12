@@ -57,12 +57,14 @@ class App extends React.Component {
 *index.js*
 
 ```javascript
+// Legacy method for React <18
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
 > :warning: As of React v18, the `ReactDOM.render` API is considered 'legacy'. The new API is `ReactDOM.createRoot`...
 
 ```javascript
+// Current method for React 18
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 root.render(<App />);
@@ -77,14 +79,14 @@ You may still get a warning though:
 What they're saying is that they want you to import it like so: 
 
 ```javascript
-import * as ReactDOMClient from 'react-dom/client';
+import ReactDOMClient from 'react-dom/client';
 
 const container = document.getElementById('root');
 const root = ReactDOMClient.createRoot(container);
 root.render(<App />);
 ```
 
-But this type of import is a node_modules thing. With this barebones approach, we aren't using imports, just adding the two react scripts as shown below so it's not clear how you'd avoid that warning. 
+But this type of import is a node_modules thing. With this barebones approach, we aren't using imports, just adding the two react scripts as shown below so it's not clear how you'd avoid that warning. As of this wrtitng the approach `ReactDOM.createRoot(container);` comes directly from the [React docs](https://reactjs.org/docs/add-react-to-a-website.html).
 
 
 ## 4. Create an element to hold your rendered react app in your html
