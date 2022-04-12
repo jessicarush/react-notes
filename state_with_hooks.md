@@ -10,6 +10,7 @@
 - [Set initial state](#set-initial-state)
 - [Read state](#read-state)
 - [Update state](#update-state)
+  * [Functional updates](#functional-updates)
 - [Form handling (controlled inputs)](#form-handling-controlled-inputs)
   * [Custom hook for forms](#custom-hook-for-forms)
 - [One or many state variables?](#one-or-many-state-variables)
@@ -167,6 +168,30 @@ function Example(props) {
   );
 }
 ```
+
+### Functional updates 
+
+If the new state is computed using the previous state, you can pass a function to setState. The function will receive the previous value, and return an updated value. Here’s an example of a counter component that uses both forms of setState:
+
+```jsx
+function Counter({initialCount}) {
+  const [count, setCount] = useState(initialCount);
+  return (
+    <>
+      Count: {count}
+      <button onClick={() => setCount(initialCount)}>Reset</button>
+      <button onClick={() => setCount(prevCount => prevCount - 1)}>-</button>
+      <button onClick={() => setCount(prevCount => prevCount + 1)}>+</button>
+    </>
+  );
+}
+```
+
+According to the [React docs here](https://reactjs.org/docs/hooks-reference.html#functional-updates):
+
+> The ”+” and ”-” buttons use the functional form, because the updated value is based on the previous value. But the “Reset” button uses the normal form, because it always sets the count back to the initial value.
+
+However, I have seen them also use `setCount(count + 1)`, sometimes [in the same section](https://reactjs.org/docs/hooks-reference.html#usetransition). So I'm not really sure if this is a rule or a suggestion. I'm guessing it's just like with Classes and the old methods of state, where there are situations where the value may not be current so using the previous state value as a functional update is safer.
 
 
 ## Form handling (controlled inputs)
