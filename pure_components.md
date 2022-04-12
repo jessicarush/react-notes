@@ -4,6 +4,16 @@ Pure components are used when you want to prevent a component from re-rendering 
 
 > A `React.PureComponent` is similar to `React.Component`. The difference between them is that `React.Component` doesn’t implement `shouldComponentUpdate()`, but `React.PureComponent` implements it with a shallow prop and state comparison.
 
+
+## Table of Contents
+
+<!-- toc -->
+
+- [Example using Class Components](#example-using-class-components)
+- [Example using Functional Components](#example-using-functional-components)
+
+<!-- tocstop -->
+
 ## Example using Class Components
 
 So here's the problem: Let's say I have a parent component that renders a number of child components. It keeps track of the children using state. Let's say the children can also be deleted. If one is deleted, the remaining children should NOT be re-rendered since they haven't changed... but by default, they do.
