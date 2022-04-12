@@ -13,6 +13,7 @@
   * [CSS and image assets](#css-and-image-assets)
 - [Renaming root folder](#renaming-root-folder)
 - [React version](#react-version)
+- [create-react-app version](#create-react-app-version)
 - [React scripts](#react-scripts)
 
 <!-- tocstop -->
@@ -253,6 +254,16 @@ Note you can see what React version is installed by looking at the `package.json
 
 ```bash
 npm view react version
+```
+
+## create-react-app version 
+
+Note that using `npx create-react-app myapp`, will always use the latest version of create-react-app. Once run, you can see the version number by looking at the `"react-scripts": "^5.0.0",` line. You can verify the version number by going to the [CHANGELOG](https://github.com/facebook/create-react-app/blob/main/CHANGELOG.md) in teh create-react-app github repo.
+
+You can also male sure you've got teh latest be running:
+
+```
+npm install react-scripts@latest
 ```
 
 
