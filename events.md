@@ -26,116 +26,116 @@ In React, every JSX element has built-in attributes representing every kind of b
 
 Any event that can be used in JavaScript exists in React. [See here for the complete list of supported events and related properties](https://reactjs.org/docs/events.html#supported-events).
 
-**Clipboard Events**
-onCopy
-onCut
-onPaste
+**Clipboard Events**  
+onCopy  
+onCut  
+onPaste  
 
-**Composition Events**
-onCompositionEnd
-onCompositionStart
-onCompositionUpdate
+**Composition Events**  
+onCompositionEnd  
+onCompositionStart  
+onCompositionUpdate  
 
-**Keyboard Events**
-onKeyDown
-onKeyPress
-onKeyUp
+**Keyboard Events**  
+onKeyDown  
+onKeyPress  
+onKeyUp  
 
-**Focus Events**
-onFocus
-onBlur
+**Focus Events**  
+onFocus  
+onBlur  
 
-**Form Events**
-onChange
-onInput
-onInvalid
-onSubmit
+**Form Events**  
+onChange  
+onInput  
+onInvalid  
+onSubmit  
 
-**Mouse Events**
-onClick
-onContextMenu
-onDoubleClick
-onDrag
-onDragEnd
-onDragEnter
-onDragExit
-onDragLeave
-onDragOver
-onDragStart
-onDrop
-onMouseDown
-onMouseEnter
-onMouseLeave
-onMouseMove
-onMouseOut
-onMouseOver
-onMouseUp
+**Mouse Events**  
+onClick  
+onContextMenu  
+onDoubleClick  
+onDrag  
+onDragEnd  
+onDragEnter  
+onDragExit  
+onDragLeave  
+onDragOver  
+onDragStart  
+onDrop  
+onMouseDown  
+onMouseEnter  
+onMouseLeave  
+onMouseMove  
+onMouseOut  
+onMouseOver  
+onMouseUp  
 
-**Pointer Events**
-onPointerDown
-onPointerMove
-onPointerUp
-onPointerCancel
-onGotPointerCapture
-onLostPointerCapture
-onPointerEnter
-onPointerLeave
-onPointerOver
-onPointerOut
+**Pointer Events**  
+onPointerDown  
+onPointerMove  
+onPointerUp  
+onPointerCancel  
+onGotPointerCapture  
+onLostPointerCapture  
+onPointerEnter  
+onPointerLeave  
+onPointerOver  
+onPointerOut  
 
-**Selection Events**
-onSelect
+**Selection Events**  
+onSelect  
 
-**Touch Events**
-onTouchCancel
-onTouchEnd
-onTouchMove
-onTouchStart
+**Touch Events**  
+onTouchCancel  
+onTouchEnd  
+onTouchMove  
+onTouchStart  
 
-**UI Events**
-onScroll
+**UI Events**  
+onScroll  
 
-**Wheel Events**
-onWheel
+**Wheel Events**  
+onWheel  
 
-**Media Events**
-onAbort
-onCanPlay
-onCanPlayThrough
-onDurationChange
-onEmptied
-onEncrypted
-onEnded
-onError
-onLoadedData
-onLoadedMetadata
-onLoadStart
-onPause
-onPlay
-onPlaying
-onProgress
-onRateChanged
-onSeeking
-onStalled
-onSuspend
-onTimeUpdate
-onVolumeChange
-onWaiting
+**Media Events**  
+onAbort  
+onCanPlay  
+onCanPlayThrough  
+onDurationChange  
+onEmptied  
+onEncrypted  
+onEnded  
+onError  
+onLoadedData  
+onLoadedMetadata  
+onLoadStart  
+onPause  
+onPlay  
+onPlaying  
+onProgress  
+onRateChanged  
+onSeeking  
+onStalled  
+onSuspend  
+onTimeUpdate  
+onVolumeChange  
+onWaiting  
 
-**Image Events**
-onLoad
-onError
+**Image Events**  
+onLoad  
+onError  
 
-**Animation Events**
-onAnimationStart
-onAnimationEnd
-onAnimationIteration
+**Animation Events**  
+onAnimationStart  
+onAnimationEnd  
+onAnimationIteration  
 
-**Transition Events**
-onTransitionEnd
+**Transition Events**  
+onTransitionEnd  
 
-**Other Events**
-onToggle
+**Other Events**  
+onToggle  
 
 
 ## Event Data
@@ -175,7 +175,6 @@ You can also access the JavaScript standard `e.target`, `e.target.value`, etc.
 ## this binding
 
 Because of the way event callbacks are handled by React, in order to use the `this` keyword within a callback function (for example to change state with `this.setState()`), we need to either bind `this` in the constructor or use arrow syntax and babel as discussed in [state.md](state.md).
-
 
 ```javascript
 class Button extends Component {
@@ -263,11 +262,13 @@ If you need to pass arguments to the handler, one quick and dirty way is to use 
 If the button (or whatever) were inside a child component, we could pass the whole function as a prop then reference the prop in the child's event attribute:
 
 *ParentComponent.js*
+
 ```javascript
 <ChildComponent handleClick={this.handleChildClick.bind(this, 'tomato')}/>
 ```
 
 *ChildComponent.js*
+
 ```javascript
 <button onClick={this.props.handleClick}>Click me</button>
 ```
@@ -306,6 +307,7 @@ class TestComponent extends Component {
 If the event was in the child, it would be the same idea:
 
 *ParentComponent.js*
+
 ```javascript
 class TestComponent extends Component {
   constructor(props) {
@@ -328,6 +330,7 @@ class TestComponent extends Component {
 ```
 
 *ChildComponent.js*
+
 ```javascript
 class TestChildComponent extends Component {
   constructor(props) {

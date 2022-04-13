@@ -112,6 +112,7 @@ You can pass an object of key value pairs or, a function that returns an object 
 Normally, an event would trigger a state change but for the moment, to illustrate changing a state the following class has a method that uses the `setInterval()` Window/Global Scope method to change the score state every 1000ms.
 
 Passing a regular object to `setState()`:
+
 ```javascript
 class StateDemo extends Component {
   constructor(props) {
@@ -138,6 +139,7 @@ class StateDemo extends Component {
 ```
 
 Passing a function to `setState()`:
+
 ```javascript
 changeState() {
   this.setState(() => {
@@ -148,6 +150,7 @@ changeState() {
 ```
 
 Passing a callback to `setState()`:
+
 ```javascript
 // ... outside of the component
 function randomScore() {
@@ -161,6 +164,7 @@ changeState() {
   this.setState(randomScore);
 }
 ```
+
 or:
 
 ```javascript
@@ -180,7 +184,7 @@ Note that using a callback makes testing code much simpler, for example:
 expect(incrementScore({count: 0})).toEqual({count: 1});
 ```
 
-Not that you should never `setState()` in the constructor.
+Note that you should never `setState()` in the constructor.
 
 
 ## React Events
@@ -263,6 +267,7 @@ Remember that `setState()` is asynchronous, which means it's risky to assume the
 When passing a function where we want to update a state value, we give it the current state as a parameter. The function should use that parameter to do any calculating, then return an object representing the new state.
 
 Using a function:
+
 ```javascript
 class Score extends Component {
   constructor(props) {
@@ -290,6 +295,7 @@ class Score extends Component {
 ```
 
 Using a callback:
+
 ```javascript
 function incrementScore(currentState) {
   return {score: currentState.score + 1};
@@ -316,6 +322,7 @@ class Score extends Component {
 ```
 
 When the callback is a method in the class, remember to add `this`:
+
 ```javascript
 class Score extends Component {
   constructor(props) {
@@ -396,6 +403,7 @@ If, for example, I had a child component that I wanted to change state: While th
 When you use this pattern, both the parent and the child need to bind their callback functions. For example:
 
 Parent component:
+
 ```javascript
 class TestComponent extends Component {
   constructor(props) {
@@ -426,6 +434,7 @@ class TestComponent extends Component {
 ```
 
 Child component:
+
 ```javascript
 class TestChildComponent extends Component {
   constructor(props) {
@@ -448,7 +457,7 @@ class TestChildComponent extends Component {
 }
 ```
 
-That being said, when you have state properties that are mainly for presentation, that state information could be stored in the component where it is being used. For the "core" data in an app, try to centralize the data in a parent component.  It can be helpful to frame it through the question: "what data would I want to send off to a database?".  In cases where we're only using a state/function for display purpose and wouldn't need to store that in a database, it might be preferable to keep it in the child component.
+That being said, when you have state properties that are mainly for presentation (UI logic), that state information could be stored in the component where it is being used. For the "core" data in an app (business logic); try to centralize the data in a parent component. It can be helpful to frame it through the question: "what data would I want to send off to a database?". In cases where we're only using a state/function for display purpose and wouldn't need to store that in a database, it might be preferable to keep it in the child component.
 
 
 ## Updating state with map() vs for
@@ -470,6 +479,7 @@ this.state = {
 What I want to do, is update a property of one of the objects which I'm going to select by id.
 
 Here's doing it with a for loop:
+
 ```javascript
 editTodo(id) {
   this.setState(currentState => {
@@ -485,6 +495,7 @@ editTodo(id) {
 ```
 
 And with map():
+
 ```javascript
 editTodo(id) {
   const newTodos = this.state.todos.map(todo => {
@@ -497,6 +508,18 @@ editTodo(id) {
   this.setState({ todos: newTodos});
 }
 ```
+
+and with the ternary operand:
+
+```javascript
+editTodo(id) {
+  const newTodos = this.state.todos.map((todo) => {
+    return todo.id === id ? { ...todo, editing: true } : todo;
+  });
+  this.setState({ todos: newTodos });
+}
+```
+
 
 ## setState optional callback
 
@@ -519,7 +542,7 @@ updateVotes(id, delta) {
 
 ## Toggling a true/false value
 
-This is more of a plain old JavaScript note, rather that a React-specific note but it came up so I'm making a note of it.
+This is more of a plain old JavaScript reminder, rather that a React-specific tip but it came up so I'm making a note of it.
 
 When you want to toggle a state on and off, a very long way might be something like this;
 
@@ -530,7 +553,8 @@ if (currentState.todos[i].id === id) {
 }
 ```
 
-But I always forget, it's way simpler to use the `!` not operand:
+But it's way simpler to use the `!` not operand:
+
 ```javascript
 if (currentState.todos[i].id === id) {
   currentState.todos[i].completed = !currentState.todos[i].completed;

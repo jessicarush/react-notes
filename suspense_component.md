@@ -1,6 +1,6 @@
 # React Suspense Features
 
-New to React 18 
+**New to React 18**
 
 Server rendering is an important performance optimization for React apps that let's users see content faster. Suspense on the server allows you to show critical content first and let slower components pop in as content becomes available. Basically, parts of the app can be served asynchronously.
 
