@@ -7,6 +7,7 @@
 - [Introduction](#introduction)
 - [Why React](#why-react)
 - [Design Decisions](#design-decisions)
+- [React 18 notes](#react-18-notes)
 - [Learning Questions](#learning-questions)
   * [Are all React.js apps SPAs?](#are-all-reactjs-apps-spas)
   * [How would you integrate your React component/SPA into an existing website?](#how-would-you-integrate-your-react-componentspa-into-an-existing-website)
@@ -58,6 +59,39 @@ When building a React app, the key design decisions will be:
 - What changes when state changes
 
 
+## React 18 notes 
+
+There is a new way to render your app using `createRoot` which is from `react-dom/client`. 
+
+Note that in strict dev mode, react calls some of the code twice. This will result in double console logs and API calls. See: [React Docs](https://reactjs.org/blog/2022/03/29/react-v18.html#new-strict-mode-behaviors), [Hacker News](https://news.ycombinator.com/item?id=30976040)
+
+This apparently won't happen in the production build. You can disable strict mode temporarily to turn it off.
+
+
+```jsx
+import React from 'react';
+import ReactDOMClient from 'react-dom/client';
+import App from './App';
+import './index.css';
+import reportWebVitals from './reportWebVitals';
+
+const container = document.getElementById('root');
+const root = ReactDOMClient.createRoot(container);
+
+root.render(
+  // <React.StrictMode>
+    <App />
+  // </React.StrictMode>
+);
+
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+```
+
+
 ## Learning Questions
 
 ### Are all React.js apps SPAs?
@@ -81,6 +115,7 @@ With create-react-app, we can use the `npm run build` command and serve all the 
 Lastly, we can create our own webpack configuration...
 
 TODO..
+
 
 ### Can I have flask serve the build/index.html created from create-react-app?
 
