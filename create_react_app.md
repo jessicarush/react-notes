@@ -46,7 +46,7 @@ cd my-app
 npm start
 ```
 
-> NOTE: I've had the issue [described here](https://stackoverflow.com/questions/70358474/error-while-creating-new-react-app-you-are-running-create-react-app-4-0-3-w). Who knows how it happended but the steps of clearing the cache and letting it install again fixed it.
+> NOTE: I've had the issue [described here](https://stackoverflow.com/questions/70358474/error-while-creating-new-react-app-you-are-running-create-react-app-4-0-3-w). Who knows how it happened but the steps of clearing the cache and letting it install again fixed it.
 
 When you start the app you should be able to see it running at:
 
@@ -256,9 +256,10 @@ Note you can see what React version is installed by looking at the `package.json
 npm view react version
 ```
 
+
 ## create-react-app version 
 
-Note that using `npx create-react-app myapp`, will always use the latest version of create-react-app. Once run, you can see the version number by looking at the `"react-scripts": "^5.0.0",` line. You can verify the version number by going to the [CHANGELOG](https://github.com/facebook/create-react-app/blob/main/CHANGELOG.md) in teh create-react-app github repo.
+Note that using `npx create-react-app myapp`, will always use the latest version of create-react-app. Once run, you can see the version number by looking at the `"react-scripts": "^5.0.0",` line. You can verify the version number by going to the [CHANGELOG](https://github.com/facebook/create-react-app/blob/main/CHANGELOG.md) in the create-react-app github repo.
 
 You can also male sure you've got teh latest be running:
 
@@ -280,4 +281,6 @@ Create-react-app installs the following scripts:
 }
 ```
 
-This allows us to run `npm start` for running the app during development, `npm build` for creating the optimized build version, `npm test` for running tests in `App.test.js` and `npm eject` is an advanced operation that allows you to customize the configuration under Create-react-app (e.g. webpack and babel).
+This allows us to run `npm start` for running the app during development, `npm run build` for creating the optimized build version, `npm test` for running tests in `App.test.js` and `npm run eject` is an advanced operation that allows you to customize the configuration under Create-react-app (e.g. webpack and babel).
+
+Note you can omit 'run' from `npm start` and `npm test`.
