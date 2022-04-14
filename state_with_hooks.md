@@ -191,7 +191,12 @@ According to the [React docs here](https://reactjs.org/docs/hooks-reference.html
 
 > The ”+” and ”-” buttons use the functional form, because the updated value is based on the previous value. But the “Reset” button uses the normal form, because it always sets the count back to the initial value.
 
-However, I have seen them also use `setCount(count + 1)`, sometimes [in the same section](https://reactjs.org/docs/hooks-reference.html#usetransition). So I'm not really sure if this is a rule or a suggestion. I'm guessing it's just like with Classes and the old methods of state, where there are situations where the value may not be current so using the previous state value as a functional update is safer.
+However, I have seen them also use `setCount(count + 1)`, sometimes [in the same section](https://reactjs.org/docs/hooks-reference.html#usetransition). So I'm not really sure if this is a rule or a suggestion. I'm guessing there are situations where the value may not be current so using the previous state value through this functional update is safer. The pattern seems to be to use one character like so:
+
+```jsx
+setCount(c => c + 1);
+setFlag(f => !f);
+```
 
 
 ## Form handling (controlled inputs)
