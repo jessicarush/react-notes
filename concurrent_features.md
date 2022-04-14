@@ -12,6 +12,8 @@ You can use startTransition to navigate between screens without blocking user in
 
 > Transitions are a new concurrent feature introduced in React 18. They allow you to mark updates as transitions, which tells React that they can be interrupted and avoid going back to Suspense fallbacks for already visible content.
 
+Note that last piece of information will make more sense if you review [suspense_component.md](suspense_component.md).
+
 > However, long term, we expect the main way you’ll add concurrency to your app is by using a concurrent-enabled library or framework. In most cases, you won’t interact with concurrent APIs directly. For example, instead of developers calling startTransition whenever they navigate to a new screen, router libraries will automatically wrap navigations in startTransition.
 
 ## Table of Contents
@@ -92,7 +94,11 @@ See also: [suspense_component.md](suspense_component.md)
 
 ## useDeferredValue
 
-Note `useDeferredValue` only kicks in when/if the computer is slow. 
+> useDeferredValue lets you defer re-rendering a non-urgent part of the tree. It is similar to debouncing, but has a few advantages compared to it. There is no fixed time delay, so React will attempt the deferred render right after the first render is reflected on the screen. The deferred render is interruptible and doesn’t block user input.
+
+> useDeferredValue accepts a value and returns a new copy of the value that will defer to more urgent updates. If the current render is the result of an urgent update, like user input, React will return the previous value and then render the new value after the urgent render has completed.
+
+In simpler terms `useDeferredValue` only kicks in when/if the computer is slow. 
 
 ```jsx
 const [items, setItems] = React.useState(defaultItems);
