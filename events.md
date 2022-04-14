@@ -371,7 +371,7 @@ handleUpdateThing() {
 
 ## stopPropagation
 
-Sometimes you will find that you have events triggering when you don't wan them to. For example, the code below uses a component from the `react-copy-to-clipboard` library. The `onCopy` event triggers a callback function. If though we wanted to have something inside that element that also has an event-related action (e.g. a link), we may want to stop that event from bubbling up. This can be done with `stopPropagation()`:
+Sometimes you will find that you have events triggering when you don't want them to. For example, the code below uses a component from the `react-copy-to-clipboard` library. The `onCopy` event triggers a callback function. If we wanted to have something inside that element that also has an event-related action (e.g. a link), we may want to stop that event from bubbling up. This can be done with `stopPropagation()`:
 
 ```javascript
 <CopyToClipboard onCopy={ updateCopied }>
