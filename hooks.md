@@ -17,6 +17,7 @@
 - [useEffect](#useeffect)
   * [used for setState callbacks](#used-for-setstate-callbacks)
 - [useLayoutEffect](#uselayouteffect)
+- [useId](#useid)
 - [Custom hooks](#custom-hooks)
   * [Custom hook example: localStorage](#custom-hook-example-localstorage)
 
@@ -39,6 +40,11 @@ Additional built-in hooks:
 - `useImperativeHandle`
 - `useLayoutEffect`
 - `useDebugValue`
+- `useId`
+- `useTransition`
+- `useDeferredValue`
+
+See [concurrent_features.md](concurrent_features.md) for `useTransition` and `useDeferredValue`.
 
 
 ## Rules
@@ -204,6 +210,51 @@ useEffect(() => {
 ## useLayoutEffect
 
 TODO
+
+
+## useId 
+
+New to React 18, `useId` is a hook for generating unique IDs on both the client and server. For example:
+
+```jsx
+function Checkbox() {
+  const id = useId();
+  return (
+    <>
+      <label htmlFor={id}>Do you like React?</label>
+      <input id={id} type="checkbox" name="react"/>
+    </>
+  );
+};
+```
+
+For multiple IDs in the same component, append a suffix using the same id:
+
+```jsx
+function NameFields() {
+  const id = useId();
+  return (
+    <div>
+      <label htmlFor={id + '-firstName'}>First Name</label>
+      <div>
+        <input id={id + '-firstName'} type="text" />
+      </div>
+      <label htmlFor={id + '-lastName'}>Last Name</label>
+      <div>
+        <input id={id + '-lastName'} type="text" />
+      </div>
+    </div>
+  );
+}
+```
+
+For some reason they are making sure to note:
+
+> useId is not for generating keys in a list. Keys should be generated from your data.
+
+I'm not sure why they would say this given the examples they show in the docs. If you can use it to create and id for a piece of data, why would you not then use that id for a key?
+
+> :warning: useId generates a string that includes the : token. This helps ensure that the token is unique, but is not supported in CSS selectors or APIs like querySelectorAll.
 
 
 ## Custom hooks
