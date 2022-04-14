@@ -1,4 +1,4 @@
-# Add a React to Existing HTML
+# Add React to Existing HTML
 
 Typically we would want to create a standalone SPA using `create-react-app`, but what options do we have if we want to include our React project into an existing html doc?
 
