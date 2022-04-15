@@ -65,8 +65,7 @@ ReactDOM.render(<App />, document.getElementById('root'));
 
 ```javascript
 // Current method for React 18
-const container = document.getElementById('root');
-const root = ReactDOM.createRoot(container);
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 ```
 
@@ -79,10 +78,9 @@ You may still get a warning though:
 What they're saying is that they want you to import it like so: 
 
 ```javascript
-import ReactDOMClient from 'react-dom/client';
+import ReactDOM from 'react-dom/client';
 
-const container = document.getElementById('root');
-const root = ReactDOMClient.createRoot(container);
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 ```
 
