@@ -35,9 +35,9 @@ function Example(props) {
   // state
   const [name, setName] = useState('');
 
-  function updateMyState() {
-    setName('foo');
-  }
+  useEffect(() => {
+    console.log('mounted');
+  });
 
   return (
     <div className="Example">
