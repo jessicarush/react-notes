@@ -58,6 +58,10 @@ When building a React app, the key design decisions will be:
 - Deciding on state and where the state should be defined
 - What changes when state changes
 
+This article: [Tao of React - Software Design, Architecture & Best Practices](https://alexkondov.com/tao-of-react/) lists some really great, practical, suggestions for designing and building your React app.
+
+This article: [Bad Habits of Mid-Level React Developers](https://dev.to/srmagura/bad-habits-of-mid-level-react-developers-b41) is slightly more opinionated but still has some useful suggestions.
+
 
 ## React 18 notes 
 
