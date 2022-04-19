@@ -89,7 +89,7 @@ The `render()` method is required, and is the method that outputs HTML to the DO
 
 ### componentDidMount
 
-The `componentDidMount()` method is called after the component is rendered. This is where you run statements that require that the component is already placed in the DOM (for example to load AJAX data: see [ajax.md](ajax.md)). Note that if you were to call `setState()` here, it would actually trigger a re-render (update).
+The `componentDidMount()` method is called after the component is rendered. This is where you run statements that require that the component is already placed in the DOM (for example to fetch data from some API: see [axios.md](axios.md)). Note that if you were to call `setState()` here, it would actually trigger a re-render (update).
 
 ```javascript
 class Test extends React.Component {
