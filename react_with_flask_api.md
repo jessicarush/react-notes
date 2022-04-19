@@ -1,9 +1,19 @@
 # React + Flask API 
 
-## Table of contents 
+## Table of contents
 
 <!-- toc -->
 
+- [Directory structure](#directory-structure)
+- [CORS](#cors)
+  * [frontend and backend will be served together (same origin)](#frontend-and-backend-will-be-served-together-same-origin)
+  * [frontend and backend will be served separately (different origins)](#frontend-and-backend-will-be-served-separately-different-origins)
+    + [Simple usage (allow everything)](#simple-usage-allow-everything)
+    + [Resource specific usage](#resource-specific-usage)
+    + [Route specific usage](#route-specific-usage)
+- [Notes](#notes)
+
+<!-- tocstop -->
 
 ## Directory structure
 
