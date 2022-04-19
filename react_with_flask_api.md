@@ -74,7 +74,7 @@ In the meantime, we can configure a [proxy](https://create-react-app.dev/docs/pr
   "proxy": "http://localhost:5000",
 ```
 
-This tells the React development server to proxy any unknown requests to your API server. One we add this proxy pointing to our backend, we can change all our API calls to just endpoint path:
+This tells the React development server to proxy any unknown requests to your API server. Once we add this proxy pointing to our backend, we can change all our API calls to just endpoint path:
 
 ```javascript
 axios.get('/api/color', headers);
