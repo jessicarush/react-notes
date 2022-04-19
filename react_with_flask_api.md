@@ -46,10 +46,10 @@ Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that allo
 
 ### Frontend and backend will be served together (same origin)
 
-When developing, the Flask backend will likely be running on one port (e.g. http://http://127.0.0.1:5000/) and the React backend will be running on another (e.g. http://127.0.0.1:3000/). Out-of-the-box, if you want to make an API call to the backend, you would have to use the full URL:
+When developing, the Flask backend will likely be running on one port (e.g. http://localhost:5000/) and the React backend will be running on another (e.g. http://localhost:3000/). Out-of-the-box, if you want to make an API call to the backend, you would have to use the full URL:
 
 ```javascript
-axios.get('http://127.0.0.1:5000/api/color', headers);
+axios.get('http://localhost:5000/api/color', headers);
 ```
 
 Anyone can make a get request without worrying about CORS. But, if the server is configured to send back some json data, it would then we need to consider the following:
@@ -117,7 +117,7 @@ CORS(app)
 That't it. Our front end can now access resources and POST to our backend APIs using the full URL:
 
 ```javascript
-axios.post('http://127.0.0.1:5000/api/color', data, headers);
+axios.post('http://localhost:5000/api/color', data, headers);
 ```
 
 :warning: Obviously the base URL would need to be updated to the actual domain name when deployed. 
