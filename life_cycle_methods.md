@@ -388,5 +388,5 @@ function Example(props) {
 }
 ```
 
-See also: [hooks.md]
+See also: [hooks.md](hooks.md)
 
