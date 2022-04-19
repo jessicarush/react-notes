@@ -6,8 +6,8 @@
 
 - [Directory structure](#directory-structure)
 - [CORS](#cors)
-  * [frontend and backend will be served together (same origin)](#frontend-and-backend-will-be-served-together-same-origin)
-  * [frontend and backend will be served separately (different origins)](#frontend-and-backend-will-be-served-separately-different-origins)
+  * [Frontend and backend will be served together (same origin)](#frontend-and-backend-will-be-served-together-same-origin)
+  * [Frontend and backend will be served separately (different origins)](#frontend-and-backend-will-be-served-separately-different-origins)
     + [Simple usage (allow everything)](#simple-usage-allow-everything)
     + [Resource specific usage](#resource-specific-usage)
     + [Route specific usage](#route-specific-usage)
@@ -17,11 +17,34 @@
 
 ## Directory structure
 
+```text
+.
+├─ backend
+│  ├─ app
+│  ├─ logs
+│  ├─ venv
+│  ├─ .env
+│  ├─ .gitignore
+│  ├─ config.py
+│  ├─ README.md
+│  ├─ requirements.txt
+│  └─ run.py
+└─ frontend
+   ├─ build
+   ├─ node_modules
+   ├─ public
+   ├─ src
+   ├─ .gitignore
+   ├─ package-lock.json
+   ├─ package.json
+   └─ README.md
+```
+
 ## CORS 
 
 Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own from which a browser should permit loading resources. 
 
-### frontend and backend will be served together (same origin)
+### Frontend and backend will be served together (same origin)
 
 When developing, the Flask backend will likely be running on one port (e.g. http://http://127.0.0.1:5000/) and the React backend will be running on another (e.g. http://127.0.0.1:3000/). Out-of-the-box, if you want to make an API call to the backend, you would have to use the full URL:
 
@@ -70,7 +93,7 @@ We also no longer need the headers for any responses on the server:
 This proxy is only applicable to the React development server. When we deploy the frontend and backend together, we would [configure nginx](https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project) to serve the frontend, then act as a reverse-proxy for the backend API which will be running as a service. In other words, we don't need to change anything in our front or backend code when we deploy this.
 
 
-### frontend and backend will be served separately (different origins)
+### Frontend and backend will be served separately (different origins)
 
 See: <https://flask-cors.readthedocs.io/en/latest/>
 
@@ -133,4 +156,4 @@ It is a very good idea to prefix API endpoints with /api so that:
 - they do not get mixed with any possible routes used by the React side. 
 - they can be easily targeted with CORS rules as shown above
 
-Flask-cors allows for total granular control beyond what is shown here, for example you can pass paramters saying which methods are allowed and more. [See the API docs](https://flask-cors.readthedocs.io/en/latest/api.html).
+Flask-cors allows for total granular control beyond what is shown here, for example you can pass parameters saying which methods are allowed and more. [See the API docs](https://flask-cors.readthedocs.io/en/latest/api.html).
