@@ -5,11 +5,13 @@
 <!-- toc -->
 
 - [Introduction](#introduction)
-- [Example - Simple request to API](#example---simple-request-to-api)
-- [Example - Request with data](#example---request-with-data)
+- [Example - GET request](#example---get-request)
+- [Example - GET request with param data](#example---get-request-with-param-data)
+- [Example - POST request](#example---post-request)
+- [Example - axios api](#example---axios-api)
 - [Example - Adding a loading animation](#example---adding-a-loading-animation)
 - [Example - Using an async function](#example---using-an-async-function)
-- [Passing headers](#passing-headers)
+- [Multiple requests](#multiple-requests)
 - [axios in functional components](#axios-in-functional-components)
 
 <!-- tocstop -->
@@ -24,23 +26,35 @@ To use Axios, you'll need to install it:
 npm install axios
 ```
 
-If you want to fetch data with an asychronous request, it is **always recommended that you do this in the `componentDidMount()` method** as opposed to the `constructor()`. In addition, you should also always avoid setting state in the constructor.
+If you want to fetch data with an asynchronous request, it is **always recommended that you do this in the `componentDidMount()` method** of class components as opposed to the `constructor()`. In addition, you should also always avoid setting state in the constructor.
 
-## Example - Simple request to API
+If working with functional components, use the `useEffect()` hook.
 
-This example makes a request to a simple github api.
 
-First, make sure to import axios:
+## Example - GET request
+
+This example makes a request to a simple github api. First, make sure to import axios:
 
 ```javascript
 import axios from 'axios';
 ```
 
-Then use `axios.get().then()`. Note that the `.then()` is a method of the standard built-in `Promise` object.
+Then use `axios.get().then()`. Note that the `.then()` is a method of the standard built-in `Promise` object. See [promises.md](https://github.com/jessicarush/javascript-notes/blob/master/promises.md).
 
-> It takes up to two arguments: callback functions for success and failure cases of the Promise.
+```javascript
+axios.get('/user')
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  })
+  .then(function () {
+    // always executed
+  });
+```
 
-Note: I can't find an example of this. In the meantime, here's a decent [discussion on error handling](https://www.intricatecloud.io/2020/03/how-to-handle-api-errors-in-your-web-app-using-axios/).
+A working example:
 
 ```javascript
 class Test extends Component {
@@ -48,17 +62,21 @@ class Test extends Component {
     super(props);
     this.state = {data: ""};
   }
+
   componentDidMount() {
+    const url = "https://api.github.com/zen";
     // load data
-    axios.get("https://api.github.com/zen").then(response => {
-      // view the entire response object
-      console.log(response);
-      // view the response object keys
-      console.log(Object.keys(response));
-      // set state with that data
-      this.setState({data: response.data});
-    });
+    axios.get(url)
+      .then(response => {
+        // view the entire response object
+        console.log(response);
+        // view the response object keys
+        console.log(Object.keys(response));
+        // set state with that data
+        this.setState({data: response.data});
+      });
   }
+
   render() {
     return (
       <div>
@@ -75,45 +93,41 @@ The response keys:
 [ "data", "status", "statusText", "headers", "config", "request" ]
 ```
 
-Add another request:
+Another request:
 
 ```javascript
 class Test extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: "",
       colorName: "",
       colorHex: ""
     };
   }
+
   componentDidMount() {
-    // load data and set state with that data
-    axios.get("https://api.github.com/zen").then(response => {
-      this.setState({data: response.data});
-    });
-
-    axios.get("https://log.zebro.id/api_demo_one").then(response => {
-      this.setState({
-        colorName: Object.keys(response.data)[0],
-        colorHex: Object.values(response.data)[0]
+    const url = "https://log.zebro.id/api_demo_one";
+    axios.get(url)
+      .then(response => {
+        this.setState({
+          colorName: Object.keys(response.data)[0],
+          colorHex: Object.values(response.data)[0]
+        });
       });
-    });
-
   }
+
   render() {
     const style = {color: this.state.colorHex};
     return (
       <div>
-        <h1>{this.state.data}</h1>
-        <h1 style={style}>{this.state.colorName} {this.state.colorHex}</h1>
+        <p style={style}>{this.state.colorName} {this.state.colorHex}</p>
       </div>
     );
   }
 }
 ```
 
-For reference, the python flask endpoint for the second api looks like this:
+For reference, the python flask endpoint for this api:
 
 ```python
 @app.route('/api_demo_one', methods=['GET'])
@@ -127,8 +141,10 @@ def api_demo():
 
 Note the `Access-Control-Allow-Origin` header. In order for requests outside the response origin to access the response, this header must be set. `*` is a wildcard allowing any site to receive the response. You should only use this for public APIs. Private APIs should never use `*`, and should instead have a specific domain or domains set. In addition, the wildcard only works for requests made with the crossorigin attribute set to anonymous, and it prevents sending credentials like cookies in requests. [See MDN for more on this](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin).
 
+For more on CORS see also: [react_with_flask_api.md](react_with_flask_api.md).
 
-## Example - Request with data
+
+## Example - GET request with param data
 
 This example sends query parameters along with the get request:
 
@@ -141,16 +157,22 @@ class Test extends Component {
       colorHex: ""
     };
   }
-  componentDidMount() {
-    // load data and set state with that data
-    axios.get("http://127.0.0.1:5000/api_demo_one", {params: {value: 'rgb'}}).then(response => {
-      this.setState({
-        colorName: Object.keys(response.data)[0],
-        colorHex: Object.values(response.data)[0]
-      });
-    });
 
+  componentDidMount() {
+    const url = "http://127.0.0.1:5000/api_demo_one";
+    // Equivalent to "http://127.0.0.1:5000/api_demo_one?value=rgb"
+    const config = {
+      params: {value: 'rgb'}
+    }
+    axios.get(url, config)
+      .then(response => {
+        this.setState({
+          colorName: Object.keys(response.data)[0],
+          colorHex: Object.values(response.data)[0]
+        });
+      });
   }
+
   render() {
     const style = {color: this.state.colorHex};
     return (
@@ -160,6 +182,55 @@ class Test extends Component {
     );
   }
 }
+```
+
+## Example - POST request 
+
+```javascript
+axios.post('/user', {
+    firstName: 'Fred',
+    lastName: 'Flintstone'
+  })
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+```
+
+A working example:
+
+```javascript
+
+function saveColor() {
+  const url = '/api/demo_two';
+  const data = { name: color.name, hex: color.hex };
+  const config = {
+    headers: {'Content-Type': 'application/json'}
+  };
+  axios.post(url, data, config)
+    .then(response => {
+      console.log(response.data)
+    })
+    .catch(err => {
+      console.log(`something went wrong: ${err}`);
+    });
+  }
+```
+
+
+## Example - axios api
+
+Instead of using axios `.get()` and `.post()`, you can also use the axios function to pass whatever method you like. For example:
+
+```javascript
+axios({
+  method: 'post',
+  url: 'https://example.com/api/post',
+  data: {id: '123'},
+  headers: {'Content-type': 'application/json'}
+});
 ```
 
 ## Example - Adding a loading animation
@@ -175,15 +246,17 @@ class Test extends Component {
       data: ""
     };
   }
+
   componentDidMount() {
-    // load data and set state with that data
-    axios.get("https://api.github.com/zen").then(response => {
-      setTimeout(function () {
+    const url = "https://api.github.com/zen";
+    axios.get(url)
+      .then(response => {
+        setTimeout(function () {
           this.setState({data: response.data, isLoaded: true});
-        }.bind(this), 3000
-      );
-    });
+        }.bind(this), 3000);
+      });
   }
+
   render() {
     return (
       <div>
@@ -202,6 +275,7 @@ class GithubUser extends Component {
     super(props);
     this.state = {imgUrl: '', name: ''};
   }
+
   async componentDidMount() {
     const url = `https://api.github.com/users/${this.props.username}`;
     let response = await axios.get(url);
@@ -209,6 +283,7 @@ class GithubUser extends Component {
     let data = response.data;
     this.setState({imgUrl: data.avatar_url, name: data.name});
   }
+
   render() {
     return (
       <div>
@@ -229,6 +304,7 @@ class GithubUser extends Component {
     super(props);
     this.state = {imgUrl: '', name: ''};
   }
+
   async componentDidMount() {
     const url = `https://api.github.com/users/${this.props.username}`;
     try {
@@ -240,6 +316,7 @@ class GithubUser extends Component {
       console.log(`something went wrong: ${err}`);
     }
   }
+
   render() {
     return (
       <div>
@@ -252,19 +329,66 @@ class GithubUser extends Component {
 }
 ```
 
-## Passing headers
-
-If you need to pass a header along with your axios request, it would look like this:
+Example async post with all the extras:
 
 ```javascript
-async componentDidMount() {
-  const joke_url = 'https://icanhazdadjoke.com/';
-  // We need to pass in an Accept header to receive JSON
-  const headers = {Accept: 'application/json'};
-  let response = await axios.get(joke_url, {headers: headers});
-  console.log(response);
+async function saveColor() {
+  try {
+    const url = `/api/demo_two`;
+    const data = { name: color.name, hex: color.hex };
+    const config = {
+      headers: {'Content-Type': 'application/json'}
+    };
+    let response = await axios.post(url, data, config);
+    console.log(response.data);
+  } catch (err) {
+    console.log(`something went wrong: ${err}`);
+  }
 }
 ```
+
+## Multiple requests 
+
+You can execute multiple requests **one after the other** by chaining `.then()` methods with regular promises or by using multiple await statements in async functions:
+
+```javascript
+async function getUserData() {
+  try {
+    let response1 = await axios.get('/user/12345');
+    let response2 = await axios.get('/user/12345/permissions');
+  } catch (err) {
+    console.log(`something went wrong: ${err}`);
+  }
+}
+```
+
+Multiple requests can be done **at the same time** with `Promise.All()`:
+
+```javascript
+function getUserAccount() {
+  return axios.get('/user/12345');
+}
+
+function getUserPermissions() {
+  return axios.get('/user/12345/permissions');
+}
+
+Promise.all([getUserAccount(), getUserPermissions()])
+  .then(function (results) {
+    const acct = results[0];
+    const perm = results[1];
+  });
+```
+
+with async/await:
+
+```javascript
+let [someResult, anotherResult] = await Promise.all([
+  someCall(), 
+  anotherCall()
+]);
+```
+
 
 ## axios in functional components
 
