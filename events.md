@@ -9,6 +9,7 @@
 - [Event Data](#event-data)
 - [this binding](#this-binding)
 - [Passing arguments to handlers](#passing-arguments-to-handlers)
+- [Functional components](#functional-components)
 - [Naming event handlers](#naming-event-handlers)
 - [stopPropagation](#stoppropagation)
 
