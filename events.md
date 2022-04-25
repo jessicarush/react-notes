@@ -353,6 +353,67 @@ class TestChildComponent extends Component {
 It's no wonder people prefer using inline binding despite the performance penalty.
 
 
+## Functional components
+
+Regular event handler:
+
+```javascript
+function TestComponent() {
+  const [color, setColor] = useState('fff');
+  const styles = {backgroundColor: color};
+
+  const handleSetColor = () => {
+    setColor('tomato');
+  };
+
+  return (
+    <div className="TestComponent" style={styles}>
+      <button onClick={handleSetColor}>Click me</button>
+    </div>
+  );
+}
+```
+
+Inline event handler:
+
+```javascript
+function TestComponent() {
+  const [color, setColor] = useState('fff');
+  const styles = {backgroundColor: color};
+
+  const handleSetColor = (e, color) => {
+    setColor(color);
+  };
+
+  return (
+    <div className="TestComponent" style={styles}>
+      <button onClick={ e => handleSetColor(e, 'green')}>Click me</button>
+    </div>
+  );
+}
+```
+
+Callback event handler:
+
+```javascript
+function TestChildComponent() {
+  // Passed from parent component
+  const {color, setColor} = props;
+  const styles = {backgroundColor: color};
+
+  const handleSetColor = () => {
+    setColor('purple');
+  };
+
+  return (
+    <div className="TestComponent" style={styles}>
+      <button onClick={handleSetColor}>Click me</button>
+    </div>
+  );
+}
+```
+
+
 ## Naming event handlers
 
 Know that React doesn't care how your event handling functions are named but a recommended approach for consistency reasons is this:
@@ -379,14 +440,14 @@ Sometimes you will find that you have events triggering when you don't want them
 
     {/* content */}
 
-    <Link to="/" className="info-more" onClick={e => {e.stopPropagation()}}>
+    <Link to="/" className="info-more" onClick={e => e.stopPropagation()}>
       More
     </Link>
   </div>
 </CopyToClipboard>
 ```
 
-Note that in this particular case, without the `onClick={e => {e.stopPropagation()}`, the console will actually give us a warning:
+Note that in this particular case, without the `onClick={e => e.stopPropagation()}`, the console will actually give us a warning:
 
 > Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
 
