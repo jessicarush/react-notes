@@ -53,7 +53,7 @@ class Welcome extends React.Component {
 ReactDOM.render(<Welcome />, document.getElementById('root'));
 ```
 
-Note that in the render function inside the class, you can only return one element. Therefor, if you're actually creating a number of elements, they should all be wrapped in one, e.g. a `<div>`:
+Note that in the render function inside the class, you can only return one element. Therefor, if you're creating a number of elements, they should all be wrapped in one, e.g. a `<div>`:
 
 ```javascript
 class Welcome extends React.Component {
@@ -250,7 +250,7 @@ function Example(props) {
 
   return (
     <div className="Example">
-      // Read State
+      {/* Read State */}
       <p>{ name }, { count }</p>
       <button onClick={ updateMyState }>update state</button>
     </div>
@@ -265,7 +265,34 @@ See <https://reactjs.org/docs/hooks-state.html> for a very good comparison betwe
 
 See [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md) for my notes.
 
-The `useEffect()` hook can be used to replicate lifecycle behavior. See: [hooks.md](hooks.md)
+The `useEffect()` hook can be used to replicate lifecycle behavior. See: [hooks.md](hooks.md).
+
+```javascript
+import React, { useEffect, useState } from 'react';
+
+function Example(props) {
+  const [count, setCount] = useState(0);
+
+  function updateMyState() {
+    setCount(c => c + 1);
+  }
+
+  // Similar to lifecycle methods componentDidMount and componentDidUpdate :
+  useEffect(() => {
+    document.title = `Count: ${count}`;
+  }, [count]);
+
+  return (
+    <div className="Example">
+      <p>{ count }</p>
+      <button onClick={ updateMyState }>update state</button>
+    </div>
+
+  );
+}
+
+export default Example;
+```
 
 
 ## Nested Components
@@ -324,3 +351,19 @@ export default Box;
 ```
 
 Note in a functional component you would just use `{props.children}`.
+
+```javascript
+function Box(props) {
+  return (
+    <div className="Box">
+      <h1 className="Box-header">
+        This is my box component. The rest of the content in this box comes
+        from props.children.
+      </h1>
+      {props.children}
+    </div>
+  );
+}
+
+export default Box;
+```
