@@ -121,6 +121,7 @@ function Example(props) {
   function updateMyState() {
     // Update state
     setName('Bob');
+    // Note there's a better way to do this...functional updates
     setCount(count + 1);
   }
 
@@ -155,10 +156,7 @@ function Example(props) {
 
   function updateMyState() {
     // Update state
-    setState({
-      ...state,
-      name: 'Bob'
-    });
+    setState({...state, name: 'Bob'});
   }
 
   return (
