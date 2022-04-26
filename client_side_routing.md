@@ -1,7 +1,7 @@
 # Client-side Routing
 
 
-Routing is the mechanism by which requests are connected to some code. Traditionally routing referred to server-side routing. With server-side routing, a user clicks something (e.g. a link) that requests a new page or content from the server, and then the server responds with the new content or document.
+Routing is the mechanism by which requests are connected to some code. Traditionally "routing" referred to server-side routing. With server-side routing, a user clicks something (e.g. a link) that requests a new page or content from the server, and then the server responds with the new content or document.
 
 The main drawback of server-side routing is the time it can take to display content on a page. Often the page will have sections (e.g. header and footer) that aren't actually changing but get reloaded anyways. The server doesn’t know that we don’t have to reload sections that are already being displayed. The server will simply send a file that needs to be displayed and then call for a full refresh to display it.
 
@@ -13,7 +13,7 @@ Client-side routing simply runs this process in the browser using JavaScript. As
 <!-- toc -->
 
 - [Pros](#pros)
-- [Cons](#cons)
+- [Cons](#cons)cd 
 - [React Router](#react-router)
   * [Define Routes](#define-routes)
   * [404 Equivalent](#404-equivalent)
@@ -67,17 +67,18 @@ Include and enable the Router in your index.js:
 
 ```javascript
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App';
 
-
-ReactDOM.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>,
-  document.getElementById('root')
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
 );
 ```
 
@@ -95,10 +96,10 @@ Note there are [other Router types](https://reactrouter.com/docs/en/v6/api) too.
 Define the routes by mapping URLs to components:
 
 ```javascript
-import './App.css';
 import { Route, Routes } from 'react-router-dom';
+import Home from './Home';
 import About from './About';
-
+import './App.css';
 
 function App() {
   return (
@@ -106,6 +107,7 @@ function App() {
       <h1 className="App-header">React Router demo</h1>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
       </Routes>
     </div>
   );
@@ -115,20 +117,15 @@ function App() {
 You can also *nest* routes inside other routes to display both parent and child. To do this, you need to render an `<Outlet />` in the parent component. The `<Outlet />` is like a placeholder or marker for where the child components will be rendered. For example:
 
 ```javascript
-import React, { Component } from 'react';
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 
-
-class Dashboard extends Component {
-
-  render() {
-    return (
-      <div className="Dashboard">
-        <h1 className="App-header">Dashboard...</h1>
-        <Outlet />
-      </div>
-    );
-  }
+function Dashboard(props) {
+  return (
+    <div className="Dashboard">
+      <h1>Dashboard</h1>
+      <Outlet />
+    </div>
+  );
 }
 
 export default Dashboard;
@@ -137,22 +134,31 @@ export default Dashboard;
 Then in App.js:
 
 ```javascript
+import { Route, Routes } from 'react-router-dom';
+import Home from './Home';
+import About from './About';
+import Dashboard from './Dashboard';
+import DashboardMsg from './DashboardMsg';
+import DashboardTasks from './DashboardTasks';
+import './App.css';
+
 function App() {
   return (
     <div className="App">
       <h1 className="App-header">React Router demo</h1>
       <Routes>
         <Route path="/" element={<Home />} />
-
+        <Route path="/about" element={<About />} />
         <Route path="/dashboard" element={<Dashboard />}>
           <Route path="messages" element={<DashboardMsg />} />
           <Route path="tasks" element={<DashboardTasks />} />
         </Route>
-
       </Routes>
     </div>
   );
 }
+
+export default App;
 ```
 
 Nested routes build their path by adding to the parent route's path.
@@ -187,6 +193,7 @@ function App() {
 
       <nav>
         <Link to="/">Home</Link>
+        <Link to="/about">About</Link>
         <Link to="dashboard">Dashboard</Link>
         <Link to="dashboard/messages">Messages</Link>
         <Link to="dashboard/tasks">Tasks</Link>
@@ -194,6 +201,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
         <Route path="/dashboard" element={<Dashboard />}>
           <Route path="messages" element={<DashboardMsg />} />
           <Route path="tasks" element={<DashboardTasks />} />
@@ -225,8 +233,9 @@ import { Route, Routes, NavLink } from 'react-router-dom';
 
 // ...
 
-<nav className"App-nav">
+<nav className="App-nav">
   <NavLink to="/">Home</NavLink>
+  <NavLink to="/about">About</NavLink>
   <NavLink to="dashboard">Dashboard</NavLink>
   <NavLink to="dashboard/messages">Messages</NavLink>
   <NavLink to="dashboard/tasks">Tasks</NavLink>
@@ -380,8 +389,7 @@ function Pics() {
   console.log(navigate);
   console.log(picId, picName);
   return (
-    <div className="Pics">
-    </div>
+    <div className="Pics"></div>
   );
 }
 
@@ -480,7 +488,7 @@ const params = useParams();
   const format = params.format || 'default';
 ```
 
-Note that in previous versions of react router you used to be able to do something like: ``path="/path/:format?"`` to indicate optional URL Params but they have removed support for this feature in favour of teh above.
+Note that in previous versions of react router you used to be able to do something like: ``path="/path/:format?"`` to indicate optional URL Params but they have removed support for this feature in favour of the above.
 
 
 ### Redirects
@@ -601,7 +609,7 @@ Keep in mind, `useNavigate` will sometimes be a better choice over `<Link>` for 
 
 ### Example 1: pass input values to a link
 
-If we wanted to receive input to pass into the URL params above we could simple use a link and form like so:
+If we wanted to receive input to pass into the URL params above we could simply use a link and form like so:
 
 ```javascript
 import React, { Component } from 'react';
