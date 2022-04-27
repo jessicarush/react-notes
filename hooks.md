@@ -86,6 +86,7 @@ function Example() {
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
+    console.log('I will run everytime the component renders or updates');
     // Update the document title using the browser API
     document.title = `You clicked ${count} times`;
   });
@@ -111,7 +112,7 @@ function Demo() {
 
   // componentDidMount
   useEffect(() => {
-    console.log('I have been mounted');
+    console.log('I will run once when the component is first rendered.');
     axios.get("https://api.github.com/zen").then(response => {
       setZen(response.data);
     });
@@ -140,7 +141,7 @@ function Demo() {
 
   // componentDidMount
   useEffect(() => {
-    console.log('I have been mounted');
+    console.log('I will run once when the component is first rendered.');
     async function getZen() {
       let response = await axios.get('https://api.github.com/zen');
       setZen(response.data);
@@ -169,7 +170,7 @@ function Demo() {
 
   // componentDidMount
   useEffect(() => {
-    console.log('I have been mounted');
+    console.log('I will run once when the component is first rendered.');
     async function getZen() {
       try {
         let response = await axios.get('https://api.github.com/zen');
@@ -204,8 +205,47 @@ const doSomething = () => {
 }
 
 useEffect(() => {
-   console.log('Do something after counter has changed', counter);
+  console.log('I will run on initial render and whenever counter gets updated.', counter);
 }, [counter]);
+```
+
+### used with a loading indicator
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function Demo() {
+  const [zen, setZen] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // componentDidMount
+  useEffect(() => {
+    async function getZen() {
+      setIsLoading(true);
+      try {
+        let response = await axios.get('https://api.github.com/zen');
+        setZen(response.data);
+      } catch (err) {
+        console.log(`something went wrong: ${err}`);
+      }
+      setIsLoading(false);
+    }
+    getZen();
+  }, []);
+
+  return (
+    <div className="Demo">
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <p>{zen}</p>
+      )}
+    </div>
+  );
+}
+
+export default Demo;
 ```
 
 
