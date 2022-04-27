@@ -74,6 +74,8 @@ The [Effect Hook](https://reactjs.org/docs/hooks-effect.html) lets you perform *
 
 See also: [life_cycle_methods.md](https://github.com/jessicarush/react-notes/blob/master/life_cycle_methods.md#lifecycle-methods-in-function-components)
 
+See also: [Robin Wieruch's post on useEffect()](https://www.robinwieruch.de/react-useeffect-hook/)
+
 For example:
 
 ```javascript
