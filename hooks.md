@@ -361,7 +361,7 @@ function useLocalStorage(key, defaultValue) {
   });
 
   // update localStorage when state changes
-  // Note that we also hve to pass they key into the depenency array. 
+  // Note that we also hve to pass they key into the dependency array. 
   // Without it, the side-effect may run with an outdated key (also called stale)
   // if the key changed between renders.
   useEffect(() => {
