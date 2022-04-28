@@ -315,7 +315,7 @@ function useToggle(initialValue=false) {
   // Create a function that sets the value to something else
   // In this case, a toggle between true/false
   const toggleState = () => {
-    setState(!state);
+    setState(s => !s);
   };
   // return the state value and the function that changes it
   return [state, toggleState];
@@ -361,9 +361,12 @@ function useLocalStorage(key, defaultValue) {
   });
 
   // update localStorage when state changes
+  // Note that we also hve to pass they key into the depenency array. 
+  // Without it, the side-effect may run with an outdated key (also called stale)
+  // if the key changed between renders.
   useEffect(() => {
     window.localStorage.setItem(key, JSON.stringify(state));
-  }, [state]);
+  }, [state, key]);
 
   // return state value and a function to toggle it
   return [state, setState];
