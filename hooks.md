@@ -1,5 +1,7 @@
 # Hooks in function components
 
+## Docs
+
 - [Introduction to hooks](https://reactjs.org/docs/hooks-intro.html)
 - [Built-in hooks](https://reactjs.org/docs/hooks-reference.html)
 - [Rules for hooks](https://reactjs.org/docs/hooks-rules.html)
@@ -60,7 +62,7 @@ See [concurrent_features.md](concurrent_features.md) for `useTransition` and `us
 
 ## useState
 
-The `useState` hook returns a stateful value, and a function to update it. See my notes [state_with_hooks.md](state_with_hooks.md) and [Using the State Hook](https://reactjs.org/docs/hooks-state.html) (React docs).
+The `useState` hook returns a stateful value, and a function to update it. See my notes in [state_with_hooks.md](state_with_hooks.md) and the React docs: [Using the State Hook](https://reactjs.org/docs/hooks-state.html).
 
 
 ## useContext
@@ -86,14 +88,14 @@ function Example() {
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
-    console.log('I will run everytime the component renders or updates');
+    console.log('I will run every time the component renders or updates');
     // Update the document title using the browser API
     document.title = `You clicked ${count} times`;
   });
 
   return (
     <div>
-      <button onClick={() => setCount(count + 1)}>Count</button>
+      <button onClick={() => setCount(c => c + 1)}>Count</button>
     </div>
   );
 }
@@ -110,7 +112,7 @@ import axios from 'axios';
 function Demo() {
   const [zen, setZen] = useState('');
 
-  // componentDidMount
+  // Similar to componentDidMount
   useEffect(() => {
     console.log('I will run once when the component is first rendered.');
     axios.get("https://api.github.com/zen").then(response => {
@@ -139,7 +141,6 @@ import axios from 'axios';
 function Demo() {
   const [zen, setZen] = useState('');
 
-  // componentDidMount
   useEffect(() => {
     console.log('I will run once when the component is first rendered.');
     async function getZen() {
@@ -168,7 +169,6 @@ import axios from 'axios';
 function Demo() {
   const [zen, setZen] = useState('');
 
-  // componentDidMount
   useEffect(() => {
     console.log('I will run once when the component is first rendered.');
     async function getZen() {
@@ -290,11 +290,13 @@ function NameFields() {
 }
 ```
 
-For some reason they are making sure to note:
+For some reason they are making sure to note this:
 
 > useId is not for generating keys in a list. Keys should be generated from your data.
 
 I'm not sure why they would say this given the examples they show in the docs. If you can use it to create and id for a piece of data, why would you not then use that id for a key?
+
+Also:
 
 > :warning: useId generates a string that includes the : token. This helps ensure that the token is unique, but is not supported in CSS selectors or APIs like querySelectorAll.
 
@@ -368,7 +370,7 @@ function useLocalStorage(key, defaultValue) {
     window.localStorage.setItem(key, JSON.stringify(state));
   }, [state, key]);
 
-  // return state value and a function to toggle it
+  // return state value and a function to update it
   return [state, setState];
 }
 
