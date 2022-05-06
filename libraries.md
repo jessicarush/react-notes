@@ -51,12 +51,12 @@ async axiosDemo() {
   }
 ```
 
-See also: [ajax.md](ajax.md)
+See also: [axios.md](axios.md)
 
 
 ## uuid
 
-[uuid](https://www.npmjs.com/package/uuid) is a package for the creation of RFC4122 UUIDs.
+[uuid](https://github.com/uuidjs/uuid) is a package for the creation of RFC4122 UUIDs.
 
 ```bash
 npm install uuid
@@ -106,7 +106,7 @@ Some components are very simple (e.g. Button) and others are a little more invol
 
 Things get a little more difficult when it comes to styling and most tutorials out there seem to have out-of-date information. The idea is that you work with themes and then do overrides when needed. Overall the learning curve is steep.
 
-The simplest way to apply custom styles would appear as a one-off customization:
+The simplest way to apply custom styles would appear to be as a one-off customization:
 
 > The easiest way to add style overrides for a one-off situation is to use the sx prop available on all MUI components.
 
@@ -224,6 +224,8 @@ Looks like this is built off of [react-form-validator-core](https://www.npmjs.co
 
 ## react-form-validator-core
 
+TODO...
+
 [react-form-validator-core](https://github.com/NewOldMax/react-form-validator-core)
 
 ```bash
@@ -238,7 +240,7 @@ Example:
 
 ## chroma.js
 
-[Chroma.js](https://gka.github.io/chroma.js/#chroma-contrast) is a small zero-dependency JavaScript library (13.5kB) for all kinds of color conversions and color scales.
+[Chroma.js](https://gka.github.io/chroma.js) is a small zero-dependency JavaScript library (13.5kB) for all kinds of color conversions and color scales.
 
 ```bash
 npm install chroma-js
@@ -378,7 +380,7 @@ Tip: to help debug and ensure components are lying on top of each other, disable
 
 Doing this may help visualize some other things too, for example you may decide to ensure each component has a background color for smoother overall transitions.
 
-Lastly, [this git commit](https://github.com/jessicarush/colour-app/commit/7183725387a60b24d268760cfd463601b2b7ae97) shows the changes made to implement page transitions. The commit after that one refactors the
+Lastly, [this git commit](https://github.com/jessicarush/colour-app/commit/7183725387a60b24d268760cfd463601b2b7ae97) shows the changes made to implement page transitions. The commit after that one refactors the `page-transition-helper` wrapper div into its own component.
 
 
 ## React sortable
@@ -391,6 +393,8 @@ npm install react-sortable-hoc
 
 
 ## dnd-kit
+
+TODO...
 
 [dnd-kit](https://github.com/clauderic/dnd-kit) is a lightweight, modular, performant, accessible and  extensible drag & drop toolkit for React.
 
