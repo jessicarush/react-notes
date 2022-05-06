@@ -20,7 +20,7 @@
 
 ## Introduction
 
-Create-react-app is a command line utility script that creates a skeleton react project and configures it so that your JS files are run through Babel automatically. It also allows us to use some additional modern JavaScript features and makes testing and deployment much easier.
+[Create-react-app](https://create-react-app.dev/docs/getting-started) is a command line utility script that creates a skeleton react project and configures it so that your JS files are run through Babel automatically. It also allows us to use some additional modern JavaScript features and makes testing and deployment much easier.
 
 So far though, my biggest complaint/frustration is that the skeleton project created (specifically the dependency tree in the node_modules directory) is an enormous ≈ 130 MB in size. This, in my opinion, is nuts.
 
@@ -50,8 +50,8 @@ npm start
 
 When you start the app you should be able to see it running at:
 
-Local:                 `http://localhost:3000/`
-On Your Network (eg):  `http://10.0.0.2:3000/`
+Local:                   `http://localhost:3000/`  
+On your network (e.g.):  `http://10.0.0.2:3000/`  
 
 The page will automatically reload if you make changes to the code and you will see the build errors and lint warnings in the console.
 
@@ -91,6 +91,7 @@ my-app
 **src** - this is where we create all our react components and css. Note that `index.css` is meant to be your site-wide css.
 **public** - contains your main `index.html`. They've also got some icon-related files in here and a `robots.txt`
 
+See also: the [folder structure in create-react-app](https://create-react-app.dev/docs/folder-structure).
 
 ## Webpack
 
@@ -190,7 +191,7 @@ Note that in the `... from './extras'`, the `./` indicates that the module is lo
 ## Conventions
 
 - each component should go in a separate file
-- the file name should match the component name, e.g. `src/Message.js` should contain `function Message()` or `class Message`
+- the file name should match the component name: e.g. `src/Message.js` should contain `function Message` or `class Message`
 - css files should also be component-specific and named to match, e.g. `src/Message.css`
 - file names and component names should be capitalized.
 - class components should extend `Component` which is imported from `'react'`
@@ -205,7 +206,7 @@ As mentioned above, css should be component-specific and saved with the same nam
 
 ```javascript
 import React, { Component } from 'react';
-import `./Message.css`;
+import './Message.css';
 ```
 
 It is also conventional to add a `className` that is the same as the component name to the top-level html element that is being returned. All sub-item styles should be prefixed with this name. For example:
@@ -245,7 +246,7 @@ class Message extends Component {
 
 ## Renaming root folder
 
-If you want to rename the apps root folder (i.e. `myapp` from `npx create-react-app my-app`) rather than renaming the folder in your os gui, use the command line `mv my-app new_name`.
+If you want to rename the app root folder (i.e. `myapp` from `npx create-react-app my-app`), rather than renaming the folder in your os gui, use the command line `mv my-app new_name`.
 
 
 ## React version
@@ -261,7 +262,7 @@ npm view react version
 
 Note that using `npx create-react-app myapp`, will always use the latest version of create-react-app. Once run, you can see the version number by looking at the `"react-scripts": "^5.0.0",` line. You can verify the version number by going to the [CHANGELOG](https://github.com/facebook/create-react-app/blob/main/CHANGELOG.md) in the create-react-app github repo.
 
-You can also male sure you've got teh latest be running:
+You can also make sure you've got the latest by running:
 
 ```
 npm install react-scripts@latest
@@ -284,3 +285,5 @@ Create-react-app installs the following scripts:
 This allows us to run `npm start` for running the app during development, `npm run build` for creating the optimized build version, `npm test` for running tests in `App.test.js` and `npm run eject` is an advanced operation that allows you to customize the configuration under Create-react-app (e.g. webpack and babel).
 
 Note you can omit 'run' from `npm start` and `npm test`.
+
+See also: [available scripts for create-react-app](https://create-react-app.dev/docs/available-scripts)
