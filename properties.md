@@ -78,6 +78,46 @@ class Welcome extends React.Component {
 }
 ```
 
+It's even tidier in functional components:
+
+```javascript
+function Welcome(props) {
+  // logs the property object which lists all the properties:
+  console.log(props);
+  return (
+    <div>
+      <p>Welcome {props.name}, happy {props.day}.</p>
+    </div>
+  );
+}
+```
+
+or:
+
+```javascript
+function Welcome(props) {
+  const {name, day} = props;
+  return (
+    <div>
+      <p>Welcome {name}, happy {day}.</p>
+    </div>
+  );
+}
+```
+
+or: 
+
+```javascript
+function Welcome({name, day}) {
+  return (
+    <div>
+      <p>Welcome {name}, happy {day}.</p>
+    </div>
+  );
+}
+```
+
+
 ## Props are Immutable
 
 One major thing to note is that properties passed to components are immutable. In other words, you cannot assign a new value to them, they are read-only.
@@ -138,7 +178,7 @@ class Welcome extends React.Component {
   render() {
     return (
       <div>
-        <p>Welcome {this.props.name}.</p>
+        <p>Welcome {this.props.name}</p>
         <p>number: {this.props.num}</p>
         <p>color: {this.props.color}</p>
       </div>
@@ -163,6 +203,21 @@ class App extends React.Component {
 
 ReactDOM.render(<App/>, document.getElementById('root'));
 ```
+
+In functional components, it's even tidier:
+
+```javascript
+function Welcome({name='human', num=5, color='red'}) {
+  return (
+    <div>
+        <p>Welcome {name}</p>
+        <p>number: {num}</p>
+        <p>color: {color}</p>
+      </div>
+  );
+}
+```
+
 
 ## Passing object as props with `...`
 
