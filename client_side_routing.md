@@ -13,7 +13,7 @@ Client-side routing simply runs this process in the browser using JavaScript. As
 <!-- toc -->
 
 - [Pros](#pros)
-- [Cons](#cons)cd 
+- [Cons](#cons)
 - [React Router](#react-router)
   * [Define Routes](#define-routes)
   * [404 Equivalent](#404-equivalent)
