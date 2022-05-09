@@ -1,13 +1,5 @@
 # Hooks in function components
 
-## Docs
-
-- [Introduction to hooks](https://reactjs.org/docs/hooks-intro.html)
-- [Built-in hooks](https://reactjs.org/docs/hooks-reference.html)
-- [Rules for hooks](https://reactjs.org/docs/hooks-rules.html)
-- [State hooks](https://reactjs.org/docs/hooks-state.html)
-
-
 ## Table of Contents
 
 <!-- toc -->
@@ -17,17 +9,27 @@
 - [useState](#usestate)
 - [useContext](#usecontext)
 - [useEffect](#useeffect)
-  * [used for setState callbacks](#used-for-setstate-callbacks)
+  * [UseEffect API example](#useeffect-api-example)
+  * [useEffect for setState callbacks](#useeffect-for-setstate-callbacks)
+  * [used with a loading indicator](#used-with-a-loading-indicator)
+- [useRef](#useref)
+- [useReducer](#usereducer)
+- [useCallback](#usecallback)
+- [useMemo](#usememo)
+- [useImperativeHandle](#useimperativehandle)
 - [useLayoutEffect](#uselayouteffect)
+- [useDebugValue](#usedebugvalue)
 - [useId](#useid)
+- [useTransition and useDeferredValue](#usetransition-and-usedeferredvalue)
 - [Custom hooks](#custom-hooks)
   * [Custom hook example: localStorage](#custom-hook-example-localstorage)
+- [Docs references](#docs-references)
 
 <!-- tocstop -->
 
 ## Introduction
 
-In React, there are basic built-in hooks:
+In React, there are basic [built-in hooks](https://reactjs.org/docs/hooks-reference.html):
 
 - `useState` for creating stateful values as previously done with `this.state`
 - `useEffect` for replicating lifecycle behavior
@@ -46,8 +48,6 @@ Additional built-in hooks:
 - `useTransition`
 - `useDeferredValue`
 
-See [concurrent_features.md](concurrent_features.md) for `useTransition` and `useDeferredValue`.
-
 
 ## Rules
 
@@ -62,12 +62,12 @@ See [concurrent_features.md](concurrent_features.md) for `useTransition` and `us
 
 ## useState
 
-The `useState` hook returns a stateful value, and a function to update it. See my notes in [state_with_hooks.md](state_with_hooks.md) and the React docs: [Using the State Hook](https://reactjs.org/docs/hooks-state.html).
+The [useState](https://reactjs.org/docs/hooks-reference.html#usestate) hook returns a stateful value, and a function to update it. See my notes in [state_with_hooks.md](state_with_hooks.md) and the React docs: [Using the State Hook](https://reactjs.org/docs/hooks-state.html).
 
 
 ## useContext
 
-Context provides a way to pass data through the component tree without having to pass props down manually at every level. See my notes in [context.md](context.md) and the [Hook API Reference](https://reactjs.org/docs/hooks-reference.html#usecontext) (React docs).
+Context provides a way to pass data through the component tree without having to pass props down manually at every level. See my notes in [context.md](context.md) and the [useContext api reference](https://reactjs.org/docs/hooks-reference.html#usecontext) (React docs).
 
 
 ## useEffect
@@ -88,14 +88,12 @@ function Example() {
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
-    console.log('I will run every time the component renders or updates');
-    // Update the document title using the browser API
-    document.title = `You clicked ${count} times`;
+    console.log('I will run every time the component mounts or updates');
   });
 
   return (
     <div>
-      <button onClick={() => setCount(c => c + 1)}>Count</button>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
     </div>
   );
 }
@@ -103,7 +101,100 @@ function Example() {
 
 Note that it's the lack of an optional second argument passed to `useEffect` that causes it to run on every update. If you only wanted code to run on the initial mount, pass an empty array as the second argument.
 
-For example, if we want a one-time api call:
+```javascript
+import React, { useState, useEffect } from 'react';
+
+function Example() {
+  const [count, setCount] = useState(0);
+
+  // Similar to componentDidMount:
+  useEffect(() => {
+    console.log('I will run once when the component first mounts');
+  }, []);
+
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+    </div>
+  );
+}
+```
+
+We can also tell `useEffect` run whenever a specific state value is updated:
+
+```javascript
+import React, { useState, useEffect } from 'react';
+
+function Example() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    console.log('I will run when the component mounts and whenever count updates');
+  }, [count]);
+
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+    </div>
+  );
+}
+```
+
+Using another hook, `useRef`, we can run only on updates (skipping the initial mount):
+
+```javascript
+import React, { useEffect, useState, useRef } from 'react';
+
+function Example(props) {
+  const [count, setCount] = useState(0);
+  const didMount = useRef(false);
+
+  useEffect(() => {
+    if (didMount.current) {
+      console.log('I will run only when count updates');
+    } else {
+      didMount.current = true;
+    }
+  }, [count]);
+
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+    </div>
+  );
+}
+```
+
+Finally, you could run only on the very first update:
+
+```javascript
+function Example(props) {
+  const [count, setCount] = useState(0);
+  const didMount = useRef(false);
+  const updatedOnce = useRef(false);
+
+  useEffect(() => {
+    if (updatedOnce.current) {
+      return
+    } else if (didMount.current) {
+      console.log('I will run only when count update the first time');
+      updatedOnce.current = true;
+    } else {
+      didMount.current = true;
+    }
+  }, [count]);
+
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+    </div>
+  );
+}
+```
+
+### UseEffect API example
+
+A one-time api call:
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -192,8 +283,7 @@ function Demo() {
 export default Demo;
 ```
 
-
-### used for setState callbacks
+### useEffect for setState callbacks
 
 In class components you can optionally pass a callback to run after the state has been updated with `this.setState`. With react hooks, you can use `useEffect()` to accomplish the same thing. For example:
 
@@ -248,11 +338,39 @@ function Demo() {
 export default Demo;
 ```
 
+## useRef 
+
+[useRef](https://reactjs.org/docs/hooks-reference.html#useref) returns a mutable ref object whose .current property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
+
+Essentially, useRef is like a “box” that can hold a value in its .current property and is handy for keeping any mutable value around. Keep in mind that `useRef` doesn’t notify you when its content changes. Mutating the .current property doesn’t cause a re-render. This is why it's useful in the `useEffect` examples above where we need to set a flag to keep track of renders and updates. In fact, if you try to assign a value to a normal variable inside `useEffect`:
+
+> Assignments to the 'didMount' variable from inside React Hook useEffect will be lost after each render. To preserve the value over time, store it in a useRef Hook and keep the mutable value in the '.current' property. Otherwise, you can move this variable directly inside useEffect
+
+## useReducer
+
+[useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) is an alternative to useState and is usually preferable when you have complex state logic that involves multiple sub-values or when the next state depends on the previous one. 
+
+See [useReducer.md](useReducer.md).
+
+## useCallback
+
+TODO...
+
+## useMemo
+
+TODO...
+
+## useImperativeHandle
+
+TODO...
 
 ## useLayoutEffect
 
-TODO
+TODO...
 
+## useDebugValue
+
+TODO...
 
 ## useId 
 
@@ -299,6 +417,11 @@ I'm not sure why they would say this given the examples they show in the docs. I
 Also:
 
 > :warning: useId generates a string that includes the : token. This helps ensure that the token is unique, but is not supported in CSS selectors or APIs like querySelectorAll.
+
+
+## useTransition and useDeferredValue
+
+See [concurrent_features.md](concurrent_features.md) for `useTransition` and `useDeferredValue`.
 
 
 ## Custom hooks
@@ -398,4 +521,11 @@ export default Demo;
 
 For another example of custom hooks, see the form handling example in [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md#custom-hook-for-forms).
 
-For more see the [React docs on building your own hooks](https://reactjs.org/docs/hooks-custom.html).
+
+## Docs references
+
+- [Introduction to hooks](https://reactjs.org/docs/hooks-intro.html)
+- [Built-in hooks](https://reactjs.org/docs/hooks-reference.html)
+- [Rules for hooks](https://reactjs.org/docs/hooks-rules.html)
+- [State hooks](https://reactjs.org/docs/hooks-state.html)
+- [Building Your Own Hooks](https://reactjs.org/docs/hooks-custom.html)
