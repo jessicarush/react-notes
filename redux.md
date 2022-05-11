@@ -1,6 +1,6 @@
 # Redux
 
-Redux is am open-source library for managing and centralizing state in a JavaScript app (most commonly used with React or Angular). It provides a way for all of your components to work and communicate with a centralized store of all your state values and logic.
+Redux is an open-source library for managing and centralizing state in a JavaScript app (most commonly used with React or Angular). It provides a way for all of your components to work and communicate with a centralized store of all your state values and logic.
 
 Some of Redux's functionality can be replicated/replaced with the `useContext` and `useReducer` hooks. Many people are switching over to the Context hook as Redux tends to be verbose, difficult to pick up and introduces more complexity. See [context.md](context.md).
 
@@ -20,9 +20,4 @@ That being said, Redux and useContext + useReducer are different tools, intended
 
 <!-- tocstop -->
 
-
-
-
-
-
-
+TODO...
