@@ -7,6 +7,8 @@
 - [Stylesheet styles](#stylesheet-styles)
 - [Conditional Styles](#conditional-styles)
 - [Inline Styles](#inline-styles)
+- [CSS-in-JS](#css-in-js)
+- [Links](#links)
 
 <!-- tocstop -->
 
@@ -135,9 +137,9 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Machine color="rgb(245,242,240)"/>
-        <Machine color="tomato"/>
-        <Machine color="#fff"/>
+        <Machine color="rgb(245,242,240)" />
+        <Machine color="tomato" />
+        <Machine color="#fff" />
       </div>
     );
   }
@@ -157,3 +159,12 @@ return (
   </div>
 );
 ```
+
+## CSS-in-JS
+
+TODO... (I'm not a fan)
+
+## Links
+
+See [React faq on styling](https://reactjs.org/docs/faq-styling.html)
+See the [classnames](https://github.com/JedWatson/classnames#readme) package
