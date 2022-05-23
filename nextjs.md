@@ -50,10 +50,10 @@ Next.js is a production framework for React. It is used on top of React, expandi
 
 These scripts refer to the different stages of developing an application:
 
-dev - Runs next dev which starts Next.js in development mode
-build - Runs next build which builds the application for production usage
-start - Runs next start which starts a Next.js production server
-lint - Runs next lint which sets up Next.js' built-in ESLint configuration
+`dev` - Runs next dev which starts Next.js in development mode  
+`build` - Runs next build which builds the application for production usage  
+`start` - Runs next start which starts a Next.js production server  
+`lint` - Runs next lint which sets up Next.js' built-in ESLint configuration  
 
 - Create a pages directory inside the project dir.
 - Populate ./pages/index.js with the following content:
@@ -107,7 +107,7 @@ It is recommended that other (non page) components be placed in a components dir
 
 See <https://nextjs.org/docs/api-reference/next/link>
 
-In addition to the automatic routing with places files in the pages directory, you can also do client-side routing using `<Link>`:
+In addition to the automatic routing with files placed in the pages directory, you can also do client-side routing using `<Link>`:
 
 ```jsx
 import Link from 'next/link';
