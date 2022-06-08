@@ -19,7 +19,11 @@ Context can be used with or without hooks.
 
 ## When to use context
 
-Context is designed to share data that can be considered *global* for a tree of React components, such as the current authenticated user, theme, or preferred language.
+Context is designed to share data that can be considered *global* for a tree of React components, such as:
+
+- theme data (e.g. dark or light mode)
+- user data (the currently authenticated user)
+- location-specific data (e.g. user language or locale)
 
 Context is primarily used when some data needs to be accessible by many components at different nesting levels. Apply it sparingly because it makes component reuse more difficult.
 
