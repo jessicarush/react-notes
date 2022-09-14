@@ -74,26 +74,32 @@ This apparently won't happen in the production build. You can disable strict mod
 
 ```jsx
 import React from 'react';
-import ReactDOMClient from 'react-dom/client';
-import App from './App';
+import ReactDOM from 'react-dom/client';
 import './index.css';
+import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-const container = document.getElementById('root');
-const root = ReactDOMClient.createRoot(container);
-
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
     <App />
   // </React.StrictMode>
 );
 
-
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 ```
+
+
+## Upgrade React in an existing create-react-app project
+
+The [create-react-app docs](https://create-react-app.dev/docs/updating-to-new-releases) states:
+
+> To update an existing project to a new version of react-scripts, open the [changelog](https://github.com/facebook/create-react-app/blob/main/CHANGELOG.md), find the version you’re currently on (check package.json in this folder if you’re not sure), and apply the migration instructions for the newer versions.
+
+In most cases bumping the react-scripts version in package.json and running npm install (or yarn install) in this folder should be enough, but it’s good to consult the changelog for potential breaking changes.
 
 
 ## Learning Questions

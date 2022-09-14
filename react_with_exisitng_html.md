@@ -73,10 +73,14 @@ Create a component and save it into the `js/src` directory
 function LikeButton() {
   const [like, setLike] = React.useState(false);
 
+  const toggleLike = () => {
+    setLike(l => !l);
+  };
+
   return (
     <div className="Example">
-      <button onClick={() => setLike(true)}>Like</button>
-      <p>{like ? 'Woot! you like' : 'Meh. you no like'}</p>
+      <button onClick={toggleLike}>Like</button>
+      <p>{like ? 'Like is true' : 'Like is false'}</p>
     </div>
   );
 }
@@ -91,7 +95,7 @@ const root = ReactDOM.createRoot(container);
 root.render(<LikeButton />);
 ```
 
-You should npw be able to see your component by serving the html (e.g. `python -m http.server`).
+You should now be able to see your component by serving the html (e.g. `python -m http.server`).
 
 Note that the API for rendering has changed from React v17 to v18.
 
@@ -132,18 +136,22 @@ But this type of import is a node_modules thing... then we need webpack and babe
 
 ```javascript
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
+import reportWebVitals from './reportWebVitals';
 
-// ReactDOM.render(<App />, document.getElementById('root'));
-ReactDOM.render(<App />, document.getElementById('react_todo'));
+const root = ReactDOM.createRoot(document.getElementById('react_todo'));
+root.render(
+  // <React.StrictMode>
+    <App />
+  // </React.StrictMode>
+);
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.register();
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
 ```
 
 ### 3. Add `"homepage": "."` to package.json 
@@ -165,11 +173,11 @@ See <https://create-react-app.dev/docs/deployment/> for more information.
 
 After running this command, locate the build directory, then copy the static directory (which should contain css and js dirs) over to the destination websites root. I renamed the static folder "react_build". 
 
-Now you need to link the css stylesheet and and the three scripts (leave the .map files).
+Now you need to link the css stylesheet and and the two scripts (leave the .map files).
 
 ```html 
     <!-- Stylesheet -->
-    <link href="./react_build/css/main.4be25687.chunk.css" rel="stylesheet">
+    <link href="./react_build/css/main.8afc6c12.css" rel="stylesheet">
   </head>
 
   <body>
@@ -179,9 +187,8 @@ Now you need to link the css stylesheet and and the three scripts (leave the .ma
     <div id="react_todo"></div>
 
     <!-- JavaScript -->
-    <script src="./react_build/js/runtime-main.86297d73.js"></script>
-    <script src="./react_build/js/2.450ae4ea.chunk.js"></script>
-    <script src="./react_build/js/main.58438f3a.chunk.js"></script>
+    <script src="./react_build/js/787.2be18bd2.chunk.js"></script>
+    <script src="./react_build/js/main.def4e3de.js"></script>
 
   </body>
 </html>
@@ -189,13 +196,10 @@ Now you need to link the css stylesheet and and the three scripts (leave the .ma
 
 Order matters here. 
 
-1. js/runtime-main.[hash].js
-2. js/[number].[hash].chunk.js
-3. js/main.[hash].chunk.js
+1. js/[number].[hash].chunk.js
+2. js/main.[hash].js
 
-With that you should be able to serve the html and see your app embedded. Note there will be a couple console warnings, one about the service worker that I haven't bothered to look into yet and another related to security.
-
-For an explanation of these files see: <https://create-react-app.dev/docs/production-build/>
+With that you should be able to serve the html and see your app embedded. For an explanation of these files see: <https://create-react-app.dev/docs/production-build/>
 
 
 ## Build your own Webpack configuration 
