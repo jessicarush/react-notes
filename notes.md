@@ -110,73 +110,27 @@ From the [React Docs](https://reactjs.org/docs/glossary.html):
 
 > Though you may build a single-page application in React, it is not a requirement. React can also be used for enhancing small parts of existing websites with additional interactivity. Code written in React can coexist peacefully with markup rendered on the server by something like PHP, or with other client-side libraries. In fact, this is exactly how React is being used at Facebook.
 
-### How would you integrate your React component/SPA into an existing website?
+### How would you integrate your React component or SPA into an existing website?
 
 See the React docs: <https://reactjs.org/docs/add-react-to-a-website.html>
 
-My summary notes are here: [add_react_to_html.md](add_react_to_html.md). I'm assuming you could have nested components, you would just need to src them in the right order. You would also need to add `type=module` to the component `<script>` tags (assuming we're using import/export). 
+My summary notes are here: [react_with_existing_html.md](react_with_existing_html.md). I'm assuming you could have nested components, you would just need to src them in the right order. You would also need to add `type=module` to the component `<script>` tags (assuming we're using import/export). 
 
-That being said, with this very simplistic approach, you wouldn't get to import css files or any other node packages into your components. Overall, the usefulness of this approach seems pretty slim. 
+That being said, with this very simplistic approach, you wouldn't get to import css files or any other node packages into your components. Overall, not vert useful. 
 
 It seems to me that if you really needed to embed a react project into and existing website, the best approach would still be to use create-react-app or webpack. 
 
-With create-react-app, we can use the `npm run build` command and serve all the static files it creates. This is explained step-by-step in the second half of [add_react_to_html.md](add_react_to_html.md).
-
-Lastly, we can create our own webpack configuration...
-
-TODO..
+With create-react-app, we can use the `npm run build` command and serve all the static files it creates. This is explained step-by-step in the second half of [add_react_to_html.md](react_with_existing_html.md).
 
 
-### Can I have flask serve the build/index.html created from create-react-app?
+### Can I have flask serve the build created from create-react-app?
 
-Yes. You need to:
-
-1. Copy all the files from inside the build directory (created from `npm run build`) and place them inside the static directory of the flask app.
-
-2. Create a route the serves a static file from the static directory:
-
-```python
-@app.route('/test', methods=['GET', 'POST'])
-def test():
-    '''Test view function.'''
-    return app.send_static_file('index.html')
-```
-
-3. Add `static_url_path=''` to the Flask app instance initialization:
-
-```python
-app = Flask(__name__, static_url_path='')
-```
-
-Alternatively, if you'd prefer to have the react build files in their own directory within the flask static dir, you could modify the package.json to have the following line:
-
-```json
-"homepage": "/static/react",
-```
-
-...where 'static' is the flask static dir and 'react' is the new dir that we'll dump the build files into. Adding this line ensures that the react app has the proper paths. See the [create-react-app docs](https://create-react-app.dev/docs/deployment/#building-for-relative-paths for better explanation. According to this doc, I may be able to use `"homepage": ".",` to have relative paths. Should test this.
-
-When we do it this way, you don't need to add the `static_url_path=''`.
-
-```python
-app = Flask(__name__)
-```
-
-Finally, we would need to specify the new dir in our route path:
-
-```python
-@app.route('/test', methods=['GET', 'POST'])
-def test():
-    '''Test view function.'''
-    return app.send_static_file('react/index.html')
-```
+Yes. This is pretty straightforward, see: [react_served_by_flask.md](react_served_by_flask.md).
 
 
 ### Does the above still work with react-router stuff?
 
 TODO...
-hashrouter?
-<https://create-react-app.dev/docs/deployment/>
 
 ### Demonstrate working with Flask backed as an API for database stuff.
 
