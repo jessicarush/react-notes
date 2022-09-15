@@ -52,7 +52,7 @@ When developing, the Flask backend will likely be running on one port (e.g. http
 axios.get('http://localhost:5000/api/color', headers);
 ```
 
-Anyone can make a get request without worrying about CORS. But, if the server is configured to send back some json data, it would then we need to consider the following:
+Anyone can make a get request without worrying about CORS. But, if the server is configured to send back some json data, we then need to consider the following:
 
 - if the requester is from the same origin, we have no CORS issues 
 - if the requester is from a different origin (e.g. a different port), then the server needs to explicitly allow code from other origins to access the resource. This can be done with the `'Access-Control-Allow-Origin'` header using the `*` wildcard.
@@ -66,15 +66,15 @@ Anyone can make a get request without worrying about CORS. But, if the server is
 
 As soon as we try to do a POST though, we will run into the same problem again. The Flask backend needs to identify if origins other than its own are allowed to Post. This is easiest done using [flask-cors](https://flask-cors.readthedocs.io/en/latest/) and is described in the next section.
 
-But for this example, it is our intention that we are going to be serving the React frontend React from the same host and port as the Flask backend (e.g. using nginx).
+But for this example, let's assume that in production we intend to serve the React frontend from the same domain and port as the Flask backend (e.g. using nginx).
 
-In the meantime, we can configure a [proxy](https://create-react-app.dev/docs/proxying-api-requests-in-development/) in the `package.json` file of the React project. This allows the app to "pretend" it's making requests from the same port of the server as the backend, thereby avoiding all CORS issues.
+In the meantime, we can configure a [proxy](https://create-react-app.dev/docs/proxying-api-requests-in-development/) in the `package.json` file of the React project. This allows the app to "pretend" it's making requests from the same port as the backend, thereby avoiding all CORS issues.
 
 ```json
   "proxy": "http://localhost:5000",
 ```
 
-This tells the React development server to proxy any unknown requests to your API server. Once we add this proxy pointing to our backend, we can change all our API calls to just endpoint path:
+This tells the React development server to proxy any unknown requests to your API server. Once we add this proxy pointing to our backend, we can change all our API calls to just the endpoint path:
 
 ```javascript
 axios.get('/api/color', headers);
@@ -148,6 +148,7 @@ def api_demo_one():
 ```
 
 :warning: Both the frontend URL here and the backend url used in the API requests will need to be updated with the actual domain name when deployed.
+
 
 ## Notes 
 
