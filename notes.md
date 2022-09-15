@@ -132,7 +132,7 @@ Yes. This is pretty straightforward, see: [react_served_by_flask.md](react_serve
 
 TODO...
 
-### Demonstrate working with Flask backed as an API for database stuff.
+### Can I demonstrate working with a database via a Flask API backend and React frontend?
 
 TODO...
 
