@@ -8,12 +8,13 @@
 - [Why React](#why-react)
 - [Design Decisions](#design-decisions)
 - [React 18 notes](#react-18-notes)
+- [Upgrade React in an existing create-react-app project](#upgrade-react-in-an-existing-create-react-app-project)
 - [Learning Questions](#learning-questions)
   * [Are all React.js apps SPAs?](#are-all-reactjs-apps-spas)
-  * [How would you integrate your React component/SPA into an existing website?](#how-would-you-integrate-your-react-componentspa-into-an-existing-website)
-  * [Can I have flask serve the build/index.html created from create-react-app?](#can-i-have-flask-serve-the-buildindexhtml-created-from-create-react-app)
+  * [How would you integrate your React component or SPA into an existing website?](#how-would-you-integrate-your-react-component-or-spa-into-an-existing-website)
+  * [Can I have flask serve the build created from create-react-app?](#can-i-have-flask-serve-the-build-created-from-create-react-app)
   * [Does the above still work with react-router stuff?](#does-the-above-still-work-with-react-router-stuff)
-  * [Demonstrate working with Flask backed as an API for database stuff.](#demonstrate-working-with-flask-backed-as-an-api-for-database-stuff)
+  * [Can I demonstrate working with a database via a Flask API backend and React frontend?](#can-i-demonstrate-working-with-a-database-via-a-flask-api-backend-and-react-frontend)
   * [What are the most common solutions for database with React? Is there a solution built-in to Next.js?](#what-are-the-most-common-solutions-for-database-with-react-is-there-a-solution-built-in-to-nextjs)
   * [How do I handle authentication (logins) using Flask backend?](#how-do-i-handle-authentication-logins-using-flask-backend)
   * [What is the common solution for handling auth in React? Is there a solution built-in to Next.js?](#what-is-the-common-solution-for-handling-auth-in-react-is-there-a-solution-built-in-to-nextjs)
@@ -130,15 +131,21 @@ Yes. This is pretty straightforward, see: [react_served_by_flask.md](react_serve
 
 ### Does the above still work with react-router stuff?
 
-TODO...
+Yes. It just works. See my notes in [react_served_by_flask.md](react_served_by_flask.md).
 
 ### Can I demonstrate working with a database via a Flask API backend and React frontend?
 
-TODO...
+Yes. See [react_with_flask_api.md](react_with_flask_api.md).
 
 ### What are the most common solutions for database with React? Is there a solution built-in to Next.js?
 
-TODO...
+There's a number of different approaches you can take:
+
+1. No backend - You can apparently use Next.js and Gatsby to do things like store posts as markdown files and load them in or store product data in json files and load that.
+
+2. Use a BaaS (backend as a service) - For people who find managing a database and building a complete API to interact with that database is a daunting challenge. Firebase is an example... in includes authentication strategies and NoSql databases.
+
+3. Build out your own backend - apparently Next.js has some API tools. Backend technologies frequently mentioned are Node.js, ExpressJS, Django, Rails.
 
 ### How do I handle authentication (logins) using Flask backend?
 
@@ -146,7 +153,12 @@ TODO...
 
 ### What is the common solution for handling auth in React? Is there a solution built-in to Next.js?
 
-TODO...
+- react-router can be used to restrict access to routes to authenticated users <https://github.com/remix-run/react-router/tree/dev/examples/auth>
+- Firebase BaaS has some pre-built options
+- ExpressJS can be used <https://blog.logrocket.com/how-to-secure-react-app-login-authentication/>
+- [flask-praetorian](https://flask-praetorian.readthedocs.io/en/latest/), see <https://yasoob.me/posts/how-to-setup-and-deploy-jwt-auth-using-react-and-flask/> 
+- use an authentication service like Auth0
+
 
 ### Demonstrate email from React to Flask
 
