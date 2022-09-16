@@ -1,6 +1,6 @@
 # Using Flask to serve React
 
-Flask can be used to serve a static react app. This method has NOt yet been tested with react-router apps. See <https://create-react-app.dev/docs/deployment/> for information.
+Flask can be used to serve a static react app. This method has also been successfully tested with react-router apps.
 
 ## Serving a static react build
 
@@ -44,8 +44,28 @@ def test():
     return app.send_static_file('react/index.html')
 ```
 
-## Serving a react-router build 
+## Serving a react-router build
 
-TODO...
-hashrouter?
-<https://create-react-app.dev/docs/deployment/>
+This setup has been tested and works with react-router v6.4.0. The only thing to keep in mind here is:
+
+1. In your flask app, keep in mind the `app.route` endpoint you use for serving the flask app must exist as a `<Route>` endpoint in your flask app.
+
+```python
+# This /home route should exist as a <Route> in the React app
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+    '''Test static serving a react build.'''
+    return app.send_static_file('react/index.html')
+```
+
+```javascript
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/home" element={<Home />} />
+  <Route path="/about" element={<About />} />
+  <Route path="/contact" element={<Contact />} />
+  <Route path="*" element={<NotFound />} />
+</Routes>
+```
+
+2. Once you have navigated to the react app, `react-router` will then take ouver the routing, so any internal links to `'/'` will be the react `'/'` endpoint, not the flask `'/'` route. To get back to flask, you would have use an absolute url or use the browsers back button or go to the url using the address.
