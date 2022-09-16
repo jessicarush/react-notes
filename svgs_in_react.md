@@ -10,6 +10,11 @@ There are a few ways to use an SVG in a React app:
 
 <!-- toc -->
 
+- [SVG placed as a regular image](#svg-placed-as-a-regular-image)
+- [SVG imported as a component](#svg-imported-as-a-component)
+- [SVG included as JSX](#svg-included-as-jsx)
+
+<!-- tocstop -->
 
 ## SVG placed as a regular image 
 
