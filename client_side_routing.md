@@ -30,10 +30,10 @@ Client-side routing simply runs this process in the browser using JavaScript. As
     + [useNavigate (current in v6)](#usenavigate-current-in-v6)
   * [Example 1: pass input values to a link](#example-1-pass-input-values-to-a-link)
   * [Example 2: use input values to redirect](#example-2-use-input-values-to-redirect)
-  * [Example 3: passing data to /:pattern routes](#example-3-passing-data-to-pattern-routes)
   * [useMatch](#usematch)
   * [Navigate](#navigate)
   * [Misc notes](#misc-notes)
+- [React Router v6.4](#react-router-v64)
 
 <!-- tocstop -->
 
@@ -90,6 +90,13 @@ Note there are [other Router types](https://reactrouter.com/docs/en/v6/api) too.
 - `<MemoryRouter>` which stores its locations internally in an array.
 - `<StaticRouter>` is used to render a React Router web app in node.
 
+**NEW** React-router v6.4 introduced new routers to support their new data APIs:
+
+- `<createBrowserRouter>` - is the new recommended router for all React Router web projects.
+- `<createMemoryRouter>` - manages it's own history stack in memory, used for running React Router in any non-browser environment.
+- `<createHashRouter>` - useful if you are unable to configure your web server to direct all traffic to your React Router application. Instead of using normal URLs, it will use the hash (#) portion of the URL to manage the "application URL"
+
+This will be covered below under [React Router v6.4](#react-router-v64).
 
 ### Define Routes
 
@@ -705,8 +712,6 @@ function Pics(props) {
 }
 ```
 
-### Example 3: passing data to /:pattern routes
-
 
 ### useMatch
 
@@ -730,3 +735,9 @@ TODO ...
 ### Misc notes
 
 All `<Route>`s and `<Link>`s inside a `<Routes>` are relative. This leads to leaner and more predictable code in `<Route path>` and `<Link to>`. This means that they automatically build on the parent route's path and URL.
+
+
+## React Router v6.4
+
+Major changes yet again in this release. Now they don't want you to use `<BrowserRouter>` as the recommended interface for running React Router in a web browser... now it's `<createBrowserRouter>` and its a completely different setup.
+
