@@ -19,7 +19,7 @@
 
 ```text
 .
-├─ backend
+├─ flask_api
 │  ├─ app
 │  ├─ logs
 │  ├─ venv
@@ -29,7 +29,7 @@
 │  ├─ README.md
 │  ├─ requirements.txt
 │  └─ run.py
-└─ frontend
+└─ react_ui
    ├─ build
    ├─ node_modules
    ├─ public
