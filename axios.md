@@ -42,7 +42,8 @@ import axios from 'axios';
 Then use `axios.get().then()`. Note that the `.then()` is a method of the standard built-in `Promise` object. See [promises.md](https://github.com/jessicarush/javascript-notes/blob/master/promises.md).
 
 ```javascript
-axios.get('/user')
+axios
+  .get('/user')
   .then(function (response) {
     console.log(response);
   })
@@ -60,21 +61,20 @@ A working example:
 class Test extends Component {
   constructor(props) {
     super(props);
-    this.state = {data: ""};
+    this.state = { data: '' };
   }
 
   componentDidMount() {
-    const url = "https://api.github.com/zen";
+    const url = 'https://api.github.com/zen';
     // load data
-    axios.get(url)
-      .then(response => {
-        // view the entire response object
-        console.log(response);
-        // view the response object keys
-        console.log(Object.keys(response));
-        // set state with that data
-        this.setState({data: response.data});
-      });
+    axios.get(url).then((response) => {
+      // view the entire response object
+      console.log(response);
+      // view the response object keys
+      console.log(Object.keys(response));
+      // set state with that data
+      this.setState({ data: response.data });
+    });
   }
 
   render() {
@@ -100,27 +100,28 @@ class Test extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      colorName: "",
-      colorHex: ""
+      colorName: '',
+      colorHex: ''
     };
   }
 
   componentDidMount() {
-    const url = "https://log.zebro.id/api_demo_one";
-    axios.get(url)
-      .then(response => {
-        this.setState({
-          colorName: Object.keys(response.data)[0],
-          colorHex: Object.values(response.data)[0]
-        });
+    const url = 'https://log.zebro.id/api_demo_one';
+    axios.get(url).then((response) => {
+      this.setState({
+        colorName: Object.keys(response.data)[0],
+        colorHex: Object.values(response.data)[0]
       });
+    });
   }
 
   render() {
-    const style = {color: this.state.colorHex};
+    const style = { color: this.state.colorHex };
     return (
       <div>
-        <p style={style}>{this.state.colorName} {this.state.colorHex}</p>
+        <p style={style}>
+          {this.state.colorName} {this.state.colorHex}
+        </p>
       </div>
     );
   }
@@ -153,41 +154,43 @@ class Test extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      colorName: "",
-      colorHex: ""
+      colorName: '',
+      colorHex: ''
     };
   }
 
   componentDidMount() {
-    const url = "http://127.0.0.1:5000/api_demo_one";
+    const url = 'http://127.0.0.1:5000/api_demo_one';
     // Equivalent to "http://127.0.0.1:5000/api_demo_one?value=rgb"
     const config = {
-      params: {value: 'rgb'}
-    }
-    axios.get(url, config)
-      .then(response => {
-        this.setState({
-          colorName: Object.keys(response.data)[0],
-          colorHex: Object.values(response.data)[0]
-        });
+      params: { value: 'rgb' }
+    };
+    axios.get(url, config).then((response) => {
+      this.setState({
+        colorName: Object.keys(response.data)[0],
+        colorHex: Object.values(response.data)[0]
       });
+    });
   }
 
   render() {
-    const style = {color: this.state.colorHex};
+    const style = { color: this.state.colorHex };
     return (
       <div>
-        <h1 style={style}>{this.state.colorName} {this.state.colorHex}</h1>
+        <h1 style={style}>
+          {this.state.colorName} {this.state.colorHex}
+        </h1>
       </div>
     );
   }
 }
 ```
 
-## Example - POST request 
+## Example - POST request
 
 ```javascript
-axios.post('/user', {
+axios
+  .post('/user', {
     firstName: 'Fred',
     lastName: 'Flintstone'
   })
@@ -202,23 +205,22 @@ axios.post('/user', {
 A working example:
 
 ```javascript
-
 function saveColor() {
   const url = '/api/demo_two';
   const data = { name: color.name, hex: color.hex };
   const config = {
     headers: {'Content-Type': 'application/json'}
   };
-  axios.post(url, data, config)
-    .then(response => {
-      console.log(response.data)
+  axios
+    .post(url, data, config)
+    .then((response) => {
+      console.log(response.data);
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(`something went wrong: ${err}`);
     });
-  }
+}
 ```
-
 
 ## Example - axios api
 
@@ -228,8 +230,8 @@ Instead of using axios `.get()` and `.post()`, you can also use the axios functi
 axios({
   method: 'post',
   url: 'https://example.com/api/post',
-  data: {id: '123'},
-  headers: {'Content-type': 'application/json'}
+  data: { id: '123' },
+  headers: { 'Content-type': 'application/json' }
 });
 ```
 
@@ -243,18 +245,19 @@ class Test extends Component {
     super(props);
     this.state = {
       isLoaded: false,
-      data: ""
+      data: ''
     };
   }
 
   componentDidMount() {
-    const url = "https://api.github.com/zen";
-    axios.get(url)
-      .then(response => {
-        setTimeout(function () {
-          this.setState({data: response.data, isLoaded: true});
-        }.bind(this), 3000);
-      });
+    const url = 'https://api.github.com/zen';
+    axios.get(url).then((response) => {
+      setTimeout(
+        function () {
+          this.setState({ data: response.data, isLoaded: true });
+        }.bind(this), 3000
+      );
+    });
   }
 
   render() {
@@ -273,7 +276,7 @@ class Test extends Component {
 class GithubUser extends Component {
   constructor(props) {
     super(props);
-    this.state = {imgUrl: '', name: ''};
+    this.state = { imgUrl: '', name: '' };
   }
 
   async componentDidMount() {
@@ -281,7 +284,7 @@ class GithubUser extends Component {
     let response = await axios.get(url);
     // this code won't run until await has finished
     let data = response.data;
-    this.setState({imgUrl: data.avatar_url, name: data.name});
+    this.setState({ imgUrl: data.avatar_url, name: data.name });
   }
 
   render() {
@@ -302,7 +305,7 @@ Even better, add try {} and catch {}:
 class GithubUser extends Component {
   constructor(props) {
     super(props);
-    this.state = {imgUrl: '', name: ''};
+    this.state = { imgUrl: '', name: '' };
   }
 
   async componentDidMount() {
@@ -311,7 +314,7 @@ class GithubUser extends Component {
       let response = await axios.get(url);
       // this code won't run until await has finished
       let data = response.data;
-      this.setState({imgUrl: data.avatar_url, name: data.name});
+      this.setState({ imgUrl: data.avatar_url, name: data.name });
     } catch (err) {
       console.log(`something went wrong: ${err}`);
     }
@@ -347,7 +350,7 @@ async function saveColor() {
 }
 ```
 
-## Multiple requests 
+## Multiple requests
 
 You can execute multiple requests **one after the other** by chaining `.then()` methods with regular promises or by using multiple await statements in async functions:
 
@@ -384,7 +387,7 @@ with async/await:
 
 ```javascript
 let [someResult, anotherResult] = await Promise.all([
-  someCall(), 
+  someCall(),
   anotherCall()
 ]);
 ```
@@ -393,3 +396,42 @@ let [someResult, anotherResult] = await Promise.all([
 ## axios in functional components
 
 See the `useEffect` section in [hooks.md](hooks.md).
+
+```javascript
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function Demo() {
+  const [zen, setZen] = useState('');
+
+  useEffect(() => {
+    console.log('I will run once when the component is first rendered.');
+
+    async function getZen() {
+      try {
+        const url = 'https://api.github.com/zen';
+        const config = {
+          headers: { 'Content-Type': 'application/json' }
+        };
+        let response = await axios.get(url, config);
+        handleResponse(response);
+      } catch (err) {
+        console.log(`something went wrong: ${err}`);
+      }
+    }
+    getZen();
+  }, []);
+
+  function handleResponse(response) {
+    setZen(response.data);
+  }
+
+  return (
+    <div className="Demo">
+      <p>{zen}</p>
+    </div>
+  );
+}
+
+export default Demo;
+```
