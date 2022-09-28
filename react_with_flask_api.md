@@ -71,10 +71,10 @@ But for this example, let's assume that in production we intend to serve the Rea
 In the meantime, we can configure a [proxy](https://create-react-app.dev/docs/proxying-api-requests-in-development/) in the `package.json` file of the React project. This allows the app to "pretend" it's making requests from the same port as the backend, thereby avoiding all CORS issues.
 
 ```json
-  "proxy": "http://localhost:5000",
+  "proxy": "http://127.0.0.1:5000",
 ```
 
-This tells the React development server to proxy any unknown requests to your API server. Once we add this proxy pointing to our backend, we can change all our API calls to just the endpoint path:
+This tells the React development server to proxy any unknown requests to your API server. Side note: for some reason you cannot use `http://localhost:5000`. Once we add this proxy pointing to our backend, we can change all our API calls to just the endpoint path:
 
 ```javascript
 axios.get('/api/color', headers);
