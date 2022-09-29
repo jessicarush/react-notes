@@ -137,7 +137,7 @@ Yes. It just works. See my notes in [react_served_by_flask.md](react_served_by_f
 
 Yes. See [react_with_flask_api.md](react_with_flask_api.md).
 
-### What are the most common solutions for database with React? Is there a solution built-in to Next.js?
+### What are the most common solutions for database/backend with React? Is there a solution built-in to Next.js?
 
 There's a number of different approaches you can take:
 
@@ -145,18 +145,26 @@ There's a number of different approaches you can take:
 
 2. Use a BaaS (backend as a service) - For people who find managing a database and building a complete API to interact with that database is a daunting challenge. Firebase is an example... in includes authentication strategies and NoSql databases.
 
-3. Build out your own backend - apparently Next.js has some API tools. Backend technologies frequently mentioned are Node.js, ExpressJS, Django, Rails.
+3. Build out your own backend - apparently Next.js has some API tools. Backend technologies frequently mentioned are Node.js, ExpressJS (or Node.js+ExpressJS), Django, Rails.
+
+Side note: monorepos? turborepo.org 
+
+Also mentioned: (FastApi a python web server)
 
 ### How do I handle authentication (logins) using Flask backend?
 
-TODO...
+- [flask-praetorian](https://flask-praetorian.readthedocs.io/en/latest/), 
+- see <https://yasoob.me/posts/how-to-setup-and-deploy-jwt-auth-using-react-and-flask/> 
+
+- see <https://blog.miguelgrinberg.com/post/how-to-create-a-react--flask-project> and <https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project>
+
+- [flask-security]()
 
 ### What is the common solution for handling auth in React? Is there a solution built-in to Next.js?
 
 - react-router can be used to restrict access to routes to authenticated users <https://github.com/remix-run/react-router/tree/dev/examples/auth>
 - Firebase BaaS has some pre-built options
 - ExpressJS can be used <https://blog.logrocket.com/how-to-secure-react-app-login-authentication/>
-- [flask-praetorian](https://flask-praetorian.readthedocs.io/en/latest/), see <https://yasoob.me/posts/how-to-setup-and-deploy-jwt-auth-using-react-and-flask/> 
 - use an authentication service like Auth0
 
 
