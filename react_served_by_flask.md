@@ -46,7 +46,7 @@ def test():
 
 ## Serving a react-router build
 
-This setup has been tested and works with react-router v6.4.0. The only thing to keep in mind here is:
+This setup has been tested and works with react-router v6.4.0. A few things to keep in mind here are:
 
 1. In your flask app, keep in mind the `app.route` endpoint you use for serving the flask app must exist as a `<Route>` endpoint in your flask app.
 
@@ -68,4 +68,18 @@ def home():
 </Routes>
 ```
 
-2. Once you have navigated to the react app, `react-router` will then take ouver the routing, so any internal links to `'/'` will be the react `'/'` endpoint, not the flask `'/'` route. To get back to flask, you would have use an absolute url or use the browsers back button or go to the url using the address.
+2. Once you have navigated to the react app, `react-router` will then take over the routing, so any internal links to `'/'` will be the react `'/'` endpoint, not the flask `'/'` route. To get back to flask, you would have use an absolute url or use the browsers back button or go to the url using the address.
+
+3. By default, the browsers 'refresh' button will now no longer when you're in the react-router app. This is because there is a server request for a particular route that doesn't exist on teh flask side. The solution is to route all unkown 404 traffic back to the react app (so that the react app's `<NotFound />` route can handle it).
+
+```python
+@app.errorhandler(404)
+def not_found_error(error):
+    # return render_template('errors/404.html'), 404
+    return app.send_static_file('react/index.html')
+```
+
+
+
+
+
