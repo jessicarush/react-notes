@@ -158,7 +158,7 @@ Also mentioned: (FastApi a python web server)
 
 - see <https://blog.miguelgrinberg.com/post/how-to-create-a-react--flask-project> and <https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project>
 
-- [flask-security]()
+- [flask-security](https://flask-security-too.readthedocs.io/en/stable/)
 
 ### What is the common solution for handling auth in React? Is there a solution built-in to Next.js?
 
