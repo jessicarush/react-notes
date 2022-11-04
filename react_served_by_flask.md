@@ -70,7 +70,7 @@ def home():
 
 2. Once you have navigated to the react app, `react-router` will then take over the routing, so any internal links to `'/'` will be the react `'/'` endpoint, not the flask `'/'` route. To get back to flask, you would have use an absolute url or use the browsers back button or go to the url using the address.
 
-3. By default, the browsers 'refresh' button will now no longer when you're in the react-router app. This is because there is a server request for a particular route that doesn't exist on teh flask side. The solution is to route all unkown 404 traffic back to the react app (so that the react app's `<NotFound />` route can handle it).
+3. By default, the browsers 'refresh' button will no longer work when you're in the react-router app. This is because there is a server request for a particular route that doesn't exist on the flask side. The solution is to route all unknown 404 traffic back to the react app (so that the react app's `<NotFound />` route can handle it).
 
 ```python
 @app.errorhandler(404)
