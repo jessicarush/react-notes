@@ -131,11 +131,11 @@ const [state, dispatch] = useReducer(
 You can also create the initial state lazily. To do this, you can pass an `init` function as the third argument. The initial state will be set to `init(initialArg)`.
 
 ```javascript
-function init(initialCount) {
-  return {count: initialCount};
+function init(initialArg) {
+  return {count: initialArg};
 }
 
-const [state, dispatch] = useReducer(reducer, initialCount, init);
+const [state, dispatch] = useReducer(reducer, initialArg, init);
 ```
 
 This lets you extract the logic for calculating the initial state outside the reducer. This is also handy for resetting the state later in response to an action.
