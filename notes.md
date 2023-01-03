@@ -117,11 +117,11 @@ See the React docs: <https://reactjs.org/docs/add-react-to-a-website.html>
 
 My summary notes are here: [react_with_existing_html.md](react_with_existing_html.md). I'm assuming you could have nested components, you would just need to src them in the right order. You would also need to add `type=module` to the component `<script>` tags (assuming we're using import/export). 
 
-That being said, with this very simplistic approach, you wouldn't get to import css files or any other node packages into your components. Overall, not vert useful. 
+That being said, with this very simplistic approach, you wouldn't get to import css files or any other node packages into your components. Overall, not very useful. 
 
 It seems to me that if you really needed to embed a react project into and existing website, the best approach would still be to use create-react-app or webpack. 
 
-With create-react-app, we can use the `npm run build` command and serve all the static files it creates. This is explained step-by-step in the second half of [add_react_to_html.md](react_with_existing_html.md).
+With create-react-app, we can use the `npm run build` command and serve all the static files it creates. This is explained step-by-step in the second half of [react_with_existing_html.md](react_with_existing_html.md).
 
 
 ### Can I have flask serve the build created from create-react-app?
@@ -153,7 +153,7 @@ Also mentioned: (FastApi a python web server)
 
 ### How do I handle authentication (logins) using Flask backend?
 
-- [flask-praetorian](https://flask-praetorian.readthedocs.io/en/latest/), 
+- [flask-praetorian](https://flask-praetorian.readthedocs.io/en/latest/)
 - see <https://yasoob.me/posts/how-to-setup-and-deploy-jwt-auth-using-react-and-flask/> 
 
 - see <https://blog.miguelgrinberg.com/post/how-to-create-a-react--flask-project> and <https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project>
