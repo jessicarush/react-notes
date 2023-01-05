@@ -141,7 +141,7 @@ handleChange(e) {
   }
 ```
 
-So, if we were to put all our state values into one object, we would need to use the spread operator on `...state` to ensure we don;t loose our other values:
+So, if we were to put all our state values into one object, we would need to use the spread operator on `...state` to ensure we don't loose our other values:
 
 
 ```javascript
@@ -247,6 +247,27 @@ input
 />
 ```
 
+Note that for simplicity, React has made it so [select menus can be controlled in the same way](https://reactjs.org/docs/forms.html#the-select-tag): set the value attribute on the `<select>` element to identify which `<option>` is selected.
+
+```javascript
+function Example() {
+
+  const [units, setUnits] = useState('px');
+  const updateUnits = (e) => setUnits(e.target.value);
+
+  const unitsOptions = ['cm', 'in', 'mm', 'px', 'pt']
+
+  return (
+    <div className="Example">
+      <select value={value} onChange={onChange}>
+        {/* We don't need to add the selected attribute to an option */}
+        {unitsOptions.map((option) => (<option key={uuid()}>{option}</option>))}
+      </select>
+    </div>
+  );
+}
+```
+
 With classes we would typically see controlled inputs all handled by one method like so:
 
 ```javascript
@@ -288,7 +309,7 @@ Form handling can also be elegantly handled with a custom hook:
 ```javascript
 import { useState } from 'react';
 
-function useInput(initialValue = '') {
+function useInput(initialValue='') {
   // Set up state
   const [value, setValue] = useState(initialValue);
   // A function to handle input change
@@ -359,10 +380,12 @@ useEffect(() => {
 }, [counter]);
 ```
 
+Read more about `useEffect()` in [hooks.md](hooks.md).
+
 
 ## Filtering Example
 
-This example comes from [Dimitri](https://dmitripavlutin.com/controlled-inputs-using-react-hooks/), who seems like a pretty cool guy. It uses a state value in a `filter()`. As a result, whenever the state value changes, the `filter)` result get updated.
+This example comes from [Dimitri](https://dmitripavlutin.com/controlled-inputs-using-react-hooks/), who seems like a pretty cool guy. It uses a state value in a `filter()`. As a result, whenever the state value changes, the `filter()` result get updated.
 
 For example in *App.js*:
 
