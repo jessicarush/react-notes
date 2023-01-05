@@ -41,7 +41,7 @@ function Example(props) {
 
   return (
     <div className="Example">
-
+      {/* Here's my comment */}
     </div>
   );
 }
