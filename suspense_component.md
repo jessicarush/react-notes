@@ -73,11 +73,11 @@ You can have as many components wrapped in Suspense as you want. Components not 
 
 ## Suspense with Transitions 
 
-> Suspense in React 18 works best when combined with the transition API. If you suspend during a transition, React will prevent already-visible content from being replaced by a fallback. Instead, React will delay the render until enough data has loaded to prevent a bad loading state.
+> Suspense in React 18 works best when combined with the transition API. If you suspend during a transition, React will prevent already-visible content from being replaced by a fallback. Instead, React will delay the render until enough data has loaded to prevent a bad loading state. [Source](https://reactjs.org/blog/2022/03/29/react-v18.html)
 
 In other words: 
 
-For content that is already shown to the user, switching back to a loading indicator can be disorienting. It is sometimes better to keep showing the old content while the new content is being prepared. To do this, we can use the new transition APIs (startTransition and useTransition) to mark updates as transitions and avoid unexpected fallbacks.
+> For content that is already shown to the user, switching back to a loading indicator can be disorienting. It is sometimes better to keep showing the old content while the new content is being prepared. To do this, we can use the new transition APIs (startTransition and useTransition) to mark updates as transitions and avoid unexpected fallbacks. [Source](https://reactjs.org/docs/react-api.html#reactsuspense)
 
 Consider this tab switcher:
 
@@ -93,7 +93,7 @@ function handleClick() {
 
 In this example, if the tab gets set to from 'photos' to 'comments', but Comments suspends, the user will see a spinner. This makes sense because Comments is not ready to render anything, and React has no choice but to show the Spinner above.
 
-However, sometimes this user experience is not desirable. This is a good example of how sometimes better to show the "old" UI while the new UI is being prepared. You can use the new startTransition API to make React do this:
+However, sometimes this user experience is not desirable. This might be a good example of how sometimes it's better to show the "old" UI while the new UI is being prepared. You can use the new startTransition API to make React do this:
 
 ```jsx
 function handleClick() {
