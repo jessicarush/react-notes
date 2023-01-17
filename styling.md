@@ -160,6 +160,52 @@ return (
 );
 ```
 
+## Setting css variables
+
+Instead of doing inline properties you can also just set your css variables. Note they will be bound to the element and not available at root:
+
+```javascript
+import './Button.css';
+
+function Button(props) {
+  const {
+    id,
+    value,
+    color,
+    hoverColor,
+    onClick,
+    ...rest
+  } = props;
+
+  const styles = {'--color': color, '--hover-color': hoverColor};
+
+  return (
+    <button
+      className={`Button`}
+      onClick={onClick}
+      style={styles}
+      {...rest}>
+      {value}
+    </button>
+  );
+}
+
+export default Button;
+```
+
+Then in your css:
+
+```css
+
+.Button {
+  color: var(--color);
+}
+
+.Button:hover {
+  color: var(--hover-color);
+}
+```
+
 ## CSS-in-JS
 
 TODO... (I'm not a fan)
