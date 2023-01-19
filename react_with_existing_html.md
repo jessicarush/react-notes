@@ -2,7 +2,7 @@
 
 Typically we would want to create a standalone SPA using `create-react-app`, but what options do we have if we want to include our React project into an existing html doc?
 
-The first example here come from the React docs, but I fail to see how this can be used for anything beyond a simple component.
+The first example here comes from the React docs, but I fail to see how this can be used for anything beyond a simple component.
 
 The second example comes from various searches so I'm not certain of its reliability.
 
@@ -57,7 +57,7 @@ npm init -y
 npm install babel-cli@6 babel-preset-react-app@3
 ```
  
-Create a folder called `src` in the directory where your js files. In my case, I use a folder called `js`. Then run the following command:
+Create a folder called `src` in the directory where your js files are. In my case, I use a folder called `js`. Then run the following command:
 
 ```bash
 npx babel --watch js/src --out-dir ./js --presets react-app/prod
