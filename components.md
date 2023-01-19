@@ -201,7 +201,12 @@ import './Example.css';
 
 // default props
 function Example(props) {
-  const {someProp, anotherProp, name='stranger', color='red'} = props;
+  const {
+    someProp, 
+    anotherProp, 
+    name='stranger', 
+    color='red'
+  } = props;
   return (
     <div className="Example">{name} and {color}</div>
   );
@@ -354,13 +359,14 @@ Note in a functional component you would just use `{props.children}`.
 
 ```javascript
 function Box(props) {
+  const { children } = props;
   return (
     <div className="Box">
       <h1 className="Box-header">
         This is my box component. The rest of the content in this box comes
         from props.children.
       </h1>
-      {props.children}
+      {children}
     </div>
   );
 }
