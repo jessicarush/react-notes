@@ -15,7 +15,7 @@
   * [Can I have flask serve the build created from create-react-app?](#can-i-have-flask-serve-the-build-created-from-create-react-app)
   * [Does the above still work with react-router stuff?](#does-the-above-still-work-with-react-router-stuff)
   * [Can I demonstrate working with a database via a Flask API backend and React frontend?](#can-i-demonstrate-working-with-a-database-via-a-flask-api-backend-and-react-frontend)
-  * [What are the most common solutions for database with React? Is there a solution built-in to Next.js?](#what-are-the-most-common-solutions-for-database-with-react-is-there-a-solution-built-in-to-nextjs)
+  * [What are the most common solutions for database/backend with React? Is there a solution built-in to Next.js?](#what-are-the-most-common-solutions-for-databasebackend-with-react-is-there-a-solution-built-in-to-nextjs)
   * [How do I handle authentication (logins) using Flask backend?](#how-do-i-handle-authentication-logins-using-flask-backend)
   * [What is the common solution for handling auth in React? Is there a solution built-in to Next.js?](#what-is-the-common-solution-for-handling-auth-in-react-is-there-a-solution-built-in-to-nextjs)
   * [Demonstrate email from React to Flask](#demonstrate-email-from-react-to-flask)

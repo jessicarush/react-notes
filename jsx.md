@@ -313,7 +313,7 @@ const todoItems = todos.map((todo, index) => (
 ));
 ```
 
-> We don’t recommend using indexes for keys if the order of items may change. This can negatively impact performance and may cause issues with component state.
+> We don’t recommend using indexes for keys if the order of items may change. This can negatively impact performance and may cause issues with component state. [Source](https://reactjs.org/docs/lists-and-keys.html#keys)
 
 Instead, we can use an external library to help: [uuid](https://www.npmjs.com/package/uuid)
 
@@ -342,7 +342,7 @@ const todoItems = todos.map(todo => (
 ));
 ```
 
-> Note that the act of installing and importing a module like this assumes that you are using a tool like [create-react-app](create_react_app.md) or [webpack](app_layout_advanced.md). Specifically, to install, you would need a `package.json` and to use `import`, you would need to set the `<script>` element's attribute `type="module"`. Since React apps need the `type` attribute to be set to `text/jsx`, we use one of the aforementioned tools to sort it out.
+Note that the act of installing and importing a module like this assumes that you are using a tool like [create-react-app](create_react_app.md) or [webpack](app_layout_advanced.md). Specifically, to install, you would need a `package.json` and to use `import`, you would need to set the `<script>` element's attribute `type="module"`. Since React apps need the `type` attribute to be set to `text/jsx`, we use one of the aforementioned tools to sort it out.
 
 
 ## Breaking code into chunks

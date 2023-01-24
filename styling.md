@@ -7,6 +7,7 @@
 - [Stylesheet styles](#stylesheet-styles)
 - [Conditional Styles](#conditional-styles)
 - [Inline Styles](#inline-styles)
+- [Setting css variables](#setting-css-variables)
 - [CSS-in-JS](#css-in-js)
 - [Links](#links)
 
