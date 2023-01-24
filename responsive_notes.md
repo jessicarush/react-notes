@@ -2,7 +2,7 @@
 
 Normally responsiveness would be a CSS discussion, but given the fact that in React we are often working with 3rd party components like those from [Material UI](https://mui.com/), having components be responsive in the way we want them to be can often be practically impossible.
 
-As an example, with Material UI's [drawer component](https://mui.com/components/drawers/#responsive-drawer), there is an option for a temporary drawer, persistent drawer and permanent drawer. The permanent drawer seems to be *not a drawer* at all but in fact a sidebar since it doesn't actually close. It's purpose is to provide a responsive option. The responsive option uses the temporary drawer on small screens and the permanent one one larger screens. But what of I wanted to use the persistent drawer on larger screens. Looks  like we are out of luck because the code structure is completely different for these two, making it difficult to conditionally switch classes or parameters. So what can we do?
+As an example, with Material UI's [drawer component](https://mui.com/components/drawers/#responsive-drawer), there is an option for a temporary drawer, persistent drawer and permanent drawer. The permanent drawer seems to be *not a drawer* at all but in fact a sidebar since it doesn't actually close. Its purpose is to provide a responsive option. The responsive option uses the temporary drawer on small screens and the permanent one on larger screens. But what if I wanted to use the persistent drawer on larger screens. Looks like we are out of luck because the code structure is completely different for these two, making it difficult to conditionally switch classes or parameters. So what can we do?
 
 
 ## Table of Contents
@@ -65,7 +65,7 @@ const Example = () => {
     {isDesktop && <p>You are a desktop or laptop</p>}
     {isTabletOrMobile && <p>You are a tablet or mobile phone</p>}
     <p>Your are in {isPortrait ? 'portrait' : 'landscape'} orientation</p>
-    {isRetina && <p>You are retina</p>}
+    {isRetina && <p>You have a retina display</p>}
   </div>
 }
 ```
