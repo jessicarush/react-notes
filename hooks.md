@@ -340,11 +340,81 @@ export default Demo;
 
 ## useRef 
 
-[useRef](https://reactjs.org/docs/hooks-reference.html#useref) returns a mutable ref object whose .current property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
+[useRef](https://reactjs.org/docs/hooks-reference.html#useref) is a hook that lets you reference a value that’s not needed for rendering. `useRef` returns a mutable ref object whose `.current` property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
 
-Essentially, useRef is like a “box” that can hold a value in its .current property and is handy for keeping any mutable value around. Keep in mind that `useRef` doesn’t notify you when its content changes. Mutating the .current property doesn’t cause a re-render. This is why it's useful in the `useEffect` examples above where we need to set a flag to keep track of renders and updates. In fact, if you try to assign a value to a normal variable inside `useEffect`:
+Essentially, `useRef` is like a “box” that can hold a value in its `.current` property and is handy for keeping any mutable value around. Keep in mind that `useRef` doesn’t notify you when its content changes. Mutating the `.current` property doesn’t cause a re-render. This is why it's useful in the `useEffect` examples above where we need to set a flag to keep track of renders and updates. In fact, if you try to assign a value to a normal variable inside `useEffect`:
 
-> Assignments to the 'didMount' variable from inside React Hook useEffect will be lost after each render. To preserve the value over time, store it in a useRef Hook and keep the mutable value in the '.current' property. Otherwise, you can move this variable directly inside useEffect
+> Assignments to the 'didMount' variable from inside React Hook useEffect will be lost after each render. To preserve the value over time, store it in a useRef Hook and keep the mutable value in the '.current' property. Otherwise, you can move this variable directly inside useEffect.
+
+By using a ref, you ensure that:
+
+- You can store information between re-renders (unlike regular variables, which reset on every render).
+- Changing it does not trigger a re-render (unlike state variables, which trigger a re-render).
+- The information is local to each copy of your component (unlike the variables outside, which are shared).
+
+Changing a ref does not trigger a re-render, so refs are not appropriate for storing information that you want to display on the screen. Use state for that instead. 
+
+Note: Do not read or write `ref.current` during rendering. For example: 
+
+```javascript
+function MyComponent() {
+  // ...
+  // ❌ Don't write a ref during rendering
+  myRef.current = 123;
+  // ...
+  // ❌ Don't read a ref during rendering
+  return <h1>{myOtherRef.current}</h1>;
+}
+```
+
+You can read or write refs from event handlers or effects instead:
+
+```javascript
+function MyComponent() {
+  // ...
+  useEffect(() => {
+    // ✅ You can read or write refs in effects
+    myRef.current = 123;
+  });
+  // ...
+  function handleClick() {
+    // ✅ You can read or write refs in event handlers
+    doSomething(myOtherRef.current);
+  }
+  // ...
+}
+```
+
+If you have to read or write something during rendering, use state instead.
+
+> useRef is most commonly used when accessing React DOM elements. For example, if you’re trying to access an input element after it’s been mounted to the DOM, instead of using the traditional document.getElementById or any other document method to access to element (like you would in vanilla JS), you can use a useRef hook. [Source](https://medium.com/swlh/all-about-the-react-useref-hook-with-a-real-world-example-5500f2c805e)
+
+
+```javascript
+import React from "react";
+
+const Form = (props) => {
+  const inputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    console.log(inputRef.current);
+    inputRef.current.focus();
+  }, []);
+
+  return (
+    <form>
+      <input 
+        type="text"
+        placeholder="Enter Name" 
+        name="name" 
+        ref={inputRef} />
+    </form>
+  );
+};
+
+export default Form;
+```
+
 
 ## useReducer
 
