@@ -512,3 +512,111 @@ For example: see their [instructions for working with CSS grid here](https://get
 ### reactstrap
 
 The [reactstrap](https://reactstrap.github.io/) library basically lets you import pre-made react components that are styled with bootstrap.
+
+
+## html2canvas 
+
+[html2canvas](https://html2canvas.hertzen.com/) lets you take screenshots with JavaScript.
+
+```javascript
+import { useRef } from 'react';
+import html2canvas from 'html2canvas';
+import './App.css';
+
+function App() {
+
+  // Create a Ref to be used to declare an area in the application
+  // that is downloadable
+  const downloadRef = useRef();
+
+  // Create an event handler to implement logic to download image (jpg, png)
+  // Using html2canvas (npm install html2canvas) we can draw the component on a
+  // canvas and transform it into an image
+  const handleDownloadImage = async () => {
+    const element = downloadRef.current;
+    const options = {backgroundColor: '#282c34'};
+    const canvas = await html2canvas(element, options);
+    // const data = canvas.toDataURL('image/jpg');
+    const data = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+
+    if (typeof link.download === 'string') {
+      link.href = data;
+      // link.download = 'image.jpg';
+      link.download = 'demo.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      window.open(data);
+    }
+  };
+
+  return (
+    <div className="App">
+
+      <div>Not included in the image.</div>
+      {/* Add the Ref to the downloadable area */}
+      <div ref={downloadRef}>This will be in the image.</div>
+
+      {/* Create a button with event handler */}
+      <button type="button" onClick={handleDownloadImage}>
+        Save as image
+      </button>
+    </div>
+  );
+}
+
+export default App;;
+```
+
+## jspdf
+
+[jspdf](https://github.com/parallax/jsPDF) is library to generate PDFs in JavaScript. It can be used with html2canvas shown above to save raster pdfs.
+
+```javascript
+import { useRef } from 'react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+import './App.css';
+
+function App() {
+
+  // Create a Ref to be used to declare an area in the application
+  // that is downloadable
+  const downloadRef = useRef();
+
+  // Create an event handler to implement logic to download a PDF
+  // Using html2canvas and jspdf (npm install html2canvas jspdf) we can draw the
+  // component on a canvas and transform it into an image, then transform that
+  // image into a PDF.
+  const handleDownloadPdf = async () => {
+    const element = downloadRef.current;
+    const options = {backgroundColor: '#282c34'};
+    const canvas = await html2canvas(element, options);
+    const data = canvas.toDataURL('image/png');
+    const pdf = new jsPDF();
+    const imgProperties = pdf.getImageProperties(data);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
+    pdf.addImage(data, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('demo.pdf');
+  };
+
+  return (
+    <div className="App">
+
+      <div>Not included in the image.</div>
+      {/* Add the Ref to the downloadable area */}
+      <div ref={downloadRef}>This will be in the image.</div>
+
+      {/* Create a button with event handler */}
+      <button type="button" onClick={handleDownloadPdf}>
+        Save as PDF
+      </button>
+    </div>
+  );
+}
+
+export default App;
+```
