@@ -78,8 +78,3 @@ def not_found_error(error):
     # return render_template('errors/404.html'), 404
     return app.send_static_file('react/index.html')
 ```
-
-
-
-
-
