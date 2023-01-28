@@ -246,7 +246,9 @@ class Message extends Component {
 
 ## Renaming root folder
 
-If you want to rename the app root folder (i.e. `myapp` from `npx create-react-app my-app`), rather than renaming the folder in your os gui, use the command line `mv my-app new_name`.
+If you want to rename the app root folder (i.e. `myapp` from `npx create-react-app my-app`), rather than renaming the folder in your os gui, use the command line `mv my-app new_name`. 
+
+You can also manually rename the folder, then update then manually update the name in `package.json`, `package-lock.json`.
 
 
 ## React version
