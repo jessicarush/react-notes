@@ -24,10 +24,10 @@ app = Flask(__name__, static_url_path='')
 Alternatively, if you'd prefer to have the react build files in their own directory within the flask static dir, you could modify the package.json to have the following line:
 
 ```json
-"homepage": "/static/react",
+"homepage": "/static/react_build",
 ```
 
-...where 'static' is the flask static dir and 'react' is the new dir that we'll dump the build files into. Adding this line ensures that the react app has the proper paths. See the [create-react-app docs](https://create-react-app.dev/docs/deployment/#building-for-relative-paths) for a better explanation. According to this doc, I may be able to use `"homepage": ".",` to have relative paths. Should test this.
+...where 'static' is the flask static dir and 'react_build' is the new dir that we'll dump the build files into. Adding this line ensures that the react app has the proper paths. See the [create-react-app docs](https://create-react-app.dev/docs/deployment/#building-for-relative-paths) for a better explanation. According to this doc, I may be able to use `"homepage": ".",` to have relative paths. Should test this.
 
 When we do it this way, you **don't** need to add the `static_url_path=''`.
 
@@ -41,7 +41,7 @@ Finally, we would need to specify the new dir in our route path:
 @app.route('/test', methods=['GET', 'POST'])
 def test():
     '''Test view function.'''
-    return app.send_static_file('react/index.html')
+    return app.send_static_file('react_build/index.html')
 ```
 
 ## Serving a react-router build
@@ -55,7 +55,7 @@ This setup has been tested and works with react-router v6.4.0. A few things to k
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     '''Test static serving a react build.'''
-    return app.send_static_file('react/index.html')
+    return app.send_static_file('react_build/index.html')
 ```
 
 ```javascript
@@ -76,5 +76,5 @@ def home():
 @app.errorhandler(404)
 def not_found_error(error):
     # return render_template('errors/404.html'), 404
-    return app.send_static_file('react/index.html')
+    return app.send_static_file('react_build/index.html')
 ```
