@@ -523,7 +523,7 @@ editTodo(id) {
 
 ## setState optional callback
 
-A second parameter to `setState()` is an optional callback function that will be executed once setState is completed and the component is re-rendered. Noe that it's generally recommended to use `componentDidUpdate()` for such logic instead.
+A second parameter to `setState()` is an optional callback function that will be executed once setState is completed and the component is re-rendered. Note that it's generally recommended to use `componentDidUpdate()` for such logic instead.
 
 `setState(stateChange[, callback])`
 
