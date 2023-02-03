@@ -62,6 +62,7 @@ There are many [routing tools](https://github.com/markerikson/react-redux-links/
 ```bash
 npm install react-router-dom
 ```
+> :warning: React Router changes its API ALL THE TIME. There have been changes since this writing. TODO... update examples with new process.
 
 Include and enable the Router in your index.js:
 
@@ -485,8 +486,8 @@ If you have optional URL Params, you can do something like this:
 
 With this, both of the following URLs will work:
 
-/palette/rainbow-colors/red
-/palette/rainbow-colors/red/rgb
+/palette/rainbow-colors/red  
+/palette/rainbow-colors/red/rgb  
 
 In my component, I would have something like:
 
@@ -519,7 +520,7 @@ Read more about [react routers redirect recommendations here](https://gist.githu
 `useNavigate()` is a new hook introduced in React Router v6. Essentially it allows you to:
 
 - Go to the previous or next pages
-- Redirect the user to a specific Url
+- Redirect the user to a specific URL
 
 `useLocation()` is another hook introduced in the 5.1 release which returns the current location object. It's useful any time you need to know the current URL.
 
@@ -740,4 +741,6 @@ All `<Route>`s and `<Link>`s inside a `<Routes>` are relative. This leads to lea
 ## React Router v6.4
 
 Major changes yet again in this release. Now they don't want you to use `<BrowserRouter>` as the recommended interface for running React Router in a web browser... now it's `<createBrowserRouter>` and its a completely different setup.
+
+TODO...
 
