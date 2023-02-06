@@ -252,6 +252,23 @@ You can also do inline binding, but this is considered less ideal in that a new 
 <button onClick={this.handleClick.bind(this)}>Click me</button>
 ```
 
+In a function component, you don't need to worry about `this`:
+
+```javascript
+function Button() {
+
+  const handleClick = () => {
+    console.log('Doing something...');
+  }
+
+  return (
+    <div>
+      <button onClick={handleClick}>Click me</button>
+    </div>
+  );
+}
+```
+
 ## Passing arguments to handlers
 
 If you need to pass arguments to the handler, one quick and dirty way is to use the last inline binding style from above:
@@ -427,7 +444,7 @@ Eventually we should get used to seeing the same patterns in our child component
 
 ```javascript
 handleUpdateThing() {
-  this.props.updateThing(arg);
+  updateThing(arg);
 }
 ```
 
