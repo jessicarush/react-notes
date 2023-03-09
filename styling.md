@@ -9,6 +9,17 @@
 - [Inline Styles](#inline-styles)
 - [Setting css variables](#setting-css-variables)
 - [CSS-in-JS](#css-in-js)
+  * [CSS-in-JS libraries](#css-in-js-libraries)
+  * [styled-components](#styled-components)
+    + [css helper](#css-helper)
+    + [styled helper](#styled-helper)
+    + [Attributes](#attributes)
+    + [as helper](#as-helper)
+    + [pseudo-elements, pseudo-selectors, and nesting...](#pseudo-elements-pseudo-selectors-and-nesting)
+    + [1. When possible, use css variables](#1-when-possible-use-css-variables)
+    + [2. Single source of Contextual styles](#2-single-source-of-contextual-styles)
+    + [3. global styles](#3-global-styles)
+  * [Styled themeing](#styled-themeing)
 - [Links](#links)
 
 <!-- tocstop -->
@@ -220,8 +231,7 @@ Many developers seem to have an issue with everything in CSS being globally scop
 - delayed rendering
 - Messy DOM
 - Library dependency
-- A lot of native CSS and SCSS features are missing with CSS-in-JS
-- No intellisense or auto-complete for CSS-in-JS in vscode
+- Some native CSS and SCSS features are missing with CSS-in-JS
 
 ### CSS-in-JS libraries 
 
@@ -270,6 +280,8 @@ function Card(props) {
 export default Card;
 ```
 
+> :lightning: `import styled from 'styled-components/macro';` to see more helpful class names when debugging in the browser dev tools.
+
 You can access props like:
 
 ```javascript
@@ -298,6 +310,20 @@ function Card(props) {
 export default Card;
 ```
 
+You can also write it like this:
+
+```javascript
+const Button = styled.button`
+  color: ${({color}) => color ? color : "silver"};
+  font-size: 1.1em;
+  margin: 1em;
+  padding: .5em 1em;
+  border: 2px solid ${({color}) => color ? color : "silver"};
+  border-radius: 3px;
+  background: transparent;
+`;
+```
+
 You can do pseudo-classes like (more on this further down):
 
 ```javascript
@@ -314,7 +340,7 @@ const Button = styled.button`
   border-radius: 3px;
   background: transparent;
 
-  // '&' or '&&' refers to the instance of the component
+  // '&' is a placeholder for the generated class name
   &:hover {
     color: white;
   }
@@ -331,6 +357,57 @@ function Card(props) {
 export default Card;
 ```
 
+#### css helper 
+
+The `css` helper function can be used to generate CSS from a template literal with interpolations. You need to use this if you return a template literal with functions inside an interpolation due to how tagged template literals work in JavaScript. If you're interpolating a string you do not need to use this, only if you're interpolating a function. I couldn't really find a good example of this but here is what it looks like:
+
+```javascript
+import styled, { css } from 'styled-components';
+
+const Wrapper = styled.h1`
+  color: white;
+  font-size: 2rem;
+  font-weight: 200;
+
+  ${p => (p.variant === 'subheading') && css`
+    font-size: 1.5rem;
+    font-weight: 500;
+  `}
+`;
+```
+
+This syntax also works:
+
+```javascript
+const Wrapper = styled.h1`
+  color: white;
+  font-size: 2rem;
+  font-weight: 200;
+
+  ${({ variant }) => (variant === 'subheading') && css`
+    font-size: 1.5rem;
+    font-weight: 500;
+  `}
+`;
+```
+
+Technically, works just fine without it but I lose my intellisense and syntax highlighting in vscode.
+
+```javascript
+const Wrapper = styled.h1`
+  color: white;
+  font-size: 2rem;
+  font-weight: 200;
+
+  ${p => (p.variant === 'subheading') && `
+    font-size: 1.5rem;
+    font-weight: 500;
+  `}
+`;
+```
+
+#### styled helper
+
 You can style an existing simple html component like:
 
 ```javascript
@@ -339,11 +416,11 @@ import styled from 'styled-components';
 // import './Card.css';
 
 const Button = styled.button`
-  color: ${props => props.color ? props.color : "silver"};
+  color: ${p => p.color ? p.color : "silver"};
   font-size: 1.1em;
   margin: 1em;
   padding: .5em 1em;
-  border: 2px solid ${props => props.color ? props.color : "silver"};
+  border: 2px solid ${p => p.color ? p.color : "silver"};
   border-radius: 3px;
   background: transparent;
 
@@ -355,7 +432,7 @@ const Button = styled.button`
 // A new component based on Button with overrides
 const SecondaryButton = styled(Button)`
   color: white;
-  background: ${props => props.color ? props.color : "silver"};
+  background: ${p => p.color ? p.color : "silver"};
 `;
 
 function Card(props) {
@@ -378,11 +455,11 @@ import styled from 'styled-components';
 // import './Card.css';
 
 const Button = styled.button`
-  color: ${props => props.color ? props.color : "silver"};
+  color: ${p => p.color ? p.color : "silver"};
   font-size: 1.1em;
   margin: 1em;
   padding: .5em 1em;
-  border: 2px solid ${props => props.color ? props.color : "silver"};
+  border: 2px solid ${p => p.color ? p.color : "silver"};
   border-radius: 3px;
   background: transparent;
 
@@ -394,7 +471,7 @@ const Button = styled.button`
 // A new component based on Button with overrides
 const SecondaryButton = styled(Button)`
   color: white;
-  background: ${props => props.color ? props.color : "silver"};
+  background: ${p => p.color ? p.color : "silver"};
 `;
 
 // A new component based on our custom component
@@ -417,16 +494,7 @@ function Card(props) {
 export default StyledCard;
 ```
 
-You could combine techniques:
-
-```javascript
-  return (
-    <div className={`${className} Card`}>
-      <Button color="tomato">Normal</Button>
-      <SecondaryButton color="teal">Secondary</SecondaryButton>
-    </div>
-  );
-```
+#### Attributes
 
 Note that with simple html components, any known HTML attribute passed as props will be automatically passed to the DOM:
 
@@ -438,7 +506,7 @@ Note that with simple html components, any known HTML attribute passed as props 
   );
 ```
 
-When you are creating s simple html component, you can also pass html attributes to it with ``:
+When you are creating s simple html component, you can also pass html attributes to it with `attrs()`:
 
 ```javascript
 const Checkbox = styled.input.attrs({ type: "checkbox" })`
@@ -446,9 +514,146 @@ const Checkbox = styled.input.attrs({ type: "checkbox" })`
 `;
 ```
 
-For pseudo-elements, pseudo-selectors, and nesting...
+#### as helper
 
-A single ampersand `&` refers to all instances of the component; it is used for applying broad overrides.
+Every styled-component you create accepts an `as` prop which'll change which HTML element gets used. This can be really handy for headings, where the exact heading level will depend on the circumstance:
+
+```javascript
+import styled, { css } from 'styled-components';
+
+// The `h1` here doesn't really matter since it'll always get overwritten!
+const Wrapper = styled.h1`
+  color: white;
+  font-size: 2rem;
+  font-weight: 200;
+
+  ${p => (p.variant === 'subheading') && css`
+    font-size: 1.5rem;
+    font-weight: 500;
+  `}
+
+  ${p => (p.variant === 'eyebrow') && css`
+    color: silver;
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  `}
+`;
+
+function Heading(props) {
+  // `level` is a number from 1 to 6, mapping to h1-h6
+  const { level, variant, children } = props
+  const element = `h${level}`;
+
+  return (
+    <Wrapper as={element} variant={variant}>
+      {children}
+    </Wrapper>
+  );
+}
+
+export default Heading;
+```
+
+Usage:
+
+```javascript
+import Heading from './Heading';
+
+function App() {
+  return (
+    <div className="App">
+
+      <Heading level="2">
+        Main heading
+      </Heading>
+      <Heading level="3" variant="subheading">
+        Subheading
+      </Heading>
+      <Heading level="2" variant="eyebrow">
+        Eyebrow heading
+      </Heading>
+
+    </div>
+  );
+}
+
+export default App;
+```
+
+Or for buttons and/or links to look the same:
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+
+
+const Button = styled.button`
+  display: inline-block;
+  border: solid 2px ${p => p.color ? p.color : 'blueviolet'};
+  border-radius: 3px;
+  color: white;
+  background: ${p => p.color ? p.color : 'blueviolet'};
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  padding: .5em 2em;
+  margin: 0;
+  text-align: center;
+  text-decoration: none;
+  transition: filter .3s ease-in-out, transform .3s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  &:hover,
+  &:focus {
+    filter: brightness(1.1);
+  }
+
+  &:focus {
+    outline: 1px dashed gray;
+    outline-offset: .2em;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+const ButtonOutline = styled(Button)`
+  color: ${p => p.color ? p.color : 'blueviolet'};
+  background: transparent;
+`;
+
+export { Button, ButtonOutline };
+```
+
+Usage:
+
+```javascript
+import { Button, ButtonOutline } from './Button';
+
+function App() {
+  return (
+    <div className="App">
+
+      <Button>Normal</Button>
+      <ButtonOutline>Outline</ButtonOutline>
+      <ButtonOutline as="a" href="#" color="tomato">Link Button</ButtonOutline>
+
+    </div>
+  );
+}
+
+export default App;
+```
+
+Reminder, this works because **for simple html components any known HTML attribute passed as props will be automatically passed to the DOM**. In this case the 'href' gets passed automatically.
+
+#### pseudo-elements, pseudo-selectors, and nesting...
+
+The docs day a single ampersand `&` refers to all instances of the component; it is used for applying broad overrides. A more accurate way of saying it is that `&` is a placeholder for the generated class name.
 
 ```javascript
 import React, { useState, useEffect } from 'react';
@@ -480,7 +685,7 @@ const Item = styled.div`
     background: green;
   }
 
-  // every Item that is preceeded by something with class 'special'
+  // every Item that is preceded by something with class 'special'
   .special ~ & {
     background: purple;
   }
@@ -489,6 +694,11 @@ const Item = styled.div`
   .wrapper & {
     background: red;
     color: white;
+  }
+
+  // media query
+  @media (max-width: 380px) {
+    font-size: 1.2em;
   }
 `;
 
@@ -512,7 +722,26 @@ function Card(props) {
 export default Card;
 ```
 
-Apparently "a double ampersand `&&` refers to an instance of the component; this is useful if you're doing conditional styling overrides and don't want a style to apply to all instances of a particular component." This doesn't really make sense to me but other sources seem to say its more about specificity. Using `&&` applies the class to the component twice. Seems hacky and janky to me.
+Apparently "a double ampersand `&&` refers to an instance of the component; this is useful if you're doing conditional styling overrides and don't want a style to apply to all instances of a particular component." This doesn't really make sense to me but other sources seem to say its more about specificity. Using `&&` applies the class to the component twice. Seems hacky and janky to me. But here's the idea:
+
+```javascript
+const Wrapper = styled.div`
+  p {
+    color: blue;
+  }
+`
+const Paragraph = styled.p`
+  color: red;
+  && {
+    color: green;
+  }
+`;
+
+// Somewhere:
+<Wrapper>
+  <Paragraph>I will be green!</Paragraph>
+</Wrapper>
+```
 
 You can access other components within a components styles:
 
@@ -533,17 +762,17 @@ const Label = styled.label`
 
 const LabelText = styled.span`
   // When a Checkbox immediately before LabelText is checked
-  ${Checkbox}:checked + && {
+  ${Checkbox}:checked + & {
     color: orange;
   }
 
   // This also works:
-  input[type="checkbox"]:checked + && {
+  input[type="checkbox"]:checked + & {
     color: orange;
   }
 
   // And this also works:
-  input:checked + && {
+  input:checked + & {
     color: orange;
   }
 `;
@@ -573,9 +802,221 @@ function Card(props) {
 export default Card;
 ```
 
-> :warning: The bottom line: I'm not sold on this stuff. I think it might work for some situations (like when a css property is linked to state) but I wouldn't want to do all CSS this way. I still think modular and BEM conventions are good for most projects I'll be doing. As an example, even in their docs, there is stuff that doesn't work. Try adding a 'size' prop to an input... is supposed to pass through as an attribute but doesn't. As of this writing, their github has 141 issues.
+> :warning: I'm not sold on this stuff yet. I think it might work for some situations (like when a css property is linked to state) but I'm not sure I'd want to do all the CSS this way. I still think modular and BEM conventions are good for most projects I'll be doing. Side note: As of this writing, their github has 141 issues.
+
+That being said, some [better advice for working with styled-component](https://www.joshwcomeau.com/css/styled-components/) takeaways:
+
+#### 1. When possible, use css variables
+
+```javascript
+// ❌ This approach is "high-friction". Whenever these values change, 
+// styled-components will need to re-generate the class and re-inject 
+// it into the document's <head>, which can be a performance liability
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+
+const Wrapper = styled.div`
+  opacity: ${p => p.opacity};
+  background-color: ${p => p.color};
+`;
+
+function Modal(props) {
+  // props
+  const { opacity, color, children } = props;
+  return (
+    <Wrapper opacity={opacity} color={color}>
+      {children}
+    </Wrapper>
+  );
+}
+
+export default Modal;
+```
+
+```javascript
+// ✅ Do this instead
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+
+const Wrapper = styled.div`
+  opacity: var(--opacity);
+  background-color: var(--color);
+`;
+
+function Modal(props) {
+  // props
+  const { opacity, color, children } = props;
+  const styles = {
+    '--color': color,
+    '--opacity': opacity
+  };
+
+  return (
+    <Wrapper style={styles}>
+      {children}
+    </Wrapper>
+  );
+}
+
+export default Modal;
+```
+
+You can even add defaults to css variables:
+
+```javascript
+const Wrapper = styled.div`
+  opacity: var(--opacity, .5);
+  background-color: var(--color, blueviolet);
+`;
+```
+
+#### 2. Single source of Contextual styles
+
+Assuming we have a basic link component:
+
+```javascript
+const TextLink = styled.a`
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+`;
+```
+
+Imagine we want to create a contextual style/version of this, specifially: when a `TextLink` is in an `Aside`, some styles are added/replaced. One possible (not good) solution:
+
+```javascript
+// ❌ This approach makes is so much harder to determine what's going on.
+// When using a TextLink, we would have no idea to look here to find these 
+// style overrides.
+
+const Wrapper = styled.aside`
+  a {
+    color: var(--color-text);
+    text-decoration: underline;
+  }
+`;
+
+const Aside = ({ children }) => {
+  return (
+    <Wrapper>
+      {children}
+    </Wrapper>
+  );
+}
+
+export default Aside;
+```
+
+Another (not great) approach:
+
+```javascript
+// ❌ This approach is only very slightly better than the above because
+// at least we can do a search for TextLink, but this is still a weak design.
+// When creating React components, it's important to think of them as "a box"
+// with strict boundaries. Ideally, when you create a component, you can trust 
+// that the HTML will only be modified from within that component. If any 
+// component can "reach in" and overwrite any other component's styles, 
+// we don't really have encapsulation at all.
+
+import TextLink from '../TextLink'
+
+const Wrapper = styled.aside`
+  ${TextLink} {
+    color: var(--color-text);
+    text-decoration: underline;
+  }
+`;
+
+const Aside = ({ children }) => {
+  return (
+    <Wrapper>
+      {children}
+    </Wrapper>
+  );
+}
+
+export default Aside;
+```
+
+A better solution in Aside.js:
+
+```javascript
+// ✅ With this approach we know, with complete confidence, that all of the 
+// styles for a given element are defined in the styled-component itself.
+
+// Export this wrapper
+export const Wrapper = styled.aside`
+  /* wrapper styles only */
+`;
+
+const Aside = ({ children }) => {
+  return (
+    <Wrapper>
+      {children}
+    </Wrapper>
+  );
+};
+
+export default Aside;
+```
+
+Then in TextLink.js 
+
+```javascript
+// ✅ TextLink is in charge of itself once more: we have a single source of styles.
+
+import { Wrapper as AsideWrapper } from '../Aside'
+
+const TextLink = styled.a`
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+
+  ${AsideWrapper} & {
+    color: var(--color-text);
+    text-decoration: underline;
+  }
+`;
+
+export default TextLink;
+```
+
+When we have two generic components like `Aside` and `TextLink`, this form of “inverted control” makes things nice and predictable. However, there will always be exceptions that make sense to do it the other way. For example, you may have some specific, one-off variants that aren't reused often. There's no need to clutter our component with markup and code that's not used 99% of the time.
+
+For this we could used the composition API `styled()`:
+
+```javascript
+// HalloweenPage.js
+import TextLink from '../TextLink';
+
+const HalloweenTextLink = styled(TextLink)`
+  font-family: 'Spooky Font', cursive;
+`;
+```
+
+Here we're using the `TextLink` component to produce a new specialized component. Note, there is a tradeoff here: In theory, we might change `TextLink` in a way that silently breaks `HalloweenTextLink`, not even remembering that that component exists.
+
+We wouldn't want to do this with `Aside` because:
+
+- We use `Aside` components all over! It is beneficial to know about those styles whenever we work with `TextLink` because it's a core part of the application
+- We want the contextual styles to be applied automatically. We don't want to have to remember to use `AsideTextLink` whenever they need a `TextLink` in an Aside.
+
+
+#### 3. global styles 
+
+TODO...
+
+> The same can be said for global styles. In most of my projects, I apply a CSS reset and a handful of common-sense baseline styles. These are always applied on tags (eg. p, h1), to keep the specificity as low as possible. This is a quality-of-life thing; it's a little annoying to need to import a Paragraph component when I can use a <p> tag with some baseline styles.
+
+
+
+
+
+### Styled theming
+
+TODO...
+
+<https://styled-components.com/docs/tooling#styled-theming>
 
 ## Links
 
-See [React faq on styling](https://reactjs.org/docs/faq-styling.html)
+See [React faq on styling](https://reactjs.org/docs/faq-styling.html)  
 See the [classnames](https://github.com/JedWatson/classnames#readme) package
