@@ -23,6 +23,9 @@ A list of react packages/libraries that I've used.
 - [React color](#react-color)
 - [Bootstrap](#bootstrap)
   * [reactstrap](#reactstrap)
+- [html2canvas](#html2canvas)
+- [jspdf](#jspdf)
+- [styled-components](#styled-components)
 
 <!-- tocstop -->
 
@@ -620,3 +623,9 @@ function App() {
 
 export default App;
 ```
+
+## styled-components 
+
+[styled-components](https://styled-components.com/) is a library for writing CSS-in-JS.
+
+See [styling.md](styling.md).
