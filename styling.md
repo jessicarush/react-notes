@@ -1002,17 +1002,195 @@ We wouldn't want to do this with `Aside` because:
 
 #### 3. global styles 
 
+> In most projects, you want to apply a CSS reset and a handful of common-sense baseline styles. These are always applied on tags (eg. p, h1), to keep the specificity as low as possible. This is a quality-of-life thing; it's annoying to need to import a Paragraph component when you can could just use a <p> tag with some baseline styles.
+
+Normally you might place all your global styles in `index.css`, but styled-components wants you to use `createGlobalStyle`. The main benefit to this, it seems, would be that it gives you accessing to theme information in your global styles. I'll try to explore this in the next section.
+
+First create a document called, say `globalStyles.js` then: 
+
+```javascript
+// globalStyles.js
+import { createGlobalStyle } from "styled-components";
+
+const GlobalStyles = createGlobalStyle`
+  html {
+  background-color: #282c34;
+  }
+  body {
+    color: white;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+      'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+      'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+`;
+
+export default GlobalStyles;
+```
+
+Then at the top of your React component tree, import it and place if before (as a sibling to) the main application component:
+
+```javascript
+// App.js 
+import GlobalStyles from './globalStyles';
+import Content from './components/Content';
+
+// ...
+ 
+function App() {
+  return (
+    <>
+      <GlobalStyles />
+      <Wrapper>
+        <Content />
+      </Wrapper>
+    </>
+  );
+}
+ 
+export default App;
+```
+
+That's it.
+
+### Theming
+
+> :star: Note that we can create our own ThemeProvider using contexts in React. See my notes in [contexts.md](contexts.md). That being said, styled-components has its own ThemeProvider which is just a wrapper for the context API.
+
+First, import a `ThemeProvider` and wrap it around the App content:
+
+```javascript
+// App.js
+import React, { useState } from 'react';
+import styled, { ThemeProvider } from 'styled-components';
+import { darkTheme, lightTheme } from './theme';
+// ...
+
+function App() {
+  const [theme, setTheme] = useState('light');
+  const isDarkMode = (theme === 'dark');
+
+  const toggleTheme = () => {
+    setTheme(isDarkMode ? 'light' : 'dark');
+  };
+
+  return (
+    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+      <GlobalStyles />
+      <Wrapper>
+        {/* The rest of my app */}
+        <ThemeSwitch id="theme-switch" toggleTheme={toggleTheme} isDarkMode />
+      </Wrapper>
+    </ThemeProvider>
+  );
+}
+
+export default App;
+```
+
+My theme: 
+
+```javascript
+// theme.js
+const darkTheme = {
+  background: '#282c34',
+  body: '#f0eded',
+  heading: '#fff',
+  subheading: '#fff'
+}
+
+const lightTheme = {
+  background: '#f7f7f7',
+  body: '#141517',
+  heading: '#000',
+  subheading: '#000'
+}
+
+export { darkTheme, lightTheme };
+```
+
+Then to access the values:
+
+```javascript
+// globalStyles.js
+import { createGlobalStyle } from "styled-components";
+
+const GlobalStyles = createGlobalStyle`
+  html {
+  background-color: ${p => p.theme.background};
+  transition: background-color .3s;
+  }
+  body {
+    color: ${p => p.theme.body};
+    transition: color .3s;
+    // ...
+  }
+`;
+
+export default GlobalStyles;
+```
+
+Then in my styled-components:
+
+```javascript
+import styled, { css } from 'styled-components';
+
+const Wrapper = styled.h1`
+  color: ${p => p.theme.heading};
+  transition: color .3s;
+  // ...
+`;
+
+function Heading(props) {
+  return (
+    <Wrapper>
+      {children}
+    </Wrapper>
+  );
+}
+
+export default Heading;
+```
+
+To get access to theme values in a non-styled component:
+
+```javascript
+import { useTheme } from "styled-components";
+
+function MyComponent() {
+  const theme = useTheme();
+
+  return (
+    <div>{theme.body}</div>
+  )
+}
+
+export default MyComponent;
+```
+
+or..
+
+```javascript
+import { withTheme } from "styled-components";
+
+function MyComponent(props) {
+  const theme = useTheme();
+
+  return (
+    <div>{props.theme.body}</div>
+  )
+}
+
+export default withTheme(MyComponent);
+```
+
+
+### Styled theming (with additional library styled-theming)
+
 TODO...
 
-> The same can be said for global styles. In most of my projects, I apply a CSS reset and a handful of common-sense baseline styles. These are always applied on tags (eg. p, h1), to keep the specificity as low as possible. This is a quality-of-life thing; it's a little annoying to need to import a Paragraph component when I can use a <p> tag with some baseline styles.
-
-
-
-
-
-### Styled theming
-
-TODO...
 
 <https://styled-components.com/docs/tooling#styled-theming>
 
