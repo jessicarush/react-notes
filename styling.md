@@ -19,7 +19,8 @@
     + [1. When possible, use css variables](#1-when-possible-use-css-variables)
     + [2. Single source of Contextual styles](#2-single-source-of-contextual-styles)
     + [3. global styles](#3-global-styles)
-  * [Styled themeing](#styled-themeing)
+  * [Theming](#theming)
+  * [Styled theming (with additional library styled-theming)](#styled-theming-with-additional-library-styled-theming)
 - [Links](#links)
 
 <!-- tocstop -->
@@ -1321,5 +1322,5 @@ theme("size", { normal: ..., compact: ... });
 - [styled-components](https://styled-components.com/)  
 - [styled-theming](https://github.com/styled-components/styled-theming#readme)  
 - [styled-theming blogpost](https://jamie.build/styled-theming.html)  
-- [styled-components docs on styled-theming](https://styled-components.com/docs/tooling#styled-theming)  
+- [styled-components docs on styled-theming](https://styled-components.com/docs/tooling#styled-theming)
 
