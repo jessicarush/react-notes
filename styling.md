@@ -357,6 +357,23 @@ function Card(props) {
 export default Card;
 ```
 
+Rather than use the ternary operator above, you can also set `defaultProps` like you would with a class component:
+
+```javascript
+const Button = styled.button`
+  color: ${props => props.color};
+  font-size: 1.1em;
+  margin: 1em;
+  padding: .5em 1em;
+  border: 2px solid ${props => props.color};
+  // ...
+`;
+
+Button.defaultProps = {
+  color: 'silver'
+}
+```
+
 #### css helper 
 
 The `css` helper function can be used to generate CSS from a template literal with interpolations. You need to use this if you return a template literal with functions inside an interpolation due to how tagged template literals work in JavaScript. If you're interpolating a string you do not need to use this, only if you're interpolating a function. I couldn't really find a good example of this but here is what it looks like:
@@ -1059,13 +1076,40 @@ That's it.
 
 > :star: Note that we can create our own ThemeProvider using contexts in React. See my notes in [contexts.md](contexts.md). That being said, styled-components has its own ThemeProvider which is just a wrapper for the context API.
 
-First, import a `ThemeProvider` and wrap it around the App content:
+First, create some themes:
+
+```javascript
+// theme.js
+const themes = {
+  light: {
+    colors: {
+      background: '#f7f7f7',
+      body: '#141517',
+      heading: '#000',
+      subheading: '#000',
+      eyebrow: 'gray'
+    }
+  },
+  dark: {
+    colors: {
+      background: '#282c34',
+      body: '#f0eded',
+      heading: '#fff',
+      subheading: '#fff',
+      eyebrow: 'silver'
+    }
+  }
+}
+export default themes;
+```
+
+Next, import a `ThemeProvider` and wrap it around the App content:
 
 ```javascript
 // App.js
 import React, { useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { darkTheme, lightTheme } from './theme';
+import themes from './themes';
 // ...
 
 function App() {
@@ -1077,7 +1121,7 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+    <ThemeProvider theme={isDarkMode ? themes.dark : themes.light}>
       <GlobalStyles />
       <Wrapper>
         {/* The rest of my app */}
@@ -1090,27 +1134,6 @@ function App() {
 export default App;
 ```
 
-My theme: 
-
-```javascript
-// theme.js
-const darkTheme = {
-  background: '#282c34',
-  body: '#f0eded',
-  heading: '#fff',
-  subheading: '#fff'
-}
-
-const lightTheme = {
-  background: '#f7f7f7',
-  body: '#141517',
-  heading: '#000',
-  subheading: '#000'
-}
-
-export { darkTheme, lightTheme };
-```
-
 Then to access the values:
 
 ```javascript
@@ -1119,11 +1142,11 @@ import { createGlobalStyle } from "styled-components";
 
 const GlobalStyles = createGlobalStyle`
   html {
-  background-color: ${p => p.theme.background};
+  background-color: ${p => p.theme.colors.background};
   transition: background-color .3s;
   }
   body {
-    color: ${p => p.theme.body};
+    color: ${p => p.theme.colors.body};
     transition: color .3s;
     // ...
   }
@@ -1138,7 +1161,7 @@ Then in my styled-components:
 import styled, { css } from 'styled-components';
 
 const Wrapper = styled.h1`
-  color: ${p => p.theme.heading};
+  color: ${p => p.theme.colors.heading};
   transition: color .3s;
   // ...
 `;
@@ -1163,7 +1186,7 @@ function MyComponent() {
   const theme = useTheme();
 
   return (
-    <div>{theme.body}</div>
+    <div>{theme.colors.body}</div>
   )
 }
 
@@ -1179,22 +1202,119 @@ function MyComponent(props) {
   const theme = useTheme();
 
   return (
-    <div>{props.theme.body}</div>
+    <div>{props.theme.colors.body}</div>
   )
 }
 
 export default withTheme(MyComponent);
 ```
 
+> :pushpin: Note you would want to also save the current theme preference in localStorage so it doesn't reset every time they leave and come back. To do this see examples/styled_components (private repo).
+
 
 ### Styled theming (with additional library styled-theming)
 
-TODO...
+Why the need for this library? According to the developers: 
+
+> Passing CSS values down this way (as shown above) works for a bit. But when you start using this in hundreds of places in your app, you'll notice it gets a bit painful. The problem is that we're back to having a separate set of styles that lives at the top of our app in giant objects. And our component styles have tons of lookup functions: `color: ${props => props.theme.buttonDefaultColor};`. [Source](https://jamie.build/styled-theming.html) 
 
 
-<https://styled-components.com/docs/tooling#styled-theming>
+Not to mention how cumbersome it gets trying to manage variants:
+
+```javascript
+const Button = styled.button`
+  color: ${props => {
+    if (props.kind === "default") return props.theme.buttonDefaultColor;
+    if (props.kind === "primary") return props.theme.buttonPrimaryColor;
+    if (props.kind === "success") return props.theme.buttonSuccessColor;
+    if (props.kind === "warning") return props.theme.buttonWarningColor;
+    if (props.kind === "danger") return props.theme.buttonDangerColor;
+  }};
+  // ...
+`;
+
+Button.defaultProps = {
+  kind: "default",
+};
+```
+
+Instead of all of this, styled-theming tries to reverse the relationship between themes and abstracts all the repetition into helpers. 
+
+styled-theming makes it easier to manage themes by allowing you to declare your themes alongside your components instead of at the top of your app. Instead of passing down values from the root of your app, you pass down names instead.
+
+```javascript
+<ThemeProvider theme={{ mode: "light" }}>
+```
+
+Then when you declare your components, you can use the `theme` helper:
+
+```javascript
+import theme from "styled-theming";
+
+const backgroundColor = theme("mode", {
+  light: "#fff",
+  dark: "#000",
+});
+
+const Button = styled.button`
+  background-color: ${backgroundColor};
+`;
+```
+
+`theme() `is a tiny little function that returns another function which you can use as a value in styled-components. It looks up the correct value using the `theme` prop you provided to `<ThemeProvider>`. You're encouraged to create your own helper functions that wrap `theme()` to make it easier to declare your themes. Just make sure that you're doing as much work as possible ahead of time (or only once).
+
+In addition to the `theme()` function, there's also a `theme.variants() `function to help you declare variantions of the same component based on a prop.
+
+```javascript
+import theme from "styled-theming";
+
+const backgroundColor = theme.variants("mode", "kind", {
+  default: { light: "#123456", dark: "#123456" },
+  primary: { light: "#123456", dark: "#123456" },
+  success: { light: "#123456", dark: "#123456" },
+  danger: { light: "#123456", dark: "#123456" },
+  warning: { light: "#123456", dark: "#123456" },
+});
+
+const Button = styled.button`
+  background-color: ${backgroundColor};
+`;
+
+// Button.propTypes = {
+//   kind: PropTypes.oneOf(["default", "primary", ...]),
+// };
+
+Button.defaultProps = {
+  kind: "default",
+};
+```
+
+Theming can sometimes happen across multiple dimensions:
+
+- Light vs Dark mode
+- Cosy vs Compact spacing
+- Accessibility modes
+
+This is why the first parameter to `theme() `and `theme.variants()` exists.
+
+```javascript
+theme("mode", {...})
+```
+
+This matches against the object that you've passed to `<ThemeProvider>` so you can have multiple of them.
+
+```javascript
+theme("mode", { light: ..., dark: ... });
+theme("size", { normal: ..., compact: ... });
+
+<ThemeProvider theme={{ mode: 'dark', size: 'compact' }}>
+```
 
 ## Links
 
-See [React faq on styling](https://reactjs.org/docs/faq-styling.html)  
-See the [classnames](https://github.com/JedWatson/classnames#readme) package
+- [styled-components](https://styled-components.com/)  
+- [styled-theming](https://github.com/styled-components/styled-theming#readme)  
+- [styled-theming blogpost](https://jamie.build/styled-theming.html)  
+- [styled-components docs on styled-theming](https://styled-components.com/docs/tooling#styled-theming)  
+- [React faq on styling](https://reactjs.org/docs/faq-styling.html)  
+- The [classnames](https://github.com/JedWatson/classnames#readme) package  
