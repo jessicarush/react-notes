@@ -1214,6 +1214,10 @@ export default withTheme(MyComponent);
 
 ### Styled theming (with additional library styled-theming)
 
+```bash
+npm install styled-theming
+```
+
 Why the need for this library? According to the developers: 
 
 > Passing CSS values down this way (as shown above) works for a bit. But when you start using this in hundreds of places in your app, you'll notice it gets a bit painful. The problem is that we're back to having a separate set of styles that lives at the top of our app in giant objects. And our component styles have tons of lookup functions: `color: ${props => props.theme.buttonDefaultColor};`. [Source](https://jamie.build/styled-theming.html) 
@@ -1312,9 +1316,10 @@ theme("size", { normal: ..., compact: ... });
 
 ## Links
 
+- [React faq on styling](https://reactjs.org/docs/faq-styling.html)  
+- [Classnames](https://github.com/JedWatson/classnames#readme) package  
 - [styled-components](https://styled-components.com/)  
 - [styled-theming](https://github.com/styled-components/styled-theming#readme)  
 - [styled-theming blogpost](https://jamie.build/styled-theming.html)  
 - [styled-components docs on styled-theming](https://styled-components.com/docs/tooling#styled-theming)  
-- [React faq on styling](https://reactjs.org/docs/faq-styling.html)  
-- The [classnames](https://github.com/JedWatson/classnames#readme) package  
+
