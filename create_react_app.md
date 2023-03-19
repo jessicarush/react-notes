@@ -1,5 +1,25 @@
 # Create React App
 
+> :warning: Update (March 17, 2023): As of this writing, with the release of the [new React docs](https://react.dev/learn/start-a-new-react-project), create-react-app has officially fallen out of fashion in favour of frameworks like Next.js, Remix, Gatsby and Expo (for native apps). While the community seems to be using Vite to replace create-react-app, there almost no mention of it in the React docs (it is mentioned once, buried deep within a note where they are still recommending using a framework). 
+>
+> Just to be clear, I asked ChatGPT to compare Vite.js and Next.js, here'sthe response:
+>
+> Sure, I'd be happy to compare Vite.js and Next.js for you!
+>
+> Vite.js and Next.js are both popular JavaScript tools for modern web development, but they have some key differences in their approach and capabilities.
+>
+> Vite.js is primarily a build tool and development server, while Next.js is a full-fledged framework for building server-rendered React applications. Here are some of the key differences between the two:
+>
+> 1. Build Tool vs. Full Framework: As mentioned, Vite.js is a build tool and development server, while Next.js is a full-fledged framework for building server-rendered React applications. This means that Next.js provides many features out-of-the-box, such as server-side rendering, static site generation, API routes, and more, while Vite.js focuses on providing a fast development environment and optimized build process.
+>
+> 2. Configuration: Vite.js has a simpler and more flexible configuration system compared to Next.js. Vite.js uses a vite.config.js file that allows you to customize various build and development options, while Next.js has a more complex configuration system that requires modifying various files and settings.
+>
+> 3. Performance: Both Vite.js and Next.js are designed to be fast and performant, but Vite.js is specifically optimized for fast development and hot module reloading, while Next.js is optimized for server-side rendering and static site generation.
+>
+> 4. Ecosystem: Vite.js and Next.js both have large and active ecosystems, but they focus on different areas. Vite.js is primarily focused on front-end development, while Next.js has a wider focus that includes server-side development and backend integration.
+>
+> In summary, Vite.js and Next.js are both excellent tools for modern web development, but they have different strengths and use cases. Vite.js is a great choice for front-end development and fast development workflows, while Next.js is a full-fledged framework for building complex server-rendered React applications.
+
 ## Table of Contents
 
 <!-- toc -->
