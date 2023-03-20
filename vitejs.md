@@ -18,6 +18,12 @@ Overall, Vite.js is a great choice for both development and production use. Its 
 
 <!-- toc -->
 
+- [Start a new Vite project](#start-a-new-vite-project)
+- [Differences to note](#differences-to-note)
+- [Build](#build)
+
+<!-- tocstop -->
+
 ## Start a new Vite project 
 
 ```bash
