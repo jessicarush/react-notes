@@ -21,8 +21,13 @@
 
 ## Introduction
 
-These notes for working with state in functional components using hooks, follow the notes in [state.md](https://github.com/jessicarush/react-notes/blob/master/state.md). As such, I'll skip the explanations of what state is and instead focus on how to do the same things with functions and hooks.
+These notes for working with state in functional components using hooks come after the notes in [state.md](https://github.com/jessicarush/react-notes/blob/master/state.md). As such, I'll skip the explanations of what state is and instead focus on how to do the same things with functions and hooks.
 
+Just one reminder for deciding when something should be state:
+
+- Does it remain unchanged over time? If so, it isn’t state.
+- Is it passed in from a parent via props? If so, it isn’t state.
+- Can you compute it based on existing state or props in your component? If so, it isn’t state.
 
 ## Set initial state
 
