@@ -46,6 +46,37 @@ npm create vite@latest my-project --template react
 
 Ask ChatGPT or phind for steps to migrate a CRA project to Vite. 
 
+## Set up ESlint 
+
+```bash
+npm install vite-plugin-eslint --save-dev
+npm install eslint --save-dev
+npm install eslint-config-react-app --save-dev
+touch .eslintrc
+```
+
+.eslintrc
+```javascript
+{
+  "extends": [
+    "react-app"
+  ]
+}
+```
+
+vite.config.js 
+```javascript
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import eslint from 'vite-plugin-eslint';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react(), eslint()],
+});
+```
+
+
 ## Differences to note
 
 Vite uses `.jsx` extentions instead of `.js`.
