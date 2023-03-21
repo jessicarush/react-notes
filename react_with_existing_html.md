@@ -1,10 +1,17 @@
 # Add React to Existing HTML
 
-Typically we would want to create a standalone SPA using `create-react-app`, but what options do we have if we want to include our React project into an existing html doc?
+> :warning: The React.dev docs have since updated their recommendations for this stuff. See <https://react.dev/learn/add-react-to-an-existing-project> for more up-to-date approaches. The content below has NOT been updated yet to reflect these new docs.
+>
+> One TLDR; from their docs is for when you want to [use React for an entire subroute of your existing website](https://react.dev/learn/add-react-to-an-existing-project#using-react-for-an-entire-subroute-of-your-existing-website). They say to:
+>1. Build the React part of your app using a framework like Next.js
+>2. Specify /some-app as the base path in your framework’s configuration
+>3. Configure your server or a proxy so that all requests under /some-app/ are handled by your React app.
+>
+> Basically treat them as separate apps and use nginx to handle which one receieves which request.
 
-The first example here comes from the React docs, but I fail to see how this can be used for anything beyond a simple component.
+Typically we would want to create a standalone app using `Vite.js` or `Next.js`, but what options do we have if we want to include our React project into an existing non-React project?
 
-The second example comes from various searches so I'm not certain of its reliability.
+The first example here comes from the React docs, but I fail to see how this can be used for anything beyond a simple component. The second example comes from various searches so I'm not certain of its reliability.
 
 ## Table of Contents
 
@@ -20,7 +27,6 @@ The second example comes from various searches so I'm not certain of its reliabi
   * [2. Update `index.js` with the new container id](#2-update-indexjs-with-the-new-container-id)
   * [3. Add `"homepage": "."` to package.json](#3-add-homepage--to-packagejson)
   * [4. `npm run build`](#4-npm-run-build)
-- [Build your own Webpack configuration](#build-your-own-webpack-configuration)
 
 <!-- tocstop -->
 
@@ -121,10 +127,12 @@ const root = ReactDOMClient.createRoot(container);
 root.render(<App />);
 ```
 
-But this type of import is a node_modules thing... then we need webpack and babel, so we might as well go the [create-react-app](create_react_app.md) route. 
+But this type of import is a node_modules thing... then we need webpack and babel, so we might as well go the ~~[create-react-app](create_react_app.md)~~ [vitejs.md](vitej.md) route. 
 
 
 ## Add a create-react-app build
+
+> :warning: have not yet looked into how to do this with Vite, only with CRA.
 
 ### 1. Add a DOM Container to the HTML
 
@@ -175,7 +183,8 @@ After running this command, locate the build directory, then copy the static dir
 
 Now you need to link the css stylesheet and and the two scripts (leave the .map files).
 
-```html 
+```html
+    <!-- ... -->
     <!-- Stylesheet -->
     <link href="./react_build/css/main.8afc6c12.css" rel="stylesheet">
   </head>
@@ -202,10 +211,4 @@ Order matters here.
 With that you should be able to serve the html and see your app embedded. For an explanation of these files see: <https://create-react-app.dev/docs/production-build/>
 
 
-## Build your own Webpack configuration 
 
-
-TODO...
-
-<https://webpack.js.org/concepts/>
-<https://github.com/mattcarlotta/cra-single-bundle/blob/master/config/webpack.config.js>
