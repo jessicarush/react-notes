@@ -8,7 +8,7 @@ Vite.js supports a wide range of front-end technologies, including JavaScript, T
 
 Vite.js can be used to generate a production build of your application. In fact, Vite.js is designed to make it easy to generate a performant and optimized production build of your application.
 
-When you run the `npm run build` command in a Vite.js project, it will create a production-ready build of your application. Vite.js uses [Rollup.js](https://rollupjs.org/) under the hood to perform the actual bundling and code splitting.
+When you run the `npm run build` command in a Vite.js project, it will create a production-ready build of your application. Vite.js uses [esbuild](https://esbuild.github.io/) in dev and [Rollup.js](https://rollupjs.org/) in production under the hood to perform the actual bundling and code splitting (whereas CRA uses Webpack).
 
 During the production build process, Vite.js will automatically apply various optimizations to your code, such as minification, dead code elimination, and tree shaking. This helps to reduce the size of your application and improve its performance.
 
@@ -19,8 +19,10 @@ Overall, Vite.js is a great choice for both development and production use. Its 
 <!-- toc -->
 
 - [Start a new Vite project](#start-a-new-vite-project)
+- [Set up ESlint](#set-up-eslint)
 - [Differences to note](#differences-to-note)
 - [Build](#build)
+- [Resources](#resources)
 
 <!-- tocstop -->
 
@@ -79,7 +81,7 @@ export default defineConfig({
 
 ## Differences to note
 
-Vite uses `.jsx` extentions instead of `.js`.
+Vite uses `.jsx` extensions instead of `.js`.
 
 Vite has a [vite.config.js](https://vitejs.dev/config/) file.
 
@@ -92,3 +94,8 @@ vite build
 # or 
 npm run build
 ```
+
+## Resources 
+
+- [Awesome Vite](https://github.com/vitejs/awesome-vite#integrations-with-backends) - A curated list of awesome things related to Vite.js
+- [How to start a React Project in 2023](https://www.robinwieruch.de/react-starter/)
