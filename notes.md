@@ -34,8 +34,16 @@
 
 React is often called a framework but it is actually more of a library. A framework is generally an "all in one" system where you model your project, files and code to what the framework requires. React, in its most basic form is just a "component-building library". The idea is that you focus on building individual components, then put those together to build a full app.
 
-There are a tonne of additional (optional) react-specific tools that you can choose from, e.g. *react-router*, *redux*, *enzyme*, *create-react-app*, etc. Once you start pulling all these tools together, it starts to resemble a framework.
+There are a tonne of additional (optional) react-specific tools that you can choose from, e.g. *react-router*, *redux*, *enzyme*, etc. Once you start pulling all these tools together, it starts to resemble a framework.
 
+> :star: March 22, 2023 Update: With the release of the new React.dev docs, React devs say that React can be used in two ways:
+>
+>- as a library (used with a low-level build tool like Vite or Parcel)
+>- as a framework architecture (used with a framework like Next.js or Remix)
+
+In other words, React says it can be used to develop a component (say an internal dashboard) that will be integrated into an existing non-React site, or it can be used to build a full React app with Server side rendering and more using a framework like Next.js.
+
+- See [How to start a React Project in 2023](https://www.robinwieruch.de/react-starter/)
 
 ## Why React
 
@@ -101,6 +109,8 @@ The [create-react-app docs](https://create-react-app.dev/docs/updating-to-new-re
 > To update an existing project to a new version of react-scripts, open the [changelog](https://github.com/facebook/create-react-app/blob/main/CHANGELOG.md), find the version you’re currently on (check package.json in this folder if you’re not sure), and apply the migration instructions for the newer versions.
 
 In most cases bumping the react-scripts version in package.json and running npm install (or yarn install) in this folder should be enough, but it’s good to consult the changelog for potential breaking changes.
+
+> :warning: March 22, 2023 Update: Since CRA is dead atm, you should [migrate to Vite](https://cathalmacdonnacha.com/migrating-from-create-react-app-cra-to-vite). Eventually, CRA will be morphed into a launcher where you will be able to choose your framework or build-tool.
 
 
 ## Learning Questions
