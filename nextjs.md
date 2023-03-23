@@ -21,6 +21,8 @@ Also noteworthy is the documentation looks very good and includes a [nice tutori
   * [Global styles](#global-styles)
   * [Component-level css](#component-level-css)
 - [pages/_app.js](#pages_appjs)
+- [Q&As](#qas)
+  * [If I build a react app using Next.js, do I have to deploy on Vercel, or can I deploy on my own server?](#if-i-build-a-react-app-using-nextjs-do-i-have-to-deploy-on-vercel-or-can-i-deploy-on-my-own-server)
 
 <!-- tocstop -->
 
@@ -257,3 +259,17 @@ function MyApp({ Component, pageProps }) {
 export default MyApp;
 ```
 
+## Q&As
+
+### If I build a react app using Next.js, do I have to deploy on Vercel, or can I deploy on my own server?
+
+No, you do not have to deploy a Next.js app on Vercel. While Vercel is the recommended deployment platform for Next.js apps, you can deploy a Next.js app on your own server or any other hosting platform that supports Node.js applications.
+
+To deploy a Next.js app on your own server or a different hosting platform, you would typically follow these steps:
+
+- Generate a production build of your Next.js app using the next build command.
+- Start the production server using the next start command.
+- Configure your server environment to run the production server and serve the appropriate ports and routes.
+- Optionally, configure your server environment to handle routing, caching, and other optimizations for your Next.js app.
+
+Note that deploying a Next.js app on your own server may require additional setup and configuration compared to deploying on Vercel, as Vercel provides a lot of automation and optimization for Next.js apps out of the box. However, with the proper setup, you can deploy your Next.js app on any server that supports Node.js applications.
