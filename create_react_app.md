@@ -1,8 +1,8 @@
 # Create React App
 
-> :warning: Update (March 17, 2023): As of this writing, with the release of the [new React docs](https://react.dev/learn/start-a-new-react-project), create-react-app has officially fallen out of fashion in favour of frameworks like Next.js, Remix, Gatsby and Expo (for native apps). While the community seems to be using Vite to replace create-react-app, there almost no mention of it in the React docs (it is mentioned once, buried deep within a note where they are still recommending using a framework). 
+> :warning: Update (March 17, 2023): As of this writing, with the release of the [new React docs](https://react.dev/learn/start-a-new-react-project), create-react-app has officially fallen out of fashion in favour of frameworks like Next.js, Remix, Gatsby and Expo (for native apps). While the community seems to be using Vite or Parcel to replace create-react-app, there's almost no mention of them in the React docs (Vite it is mentioned once, buried deep within a note where they are still recommending using a framework). 
 >
-> Just to be clear, I asked ChatGPT to compare Vite.js and Next.js, here'sthe response:
+> Just to be clear, I asked ChatGPT to compare Vite.js and Next.js, here's the response:
 >
 > Sure, I'd be happy to compare Vite.js and Next.js for you!
 >
@@ -19,6 +19,9 @@
 > 4. Ecosystem: Vite.js and Next.js both have large and active ecosystems, but they focus on different areas. Vite.js is primarily focused on front-end development, while Next.js has a wider focus that includes server-side development and backend integration.
 >
 > In summary, Vite.js and Next.js are both excellent tools for modern web development, but they have different strengths and use cases. Vite.js is a great choice for front-end development and fast development workflows, while Next.js is a full-fledged framework for building complex server-rendered React applications.
+
+To better understand the React dev teams thought process and future plans for CRA, see [this comment in the react.dev github discussions](https://github.com/reactjs/react.dev/pull/5487#issuecomment-1409720741).
+
 
 ## Table of Contents
 
