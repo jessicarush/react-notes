@@ -74,9 +74,11 @@ Context provides a way to pass data through the component tree without having to
 
 The [Effect Hook](https://reactjs.org/docs/hooks-effect.html) lets you perform *side effects* in function components. If comparing to class component lifecycle methods, you can think of `useEffect` as `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` combined.
 
-See also: [life_cycle_methods.md](https://github.com/jessicarush/react-notes/blob/master/life_cycle_methods.md#lifecycle-methods-in-function-components)
+See also:
 
-See also: [Robin Wieruch's post on useEffect()](https://www.robinwieruch.de/react-useeffect-hook/)
+- [You might not need an Effect](https://react.dev/learn/you-might-not-need-an-effect)  
+- [life_cycle_methods.md](https://github.com/jessicarush/react-notes/blob/master/life_cycle_methods.md#lifecycle-methods-in-function-components)  
+- [Robin Wieruch's post on useEffect()](https://www.robinwieruch.de/react-useeffect-hook/)  
 
 For example:
 
