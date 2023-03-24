@@ -46,7 +46,7 @@ You can also use the single line command:
 npm create vite@latest my-project --template react
 ```
 
-Ask ChatGPT or phind for steps to migrate a CRA project to Vite. 
+For steps to migrate a CRA project to Vite see: [How to migrate from CRA to Vite](https://github.com/nordcloud/pat-frontend-template/blob/master/docs/CRA_MIGRATION_GUIDE.md)
 
 ## Set up ESlint 
 
@@ -99,3 +99,4 @@ npm run build
 
 - [Awesome Vite](https://github.com/vitejs/awesome-vite#integrations-with-backends) - A curated list of awesome things related to Vite.js
 - [How to start a React Project in 2023](https://www.robinwieruch.de/react-starter/)
+- [How to migrate from CRA to Vite](https://github.com/nordcloud/pat-frontend-template/blob/master/docs/CRA_MIGRATION_GUIDE.md)
