@@ -51,7 +51,7 @@ Declaring state variables as a pair of `[something, setSomething]` is handy beca
 
 That being said...
 
-> You **don’t have to** use many state variables. State variables can hold objects and arrays just fine, so you can still group related data together. However, unlike `this.setState` in a class, updating a state variable always replaces it instead of merging it.
+> You **don’t have to** use many state variables. State variables can hold objects and arrays just fine, so you can still group **related data** together. However, unlike `this.setState` in a class, updating a state variable always replaces it instead of merging it.
 
 For example:
 
@@ -281,14 +281,14 @@ handleChange(e) {
 }
 ```
 
-If we were to put all our state values in one object called state, we could still do this, just remember to add `...state`:
+If we were to put all our state values in one object called state, we could still do this, we just remember to add `...state`:
 
 ```javascript
 import React, { useState } from 'react';
 
 function Form() {
-  const [state, setState] = useState({
-    user: '',
+  const [user, setUser] = useState({
+    username: '',
     email: ''
   });
 
@@ -298,7 +298,7 @@ function Form() {
 
   return (
     <div className="Form">
-      <input type="text" name="user" value={state.user} onChange={handleChange} />
+      <input type="text" name="username" value={state.username} onChange={handleChange} />
       <input type="email" name="email" value={state.email} onChange={handleChange} />
     </div>
   )
@@ -306,6 +306,8 @@ function Form() {
 
 export default Form;
 ```
+
+You should only group up state values like this in an object when they are related. Unrelated values should be created with separate `useState()` calls.
 
 ### Custom hook for forms
 
