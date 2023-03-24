@@ -9,10 +9,21 @@ Pure components are used when you want to prevent a component from re-rendering 
 
 <!-- toc -->
 
+- [Background](#background)
 - [Example using Class Components](#example-using-class-components)
 - [Example using Functional Components](#example-using-functional-components)
 
 <!-- tocstop -->
+
+## Background 
+
+In computer science (and especially the world of functional programming), a pure function is a function with the following characteristics:
+
+- It minds its own business: It does not change any objects or variables that existed before it was called.
+- Same inputs, same output: Given the same inputs, a pure function should always return the same result.
+
+Pure functions don’t mutate variables outside of the function’s scope or objects that were created before the call.
+
 
 ## Example using Class Components
 
@@ -22,9 +33,9 @@ For example:
 
 ```javascript
 import React, { Component } from 'react';
-import TestPureChild from './TestPureChild';
+import ChildComponent from './ChildComponent';
 
-class TestComponent extends Component {
+class ParentComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {children: ['A', 'B', 'C', 'D', 'E']};
@@ -38,16 +49,16 @@ class TestComponent extends Component {
 
   render() {
     return (
-      <div className="TestComponent">
+      <div className="ParentComponent">
         {this.state.children.map((c) => (
-          <TestPureChild key={c} id={c} delete={this.deleteChild} />
+          <ChildComponent key={c} id={c} delete={this.deleteChild} />
         ))}
       </div>
     );
   }
 }
 
-export default TestComponent;
+export default ParentComponent;
 ```
 
 And my child component:
@@ -55,7 +66,7 @@ And my child component:
 ```javascript
 import React, { Component } from "react";
 
-class TestPureChild extends Component {
+class ChildComponent extends Component {
   constructor(props) {
     super(props);
     this.handleDelete = this.handleDelete.bind(this);
@@ -68,30 +79,30 @@ class TestPureChild extends Component {
   render() {
     console.log(`Rendered ${this.props.id}`);
     return (
-      <div className="TestPureChild">
+      <div className="ChildComponent">
         <button onClick={this.handleDelete}> delete</button> {this.props.id}
       </div>
     );
   }
 }
 
-export default TestPureChild;
+export default ChildComponent;
 ```
 
 When I click the delete button in one child I will see, by the `console.log`, that all the children get re-rendered.
 
 ```bash
 # Initial render
-Rendered A TestPureChild.js:29
-Rendered B TestPureChild.js:29
-Rendered C TestPureChild.js:29
-Rendered D TestPureChild.js:29
-Rendered E TestPureChild.js:29
+Rendered A ChildComponent.js:29
+Rendered B ChildComponent.js:29
+Rendered C ChildComponent.js:29
+Rendered D ChildComponent.js:29
+Rendered E ChildComponent.js:29
 # I delete E
-Rendered A TestPureChild.js:29
-Rendered B TestPureChild.js:29
-Rendered C TestPureChild.js:29
-Rendered D TestPureChild.js:29
+Rendered A ChildComponent.js:29
+Rendered B ChildComponent.js:29
+Rendered C ChildComponent.js:29
+Rendered D ChildComponent.js:29
 ```
 
 So, to prevent this, in the Child component, I can simply extend `React.PureComponent` instead of `Component`.
@@ -99,7 +110,7 @@ So, to prevent this, in the Child component, I can simply extend `React.PureComp
 ```javascript
 import React, { PureComponent } from "react";
 
-class TestPureChild extends PureComponent {
+class ChildComponent extends PureComponent {
   constructor(props) {
     super(props);
     this.handleDelete = this.handleDelete.bind(this);
@@ -112,25 +123,25 @@ class TestPureChild extends PureComponent {
   render() {
     console.log(`Rendered ${this.props.id}`);
     return (
-      <div className="TestPureChild">
+      <div className="ChildComponent">
         <button onClick={this.handleDelete}> delete</button> {this.props.id}
       </div>
     );
   }
 }
 
-export default TestPureChild;
+export default ChildComponent;
 ```
 
 Now when I delete a child:
 
 ```bash
 # Initial render
-Rendered A TestPureChild.js:29
-Rendered B TestPureChild.js:29
-Rendered C TestPureChild.js:29
-Rendered D TestPureChild.js:29
-Rendered E TestPureChild.js:29
+Rendered A ChildComponent.js:29
+Rendered B ChildComponent.js:29
+Rendered C ChildComponent.js:29
+Rendered D ChildComponent.js:29
+Rendered E ChildComponent.js:29
 # I delete E
 ```
 
@@ -143,12 +154,12 @@ Rendered E TestPureChild.js:29
 
 **Unsolved**
 
-Continuing with the example from above, let's start by just converting the child component `TestPureChild` to a functional component, but leave the parent `TestComponent` as a class.
+Continuing with the example from above, let's start by just converting the child component `ChildComponent` to a functional component, but leave the parent `ParentComponent` as a class.
 
 ```javascript
 import React from 'react';
 
-function TestPureChild(props) {
+function ChildComponent(props) {
   console.log(`Rendered ${props.id}`);
 
   function handleDelete() {
@@ -156,29 +167,29 @@ function TestPureChild(props) {
   }
 
   return (
-    <div className="TestPureChild">
+    <div className="ChildComponent">
       <button onClick={handleDelete}> delete</button> {props.id}
     </div>
   );
 }
 
-export default TestPureChild;
+export default ChildComponent;
 ```
 
 With this I get the same re-rendering problem:
 
 ```bash
 # Initial render
-Rendered A TestPureChild.js:29
-Rendered B TestPureChild.js:29
-Rendered C TestPureChild.js:29
-Rendered D TestPureChild.js:29
-Rendered E TestPureChild.js:29
+Rendered A ChildComponent.js:29
+Rendered B ChildComponent.js:29
+Rendered C ChildComponent.js:29
+Rendered D ChildComponent.js:29
+Rendered E ChildComponent.js:29
 # I delete E
-Rendered A TestPureChild.js:29
-Rendered B TestPureChild.js:29
-Rendered C TestPureChild.js:29
-Rendered D TestPureChild.js:29
+Rendered A ChildComponent.js:29
+Rendered B ChildComponent.js:29
+Rendered C ChildComponent.js:29
+Rendered D ChildComponent.js:29
 ```
 
 So, to prevent this, in the Child component, I can simply extend wrap my component in `React.memo`.
@@ -188,7 +199,7 @@ So, to prevent this, in the Child component, I can simply extend wrap my compone
 ```javascript
 import React from 'react';
 
-function TestPureChild(props) {
+function ChildComponent(props) {
   console.log(`Rendered ${props.id}`);
 
   function handleDelete() {
@@ -196,24 +207,24 @@ function TestPureChild(props) {
   }
 
   return (
-    <div className="TestPureChild">
+    <div className="ChildComponent">
       <button onClick={handleDelete}> delete</button> {props.id}
     </div>
   );
 }
 
-export default React.memo(TestPureChild);
+export default React.memo(ChildComponent);
 ```
 
 And with that I get the results I want:
 
 ```bash
 # Initial render
-Rendered A TestPureChild.js:29
-Rendered B TestPureChild.js:29
-Rendered C TestPureChild.js:29
-Rendered D TestPureChild.js:29
-Rendered E TestPureChild.js:29
+Rendered A ChildComponent.js:29
+Rendered B ChildComponent.js:29
+Rendered C ChildComponent.js:29
+Rendered D ChildComponent.js:29
+Rendered E ChildComponent.js:29
 # I delete E
 ```
 
@@ -221,26 +232,26 @@ However... if I try to also convert the parent component to a functional compone
 
 ```javascript
 import React, { useState } from 'react';
-import TestPureChild from "./TestPureChild";
+import ChildComponent from "./ChildComponent";
 
-function TestComponent() {
+function ParentComponent() {
   const [children, setChildren] = useState(['A', 'B', 'C', 'D', 'E']);
 
   const deleteChild = (child) => {
-    setChildren(children.filter(c => c !== child));
+    setChildren(children => children.filter(c => c !== child));
   };
 
   return (
-    <div className="TestComponent">
-      {children.map(c => <TestPureChild key={c} id={c} delete={deleteChild} />)}
+    <div className="ParentComponent">
+      {children.map(c => <ChildComponent key={c} id={c} delete={deleteChild} />)}
     </div>
   );
 }
 
-export default TestComponent;
+export default ParentComponent;
 ```
 
-I'm guessing it has something to do with `useState` but I have not been able to figure out how to do this with both components being functions in my use case.
+I have not been able to figure out how to do this with both components being functions in my use case.
 
 > React.memo only checks for prop changes. If your function component wrapped in React.memo has a useState, useReducer or useContext Hook in its implementation, it will still rerender when state or context change.
 
