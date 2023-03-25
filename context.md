@@ -6,6 +6,13 @@ Context provides a way to pass data through the component tree without having to
 
 Context can be used with or without hooks.
 
+See: 
+
+- [Passing Data Deeply with Context](https://react.dev/learn/passing-data-deeply-with-context)
+- [useContext API Reference](https://react.dev/reference/react/useContext)
+- [createContext API Reference](https://react.dev/reference/react/createContext)
+
+
 ## Table of Contents
 
 <!-- toc -->
@@ -34,7 +41,7 @@ If you only want to avoid passing some props through many levels, [component com
 
 To define a context we'll need to create a new file.
 
-**Tip:** Create a new directory called *contexts*, then create a javascript file in that directory for each context. For example: `ThemeContext.js`.
+**Tip:** Create a new directory called *contexts*, then create a javascript file in that directory for each context. For example: `ThemeContext.jsx`.
 
 In this new file:
 
@@ -380,7 +387,7 @@ function App() {
 export default App;
 ```
 
-To use (consume) the context in the components is easier using `useContext`:
+To use (consume) the context in the components is easier using `useContext()`:
 
 ```javascript
 import React, { useContext } from 'react';
