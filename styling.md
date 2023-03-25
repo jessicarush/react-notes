@@ -77,27 +77,35 @@ class Machine extends React.Component {
 }
 ```
 
-To use string interpolation:
+To use if/else and string interpolation:
 
 ```javascript
 class Machine extends React.Component {
-  let textClass;
-  if (this.someprop > 0) {
-    textClass = 'win';
-  } else if (this.someprop < 0) {
-    textClass = 'lose';
+  // ...
+  let textClassName = 'Machine';
+
+  if (someprop > 0) {
+    textClassName += '__win';
   } else {
-    textClass = 'null';
+    textClassName += '__lose';
   }
   render() {
     return (
       <div className="Machine">
-        <p className={`Machine__${textClass}`}> ... </p>
+        <p className={textClassName}> ... </p>
       </div>
     );
   }
 }
 ```
+
+Using a boolean flag with string interpolation:
+
+```javascript
+<div className={`ColorChip ${isActive && '--active'}`}>
+</div>
+```
+
 
 ## Inline Styles
 
@@ -1200,7 +1208,6 @@ or..
 import { withTheme } from "styled-components";
 
 function MyComponent(props) {
-  const theme = useTheme();
 
   return (
     <div>{props.theme.colors.body}</div>
