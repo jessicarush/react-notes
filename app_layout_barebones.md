@@ -1,5 +1,7 @@
 # React App Layout (Barebones)
 
+> :warning: This is just for demonstration purposes only. You should build a new react app using a build tool like Vite (or CRA once it gets reworked) or a framework like Nextjs.
+
 ## Table of Contents
 
 <!-- toc -->
