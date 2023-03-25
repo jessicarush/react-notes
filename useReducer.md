@@ -1,8 +1,6 @@
 # useReducer
 
-<https://reactjs.org/docs/hooks-reference.html#usereducer>
-
-The `useReducer` hook is an alternative to `useState`.
+The `useReducer` hook is an alternative to `useState`. A reducer lets you unify multiple state variables into a single object and consolidate all the related logic.
 
 It accepts a reducer function like `(state, action) => newState` with the initial state (`initialArg`, `init`), and returns the current `state` paired with a `dispatch` method.
 
@@ -11,6 +9,12 @@ const [state, dispatch] = useReducer(reducer, initialArg, init);
 ```
 
 > useReducer is usually preferable to useState when you have complex state logic that involves multiple sub-values or when the next state depends on the previous one. useReducer also lets you optimize performance for components that trigger deep updates because you can pass dispatch down instead of callbacks.
+
+See: 
+
+- [Extracting State Logic into a Reducer](https://react.dev/learn/extracting-state-logic-into-a-reducer)
+- [useReducer API Reference](https://react.dev/reference/react/useReducer)
+
 
 ## Table of contents
 
@@ -143,9 +147,9 @@ This lets you extract the logic for calculating the initial state outside the re
 
 ## When to use
 
-Most of the time, you are well covered with just `useState()` method, which is built on top of `useReducer()`. But there cases when `useReducer()` is preferable. The latest React docs say useReducer is good for *complex state logic* or when *the next state depends on the previous one*.
+Most of the time, you are well covered with just `useState()` method, which is built on top of `useReducer()`. But there cases when `useReducer()` is preferable. The old React docs say useReducer is good for *complex state logic* or when *the next state depends on the previous one*.
 
-The React Beta docs however seem to shift the reasoning: *To reduce complexity and keep all your logic in one easy-to-access place*.
+The new React.dev docs however seem to shift the reasoning: *To reduce complexity and keep all your logic in one easy-to-access place*.
 
 Some community comments:
 
