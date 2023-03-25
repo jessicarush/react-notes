@@ -451,3 +451,5 @@ function Demo() {
 
 export default Demo;
 ```
+
+See also: examlples/react_with_flask_api
