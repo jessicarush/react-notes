@@ -1,10 +1,9 @@
 # React State
 
-<https://reactjs.org/docs/react-component.html#setstate>
+> :star: These notes cover state as used in **class** components. For working with state in **functional components** with *hooks* see: [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md).
+>
+> Also see <https://reactjs.org/docs/hooks-state.html> for a very good comparison between the two.
 
-These notes cover state as used in **class** components. For working with state in **functional components** with *hooks* see: [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md).
-
-Also see <https://reactjs.org/docs/hooks-state.html> for a very good comparison between the two.
 
 ## Table of Contents
 
@@ -23,6 +22,7 @@ Also see <https://reactjs.org/docs/hooks-state.html> for a very good comparison 
 - [Toggling a true/false value](#toggling-a-truefalse-value)
 
 <!-- tocstop -->
+
 
 ## Introduction
 
