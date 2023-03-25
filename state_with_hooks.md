@@ -1,6 +1,9 @@
 # State with hooks
 
-<https://reactjs.org/docs/hooks-state.html>
+See: 
+
+- [Managing State](https://react.dev/learn/managing-state)
+- [useState API Reference](https://react.dev/reference/react/useState)
 
 ## Table of Contents
 
@@ -21,9 +24,19 @@
 
 ## Introduction
 
-These notes for working with state in functional components using hooks come after the notes in [state.md](https://github.com/jessicarush/react-notes/blob/master/state.md). As such, I'll skip the explanations of what state is and instead focus on how to do the same things with functions and hooks.
+These notes for working with state in functional components using hooks come after the notes in [state.md](state.md). As such, I'll skip the basic explanations of what state is and instead focus on how to do the same things with functions and hooks.
 
-Just one reminder for deciding when something should be state:
+Principles for structuring state: 
+
+1. Group related state. If you always update two or more state variables at the same time, consider merging them into a single state variable.
+2. Avoid contradictions in state. When the state is structured in a way that several pieces of state may contradict and “disagree” with each other, you leave room for mistakes. Try to avoid this.
+3. Avoid redundant state. If you can calculate some information from the component’s props or its existing state variables during rendering, you should not put that information into that component’s state.
+4. Avoid duplication in state. When the same data is duplicated between multiple state variables, or within nested objects, it is difficult to keep them in sync. Reduce duplication when you can.
+5. Avoid deeply nested state. Deeply hierarchical state is not very convenient to update. When possible, prefer to structure state in a flat way.
+
+For examples see [Choosing the State Structure](https://react.dev/learn/choosing-the-state-structure#principles-for-structuring-state).
+
+Questions for deciding when something should be state:
 
 - Does it remain unchanged over time? If so, it isn’t state.
 - Is it passed in from a parent via props? If so, it isn’t state.
