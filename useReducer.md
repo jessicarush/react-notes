@@ -45,12 +45,15 @@ const initialState = {count: 0};
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'increment':
+    case 'increment'{
       return {count: state.count + 1};
-    case 'decrement':
+    }
+    case 'decrement': {
       return {count: state.count - 1};
-    default:
+    }
+    default: {
       throw new Error(`Unhandled action type: ${action.type}`);
+    }
   }
 }
 
@@ -147,15 +150,15 @@ This lets you extract the logic for calculating the initial state outside the re
 
 ## When to use
 
-Most of the time, you are well covered with just `useState()` method, which is built on top of `useReducer()`. But there cases when `useReducer()` is preferable. The old React docs say useReducer is good for *complex state logic* or when *the next state depends on the previous one*.
+Most of the time, you are well covered with just `useState()` method, which is built on top of `useReducer()`. But there cases when `useReducer()` is preferable. The old React docs say useReducer is good for *complex state logic* or when *the next state depends on the previous one*. The new React.dev docs however seem to shift the reasoning: *To reduce complexity and keep all your logic in one easy-to-access place*.
 
-The new React.dev docs however seem to shift the reasoning: *To reduce complexity and keep all your logic in one easy-to-access place*.
-
-Some community comments:
-
-> I use useReducer when I have multiple states that change at the same time or when you have any states that depend on each other.
-
-> Basically use reducer to avoid any situation where you could have multiple useState calls in row.
+> **Comparing useState and useReducer** 
+>
+> - Code size: Generally, with useState you have to write less code upfront. With useReducer, you have to write both a reducer function and dispatch actions. However, useReducer can help cut down on the code if many event handlers modify state in a similar way.
+> - Readability: useState is very easy to read when the state updates are simple. When they get more complex, they can bloat your component’s code and make it difficult to scan. In this case, useReducer lets you cleanly separate the how of update logic from the what happened of event handlers.
+> - Debugging: When you have a bug with useState, it can be difficult to tell where the state was set incorrectly, and why. With useReducer, you can add a console log into your reducer to see every state update, and why it happened (due to which action). If each action is correct, you’ll know that the mistake is in the reducer logic itself. However, you have to step through more code than with useState.
+> - Testing: A reducer is a pure function that doesn’t depend on your component. This means that you can export and test it separately in isolation. While generally it’s best to test components in a more realistic environment, for complex state update logic it can be useful to assert that your reducer returns a particular state for a particular initial state and action.
+> - Personal preference: Some people like reducers, others don’t. That’s okay. It’s a matter of preference. You can always convert between useState and useReducer back and forth: they are equivalent!
 
 ### Next state depends on the previous
 
