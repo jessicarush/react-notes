@@ -320,7 +320,6 @@ export default withLanguageContext(Navbar);
 
 ## In function components (UseContext hook)
 
-
 To create the context provider as a function:
 
 ```javascript
