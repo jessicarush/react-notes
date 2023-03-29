@@ -78,12 +78,44 @@ export default defineConfig({
 });
 ```
 
+## Import SVGs as components
+
+If you want to use SVGs as components in your Vite project:
+
+```jsx
+import { ReactComponent as Logo } from './logo.svg'
+```
+
+Then install `vite-plugin-svgr` as a dev dependency:
+
+```bash
+npm install vite-plugin-svgr --save-dev
+```
+
+vite.config.js 
+```javascript
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import eslint from 'vite-plugin-eslint';
+import svgr from 'vite-plugin-svgr';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    eslint(),
+    svgr({ svgrOptions: { icon: true } })
+  ],
+});
+```
+
 
 ## Differences to note
 
 Vite uses `.jsx` extensions instead of `.js`.
 
 Vite has a [vite.config.js](https://vitejs.dev/config/) file.
+
 
 ## Build 
 
@@ -99,4 +131,4 @@ npm run build
 
 - [Awesome Vite](https://github.com/vitejs/awesome-vite#integrations-with-backends) - A curated list of awesome things related to Vite.js
 - [How to start a React Project in 2023](https://www.robinwieruch.de/react-starter/)
-- [How to migrate from CRA to Vite](https://github.com/nordcloud/pat-frontend-template/blob/master/docs/CRA_MIGRATION_GUIDE.md)
+- [How to migrate from CRA to Vite](https://www.robinwieruch.de/vite-create-react-app/)
