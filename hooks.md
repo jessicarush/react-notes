@@ -29,24 +29,26 @@
 
 ## Introduction
 
-In React, there are basic [built-in hooks](https://reactjs.org/docs/hooks-reference.html):
+In React, there are basic [built-in hooks](https://react.dev/reference/react):
 
 - `useState` for creating stateful values as previously done with `this.state`
-- `useEffect` for replicating lifecycle behavior
+- `useEffect` for replicating lifecycle behavior or synchronizing a component with an external system
 - `useContext` for creating common data that can be accessed throughout the component hierarchy without passing the props down manually to each level
+- `useReducer` lets you add a reducer to your component
+- `useCallback` for caching a function definition between re-renders
+- `useMemo` lets you cache the result of a calculation between re-renders
+- `useRef` lets you reference a value that’s not needed for rendering
+- `useImperativeHandle` lets you customize the handle exposed as a ref
+- `useLayoutEffect` is a version of useEffect that fires before the browser repaints the screen
+- `useDebugValue` lets you add a label to a custom Hook in React DevTools
+- `useId` for generating unique IDs that can be passed to accessibility attributes
+- `useTransition` lets you update the state without blocking the UI
+- `useDeferredValue` lets you defer updating a part of the UI
+- `useSyncExternalStore` lets you subscribe to an external store
 
-Additional built-in hooks:
+And some that are intended for library/framework maintainers:
 
-- `useReducer`
-- `useCallback`
-- `useMemo`
-- `useRef`
-- `useImperativeHandle`
-- `useLayoutEffect`
-- `useDebugValue`
-- `useId`
-- `useTransition`
-- `useDeferredValue`
+- `useInsertionEffect`
 
 
 ## Rules
@@ -62,23 +64,23 @@ Additional built-in hooks:
 
 ## useState
 
-The [useState](https://reactjs.org/docs/hooks-reference.html#usestate) hook returns a stateful value, and a function to update it. See my notes in [state_with_hooks.md](state_with_hooks.md) and the React docs: [Using the State Hook](https://reactjs.org/docs/hooks-state.html).
+The [useState](https://react.dev/reference/react/useState) hook returns a stateful value, and a function to update it. See my notes in [state_with_hooks.md](state_with_hooks.md) and [Manaaging State](https://react.dev/learn/managing-state) in the React docs.
 
 
 ## useContext
 
-Context provides a way to pass data through the component tree without having to pass props down manually at every level. See my notes in [context.md](context.md) and the [useContext api reference](https://reactjs.org/docs/hooks-reference.html#usecontext) (React docs).
+Context provides a way to pass data through the component tree without having to pass props down manually at every level. See my notes in [context.md](context.md), [reducer_and_context.md](reducer_and_context.md) and the [useContext api reference](https://react.dev/reference/react/useContext).
 
 
 ## useEffect
 
-The [Effect Hook](https://reactjs.org/docs/hooks-effect.html) lets you perform *side effects* in function components. If comparing to class component lifecycle methods, you can think of `useEffect` as `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` combined.
+The [Effect Hook](https://react.dev/reference/react/useEffect) lets you perform *side effects* in function components. If comparing to class component lifecycle methods, you can think of `useEffect` as `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` combined.
 
 See also:
 
-- [You might not need an Effect](https://react.dev/learn/you-might-not-need-an-effect)  
 - [life_cycle_methods.md](https://github.com/jessicarush/react-notes/blob/master/life_cycle_methods.md#lifecycle-methods-in-function-components)  
-- [Robin Wieruch's post on useEffect()](https://www.robinwieruch.de/react-useeffect-hook/)  
+- [You might not need an Effect](https://react.dev/learn/you-might-not-need-an-effect)  
+- [Robin Wieruch's post on useEffect](https://www.robinwieruch.de/react-useeffect-hook/)  
 
 For example:
 
@@ -342,7 +344,7 @@ export default Demo;
 
 ## useRef 
 
-[useRef](https://reactjs.org/docs/hooks-reference.html#useref) is a hook that lets you reference a value that’s not needed for rendering. `useRef` returns a mutable ref object whose `.current` property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
+[useRef](https://react.dev/reference/react/useRef) is a hook that lets you reference a value that’s not needed for rendering. `useRef` returns a mutable ref object whose `.current` property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
 
 Essentially, `useRef` is like a “box” that can hold a value in its `.current` property and is handy for keeping any mutable value around. Keep in mind that `useRef` doesn’t notify you when its content changes. Mutating the `.current` property doesn’t cause a re-render. This is why it's useful in the `useEffect` examples above where we need to set a flag to keep track of renders and updates. In fact, if you try to assign a value to a normal variable inside `useEffect`:
 
@@ -420,9 +422,12 @@ export default Form;
 
 ## useReducer
 
-[useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) is an alternative to useState and is usually preferable when you have complex state logic that involves multiple sub-values or when the next state depends on the previous one. 
+[useReducer](https://react.dev/reference/react/useReducer) is an alternative to useState and is usually preferable when you have complex state logic that involves multiple sub-values or when the next state depends on the previous one. 
 
-See [useReducer.md](useReducer.md).
+See:
+
+- [useReducer.md](useReducer.md)
+- [reducer_and_context.md](reducer_and_context.md)
 
 ## useCallback
 
@@ -438,7 +443,8 @@ TODO...
 
 ## useLayoutEffect
 
-TODO...
+[useLayoutEffect](https://react.dev/reference/react/useLayoutEffect) can hurt performance. Prefer `useEffect` when possible.
+
 
 ## useDebugValue
 
@@ -446,7 +452,7 @@ TODO...
 
 ## useId 
 
-New to React 18, `useId` is a hook for generating unique IDs on both the client and server. For example:
+New to React 18, [useId](https://react.dev/reference/react/useId) is a hook for generating unique IDs on both the client and server. For example:
 
 ```jsx
 function Checkbox() {
@@ -495,6 +501,9 @@ Also:
 
 See [concurrent_features.md](concurrent_features.md) for `useTransition` and `useDeferredValue`.
 
+## useSyncExternalStore
+
+TODO...
 
 ## Custom hooks
 
@@ -596,8 +605,5 @@ For another example of custom hooks, see the form handling example in [state_wit
 
 ## Docs references
 
-- [Introduction to hooks](https://reactjs.org/docs/hooks-intro.html)
-- [Built-in hooks](https://reactjs.org/docs/hooks-reference.html)
-- [Rules for hooks](https://reactjs.org/docs/hooks-rules.html)
-- [State hooks](https://reactjs.org/docs/hooks-state.html)
-- [Building Your Own Hooks](https://reactjs.org/docs/hooks-custom.html)
+- [Built-in React Hooks](https://react.dev/reference/react)
+- [Reusing Logic with Custom Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks)
