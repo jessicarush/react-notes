@@ -23,7 +23,6 @@
 
 <!-- tocstop -->
 
-
 ## Introduction
 
 State in a web application can describe when things need to change as a result of an event (clicking something, data changes, etc.). Examples are a logged-in user sees different content from an anonymous user, clicking an 'edit' button could open a modal window, sections could expand or collapse, etc.

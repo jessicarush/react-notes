@@ -20,6 +20,7 @@ Overall, Vite.js is a great choice for both development and production use. Its 
 
 - [Start a new Vite project](#start-a-new-vite-project)
 - [Set up ESlint](#set-up-eslint)
+- [Import SVGs as components](#import-svgs-as-components)
 - [Differences to note](#differences-to-note)
 - [Build](#build)
 - [Resources](#resources)

@@ -9,6 +9,11 @@ See first:
 
 <!-- toc -->
 
+- [Concept](#concept)
+- [Implementation](#implementation)
+
+<!-- tocstop -->
+
 ## Concept 
 
 > Reducers let you consolidate a component’s state update logic. Context lets you pass information deep down to other components. You can combine reducers and context together to manage state of a complex screen.
@@ -16,6 +21,8 @@ See first:
 > With this approach, a parent component with complex state manages it with a reducer. Other components anywhere deep in the tree can read its state via context. They can also dispatch actions to update that state. [Source](https://react.dev/learn/managing-state#scaling-up-with-reducer-and-context)
 
 A reducer helps keep event handlers short and concise. However, the state and dispatch function are defined somewhere near the top. As your app grows you may find yourself explicitly passing these props down to other components deep in the tree (prop drilling). If it's just a few steps, no big deal, but if there's many, you may want to but both the state and dispatch function into context.
+
+## Implementation
 
 Here is how you can combine a reducer with context:
 
