@@ -21,6 +21,7 @@
 - [useDebugValue](#usedebugvalue)
 - [useId](#useid)
 - [useTransition and useDeferredValue](#usetransition-and-usedeferredvalue)
+- [useSyncExternalStore](#usesyncexternalstore)
 - [Custom hooks](#custom-hooks)
   * [Custom hook example: localStorage](#custom-hook-example-localstorage)
 - [Docs references](#docs-references)
@@ -74,13 +75,15 @@ Context provides a way to pass data through the component tree without having to
 
 ## useEffect
 
-The [Effect Hook](https://react.dev/reference/react/useEffect) lets you perform *side effects* in function components. If comparing to class component lifecycle methods, you can think of `useEffect` as `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` combined.
+The [Effect Hook](https://react.dev/reference/react/useEffect) lets you perform *side effects* in function components. Effects let you run some code after rendering and can be used to synchronize your component with a system outside of React.
+
+If comparing to class component lifecycle methods, you can think of `useEffect` as `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` combined.
 
 See also:
 
-- [life_cycle_methods.md](https://github.com/jessicarush/react-notes/blob/master/life_cycle_methods.md#lifecycle-methods-in-function-components)  
 - [You might not need an Effect](https://react.dev/learn/you-might-not-need-an-effect)  
 - [Robin Wieruch's post on useEffect](https://www.robinwieruch.de/react-useeffect-hook/)  
+- [life_cycle_methods.md](https://github.com/jessicarush/react-notes/blob/master/life_cycle_methods.md#lifecycle-methods-in-function-components)  
 
 For example:
 
@@ -344,7 +347,9 @@ export default Demo;
 
 ## useRef 
 
-[useRef](https://react.dev/reference/react/useRef) is a hook that lets you reference a value that’s not needed for rendering. `useRef` returns a mutable ref object whose `.current` property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
+[useRef](https://react.dev/reference/react/useRef) is used when you want a component to “remember” some information, but you don’t want that information to trigger new renders
+
+`useRef` returns a mutable ref object whose `.current` property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
 
 Essentially, `useRef` is like a “box” that can hold a value in its `.current` property and is handy for keeping any mutable value around. Keep in mind that `useRef` doesn’t notify you when its content changes. Mutating the `.current` property doesn’t cause a re-render. This is why it's useful in the `useEffect` examples above where we need to set a flag to keep track of renders and updates. In fact, if you try to assign a value to a normal variable inside `useEffect`:
 
@@ -419,6 +424,57 @@ const Form = (props) => {
 export default Form;
 ```
 
+And a debounced button demo using useRef:
+
+```javascript
+import { useState, useRef } from 'react';
+
+function DebouncedButton({ onClick, children }) {
+  const timeoutID = useRef(null);
+
+  return (
+    <button onClick={() => {
+      clearTimeout(timeoutID.current);
+      timeoutID.current = setTimeout(() => {
+        onClick();
+      }, 1000);
+    }}>
+      {children}
+    </button>
+  );
+}
+
+function Demo() {
+  return (
+    <>
+      <DebouncedButton
+        onClick={() => alert('Spaceship launched!')}
+      >
+        Launch the spaceship
+      </DebouncedButton>
+      <DebouncedButton
+        onClick={() => alert('Soup boiled!')}
+      >
+        Boil the soup
+      </DebouncedButton>
+    </>
+  )
+}
+
+export default Demo;
+```
+
+When to use refs:
+
+- Storing timeout IDs
+- Storing and manipulating DOM elements, which we cover on the next page
+- Storing other objects that aren’t necessary to calculate the JSX.
+
+See also:
+
+- [Referencing Values with Refs](https://react.dev/learn/referencing-values-with-refs)
+- [Manipulating the DOM with refs](https://react.dev/learn/escape-hatches#manipulating-the-dom-with-refs)
+- examples/useref_demo 
 
 ## useReducer
 
