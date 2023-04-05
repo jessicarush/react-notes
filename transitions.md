@@ -284,6 +284,14 @@ const Modal = forwardRef(function Modal(props, ref) {
   );
 });
 
+const Wrapper = styled.div`
+  // ...
+`;
+
+const Content = styled.div`
+  // ...
+`;
+
 export default Modal;
 ```
 
