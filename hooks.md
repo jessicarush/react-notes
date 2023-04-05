@@ -347,11 +347,14 @@ export default Demo;
 
 ## useRef 
 
-[useRef](https://react.dev/reference/react/useRef) is used when you want a component to “remember” some information, but you don’t want that information to trigger new renders
+[useRef](https://react.dev/reference/react/useRef) is used when:
+
+1. You want a component to “remember” some information that doesn't trigger re-renders
+2. You want to manipulate a DOM element
 
 `useRef` returns a mutable ref object whose `.current` property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
 
-Essentially, `useRef` is like a “box” that can hold a value in its `.current` property and is handy for keeping any mutable value around. Keep in mind that `useRef` doesn’t notify you when its content changes. Mutating the `.current` property doesn’t cause a re-render. This is why it's useful in the `useEffect` examples above where we need to set a flag to keep track of renders and updates. In fact, if you try to assign a value to a normal variable inside `useEffect`:
+Essentially, `useRef` is like a “box” that can hold a value in its `.current` property and is handy for keeping any mutable value around. `useRef` doesn’t notify you when its content changes... mutating the `.current` property doesn’t cause a re-render. This is why it's useful in the `useEffect` examples above where we need to set a flag to keep track of renders and updates. In fact, if you try to assign a value to a normal variable inside `useEffect`:
 
 > Assignments to the 'didMount' variable from inside React Hook useEffect will be lost after each render. To preserve the value over time, store it in a useRef Hook and keep the mutable value in the '.current' property. Otherwise, you can move this variable directly inside useEffect.
 
@@ -361,7 +364,7 @@ By using a ref, you ensure that:
 - Changing it does not trigger a re-render (unlike state variables, which trigger a re-render).
 - The information is local to each copy of your component (unlike the variables outside, which are shared).
 
-Changing a ref does not trigger a re-render, so refs are not appropriate for storing information that you want to display on the screen. Use state for that instead. 
+Since changing a ref does not trigger a re-render, they are not appropriate for storing information that you want to display on the screen. Use state for that instead. 
 
 Note: Do not read or write `ref.current` during rendering. For example: 
 
@@ -408,6 +411,7 @@ const Form = (props) => {
   React.useEffect(() => {
     console.log(inputRef.current);
     inputRef.current.focus();
+    inputRef.current.scrollIntoView();
   }, []);
 
   return (
@@ -424,7 +428,23 @@ const Form = (props) => {
 export default Form;
 ```
 
-And a debounced button demo using useRef:
+Note that a ref can be passed to a browser element using the `ref` attribute. However, if you try to pass a ref to your own component, it will not work. You need to use `.forwardRef` to pass the ref into the component then apply the ref to a browser element within. See [transitions.md](transitions.md) for an example.
+
+In a nutshell:
+
+```javascript
+<MyInput ref={inputRef} />
+```
+
+MyInput:
+
+```javascript
+const MyInput = forwardRef((props, ref) => {
+  return <input {...props} ref={ref} />;
+});
+```
+
+For an example of refs used to hold data not required for rendering, here's a debounced button demo using useRef:
 
 ```javascript
 import { useState, useRef } from 'react';
@@ -464,17 +484,21 @@ function Demo() {
 export default Demo;
 ```
 
+> Refs are an escape hatch. You should only use them when you have to “step outside React”. Common examples of this include managing focus, scroll position, measuring or calling browser APIs that React does not expose. [Source](https://react.dev/learn/manipulating-the-dom-with-refs#best-practices-for-dom-manipulation-with-refs)
+
 When to use refs:
 
 - Storing timeout IDs
-- Storing and manipulating DOM elements, which we cover on the next page
+- Storing and manipulating DOM elements
 - Storing other objects that aren’t necessary to calculate the JSX.
 
 See also:
 
 - [Referencing Values with Refs](https://react.dev/learn/referencing-values-with-refs)
 - [Manipulating the DOM with refs](https://react.dev/learn/escape-hatches#manipulating-the-dom-with-refs)
-- examples/useref_demo 
+- [How to manage a list of refs using a ref callback](https://react.dev/learn/manipulating-the-dom-with-refs#how-to-manage-a-list-of-refs-using-a-ref-callback)
+- examples/useref_timeout_demo 
+- examples/useref_scrollintoview_demo
 
 ## useReducer
 
@@ -495,7 +519,8 @@ TODO...
 
 ## useImperativeHandle
 
-TODO...
+[useImperativeHandle](https://react.dev/reference/react/useImperativeHandle) is a React Hook that lets you customize the handle exposed as a ref. See [Exposing a subset of the API with an imperative handle](https://react.dev/learn/manipulating-the-dom-with-refs#exposing-a-subset-of-the-api-with-an-imperative-handle).
+
 
 ## useLayoutEffect
 
