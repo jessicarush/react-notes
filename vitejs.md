@@ -79,6 +79,35 @@ export default defineConfig({
 });
 ```
 
+## Working with images 
+
+Images can be placed in the public directory and referenced as normal. If you create a new folder called `img` inside your public dir, you would reference those images like:
+
+```javascript
+<img
+  src="/img/img1.svg"
+  alt="placeholder 1"
+/>
+```
+
+Note: you should always reference public assets using root absolute path - for example, `public/icon.png` should be referenced in source code as `/icon.png`. Assets in public cannot be imported from JavaScript. When the dist build in created, those images will be left as-is in the img folder.
+
+You can also import images from the `src` directory. In my case, `src/img/`:
+
+```javascript
+import img1 from './img/img1.svg';
+
+// ...
+
+<img
+  src={img1}
+  alt="placeholder 1"
+/>
+```
+
+When the dist is build, all images will be renamed and placed flat in the assets dir.
+
+
 ## Import SVGs as components
 
 If you want to use SVGs as components in your Vite project:
