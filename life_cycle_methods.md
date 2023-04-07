@@ -312,7 +312,7 @@ In functional components, the `useEffect()` hook can be used to replicate lifecy
 
 > If you’re familiar with React class lifecycle methods, you can think of useEffect Hook as componentDidMount, componentDidUpdate, and componentWillUnmount combined.
 
-See [Using the Effect hook](https://reactjs.org/docs/hooks-effect.html) in the React docs.
+See [Using the Effect hook](https://react.dev/reference/react/useEffect) in the React docs.
 
 ```javascript
 import React, { useEffect } from 'react';
