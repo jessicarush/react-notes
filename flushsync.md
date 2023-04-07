@@ -6,6 +6,11 @@ Call `flushSync` to force React to flush any pending work and update the DOM syn
 
 <!-- toc -->
 
+- [Example](#example)
+- [Resources](#resources)
+
+<!-- tocstop -->
+
 ## Example 
 
 In this example we want to add a new list item then scroll that item into view. Without `flushSync`
