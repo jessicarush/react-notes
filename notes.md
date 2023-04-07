@@ -174,8 +174,9 @@ Also mentioned: (FastApi a python web server)
 
 - react-router can be used to restrict access to routes to authenticated users <https://github.com/remix-run/react-router/tree/dev/examples/auth>
 - Firebase BaaS has some pre-built options
+- Supabase (open source Firebase alternative.)
 - ExpressJS can be used <https://blog.logrocket.com/how-to-secure-react-app-login-authentication/>
-- use an authentication service like Auth0
+- use an authentication service like Auth0 (I read it can get expensive)
 
 
 ### Demonstrate email from React to Flask
