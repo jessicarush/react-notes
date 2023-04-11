@@ -452,9 +452,16 @@ function Demo() {
 export default Demo;
 ```
 
-> :star: If you want to abort the fetch call in the event that the component unmounts before the fetch has completed, you can implement a "cleanup" function using the AbortController Web API and `useEffect`. See the `useEffect` section in [hooks.md](hooks.md#fetching-data).
+To pass request args along with the get request see: *examples/axios_demo* (RandomColor.jsx).
+To send a post request see: *examples/react_with_flask_api*
+
+## AbortController
+
+If you want to [abort the fetch call](https://axios-http.com/docs/cancellation) in the event that the component unmounts before the fetch has completed, you can implement a "cleanup" function using the AbortController Web API and `useEffect`. See the `useEffect` section in [hooks.md](hooks.md#fetching-data). 
+
+You can also pass set a timeout signal along with request so it automatically aborts after a given amount of time. Both of these are demonstrated in examples/axios_demo.
 
 See:
 
-- examples/axios_demo
-- examples/react_with_flask_api
+- *examples/axios_demo*
+- *examples/react_with_flask_api*
