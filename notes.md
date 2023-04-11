@@ -76,9 +76,9 @@ This article: [Bad Habits of Mid-Level React Developers](https://dev.to/srmagura
 
 There is a new way to render your app using `createRoot` which is from `react-dom/client`. 
 
-Note that in strict dev mode, react calls some of the code twice. This will result in double console logs and API calls. See: [React Docs](https://reactjs.org/blog/2022/03/29/react-v18.html#new-strict-mode-behaviors), [Hacker News](https://news.ycombinator.com/item?id=30976040)
+Note that in strict dev mode, react calls some of the code twice. This will result in double console logs and API calls. It is a mechanism to help you verify that you have implemented proper "cleanup" if needed. See: [Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed).
 
-This apparently won't happen in the production build. You can disable strict mode temporarily to turn it off.
+This behaviour won't happen in the production build. You can disable strict mode temporarily to turn it off.
 
 
 ```jsx
