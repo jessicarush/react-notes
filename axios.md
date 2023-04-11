@@ -452,4 +452,6 @@ function Demo() {
 export default Demo;
 ```
 
-See also: examlples/react_with_flask_api
+> :star: If you want to abort the fetch call in the event that the component unmounts before the fetch has completed, you can implement a "cleanup" function using the AbortController Web API. See the `useEffect` section in [hooks.md](hooks.md#fetching-data).
+
+See also: examples/react_with_flask_api
