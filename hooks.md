@@ -10,13 +10,18 @@
 - [useContext](#usecontext)
 - [useEffect](#useeffect)
   * [UseEffect API example](#useeffect-api-example)
-  * [useEffect for setState callbacks](#useeffect-for-setstate-callbacks)
   * [used with a loading indicator](#used-with-a-loading-indicator)
+  * [Add a cleanup function if needed](#add-a-cleanup-function-if-needed)
+  * [Common Effect patterns](#common-effect-patterns)
+    + [Controlling non-React widgets](#controlling-non-react-widgets)
+    + [Subscribing to events](#subscribing-to-events)
+    + [Triggering animations](#triggering-animations)
+    + [Fetching data](#fetching-data)
 - [useRef](#useref)
+- [useImperativeHandle](#useimperativehandle)
 - [useReducer](#usereducer)
 - [useCallback](#usecallback)
 - [useMemo](#usememo)
-- [useImperativeHandle](#useimperativehandle)
 - [useLayoutEffect](#uselayouteffect)
 - [useDebugValue](#usedebugvalue)
 - [useId](#useid)
@@ -33,13 +38,13 @@
 In React, there are basic [built-in hooks](https://react.dev/reference/react):
 
 - `useState` for creating stateful values as previously done with `this.state`
-- `useEffect` for replicating lifecycle behavior or synchronizing a component with an external system
 - `useContext` for creating common data that can be accessed throughout the component hierarchy without passing the props down manually to each level
+- `useEffect` for replicating lifecycle behavior or synchronizing a component with an external system
+- `useRef` lets you reference a value that’s not needed for rendering
+- `useImperativeHandle` lets you customize the handle exposed as a ref
 - `useReducer` lets you add a reducer to your component
 - `useCallback` for caching a function definition between re-renders
 - `useMemo` lets you cache the result of a calculation between re-renders
-- `useRef` lets you reference a value that’s not needed for rendering
-- `useImperativeHandle` lets you customize the handle exposed as a ref
 - `useLayoutEffect` is a version of useEffect that fires before the browser repaints the screen
 - `useDebugValue` lets you add a label to a custom Hook in React DevTools
 - `useId` for generating unique IDs that can be passed to accessibility attributes
@@ -65,7 +70,7 @@ And some that are intended for library/framework maintainers:
 
 ## useState
 
-The [useState](https://react.dev/reference/react/useState) hook returns a stateful value, and a function to update it. See my notes in [state_with_hooks.md](state_with_hooks.md) and [Manaaging State](https://react.dev/learn/managing-state) in the React docs.
+The [useState](https://react.dev/reference/react/useState) hook returns a stateful value, and a function to update it. See my notes in [state_with_hooks.md](state_with_hooks.md) and [Managing State](https://react.dev/learn/managing-state) in the React docs.
 
 
 ## useContext
@@ -75,7 +80,9 @@ Context provides a way to pass data through the component tree without having to
 
 ## useEffect
 
-The [Effect Hook](https://react.dev/reference/react/useEffect) lets you perform *side effects* in function components. Effects let you run some code after rendering and can be used to synchronize your component with a system outside of React.
+The [Effect Hook](https://react.dev/reference/react/useEffect) lets you perform *side effects* in function components. Effects let you run some code **after rendering** and can be used to synchronize your component with a system outside of React.
+
+> Effects let you specify side effects that are caused by rendering itself, rather than by a particular event. Imagine a ChatRoom component. Sending a message in the chat is an event because it is directly caused by the user clicking a specific button. However, setting up a server connection is an Effect because it should happen no matter which interaction caused the component to appear. Effects run at the end of a commit (to the DOM) after the screen updates. This is a good time to synchronize the React components with some external system (like network or a third-party library).
 
 If comparing to class component lifecycle methods, you can think of `useEffect` as `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` combined.
 
@@ -184,7 +191,7 @@ function Example(props) {
     if (updatedOnce.current) {
       return
     } else if (didMount.current) {
-      console.log('I will run only when count update the first time');
+      console.log('I will run only when count updates the first time');
       updatedOnce.current = true;
     } else {
       didMount.current = true;
@@ -230,7 +237,7 @@ export default Demo;
 
 Note that in the above example, if I didn't pass the empty array argument, the `setZen()` function would create and endless looping trigger of `useEffect` because, without that second arg, it gets called anytime there's an update, in this case to a state value.
 
-If you want to use async/await, you need to define a function inside `useEffect`:
+If you want to use **async/await**, you need to define a function inside `useEffect`:
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -258,7 +265,7 @@ function Demo() {
 export default Demo;
 ```
 
-To be thorough... here's with the try/catch included:
+To be thorough... here's with the **try/catch** included:
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -288,22 +295,6 @@ function Demo() {
 }
 
 export default Demo;
-```
-
-### useEffect for setState callbacks
-
-In class components you can optionally pass a callback to run after the state has been updated with `this.setState`. With react hooks, you can use `useEffect()` to accomplish the same thing. For example:
-
-```javascript
-const [counter, setCounter] = useState(0);
-
-const doSomething = () => {
-  setCounter(123);
-}
-
-useEffect(() => {
-  console.log('I will run on initial render and whenever counter gets updated.', counter);
-}, [counter]);
 ```
 
 ### used with a loading indicator
@@ -343,6 +334,157 @@ function Demo() {
 }
 
 export default Demo;
+```
+
+### Add a cleanup function if needed
+
+> Some Effects need to specify how to stop, undo, or clean up whatever they were doing. For example, “connect” needs “disconnect”, “subscribe” needs “unsubscribe”, and “fetch” needs either “cancel” or “ignore”. [Source](https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed)
+
+Consider a ChatRoom component that needs to connect to the chat server when it appears.
+
+```javascript
+useEffect(() => {
+  const connection = createConnection();
+  connection.connect();
+}, []);
+```
+
+Imagine the ChatRoom component is a part of a larger app with many different screens. If the user navigates to another screen then comes back to teh ChatRoom, it will create a second connection, since the first was never destroyed. As the user navigates across the app, the connections would keep piling up. Bugs like this are easy to miss without extensive manual testing. To help you spot them quickly, in development React remounts every component once immediately after its initial mount.
+
+To fix the issue, return a cleanup function from your Effect:
+
+```javascript
+useEffect(() => {
+  const connection = createConnection();
+  connection.connect();
+  return () => {
+    connection.disconnect();
+  };
+  }, []);
+```
+
+React will call your cleanup function each time before the Effect runs again, and one final time when the component unmounts (gets removed). 
+
+### Common Effect patterns 
+
+#### Controlling non-React widgets 
+
+Sometimes you need to add UI widgets that aren’t written to React.
+
+```javascript
+useEffect(() => {
+  const map = mapRef.current;
+  map.setZoomLevel(zoomLevel);
+}, [zoomLevel]);
+```
+
+Note that there is no cleanup needed in this case. In development, React will call the Effect twice, but this is not a problem because calling setZoomLevel twice with the same value does not do anything.
+
+Some APIs may not allow you to call them twice in a row. For example, the `showModal` method of the built-in `<dialog>` element throws if you call it twice. Implement the cleanup function and make it close the dialog:
+
+```javascript
+useEffect(() => {
+  const dialog = dialogRef.current;
+  dialog.showModal();
+  return () => dialog.close();
+}, []);
+```
+
+#### Subscribing to events 
+
+If your Effect subscribes to something, the cleanup function should unsubscribe:
+
+```javascript
+useEffect(() => {
+  function handleScroll(e) {
+    console.log(window.scrollX, window.scrollY);
+  }
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+```
+
+In development, your Effect will call `addEventListener()`, then immediately `removeEventListener()`, and then `addEventListener()` again with the same handler. So there would be only one active subscription (handler) at a time.
+
+#### Triggering animations 
+
+If your Effect animates something in, the cleanup function should reset the animation to the initial values:
+
+```javascript
+useEffect(() => {
+  const node = ref.current;
+  node.style.opacity = 1; // Trigger the animation
+  return () => {
+    node.style.opacity = 0; // Reset to the initial value
+  };
+}, []);
+```
+
+#### Fetching data
+
+If your Effect fetches something, the cleanup function should either abort the fetch or ignore its result:
+
+```javascript
+useEffect(() => {
+  let ignore = false;
+
+  async function startFetching() {
+    const json = await fetchTodos(userId);
+    if (!ignore) {
+      setTodos(json);
+    }
+  }
+
+  startFetching();
+
+  return () => {
+    ignore = true;
+  };
+}, [userId]);
+```
+
+Here's an example of the [AbortController API](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) implemented through [axios](https://axios-http.com/docs/cancellation).
+
+```jsx
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
+function GithubZen(props) {
+  const [zen, setZen] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const controller = new AbortController(); // create a controller
+
+    async function getZen() {
+      console.log('fetching...');
+      const config = { signal: controller.signal } // pass config to axios.get()
+      try {
+        let response = await axios.get('https://api.github.com/zen', config);
+        setZen(response.data);
+      } catch (err) {
+        console.log(`Something went wrong: ${err}`);
+      }
+      setIsLoading(false);
+    }
+    getZen();
+
+    // Return a "cleanup" function that cancels the fetch call.
+    return () => {
+      console.log('aborting...');
+      controller.abort() // Abort fetch!
+    }
+  }, []);
+
+  return (
+    <div>
+      { isLoading ? 'loading...' : zen }
+    </div>
+  );
+}
+
+export default GithubZen;
 ```
 
 ## useRef 
@@ -500,6 +642,12 @@ See also:
 - examples/useref_timeout_demo 
 - examples/useref_scrollintoview_demo
 
+
+## useImperativeHandle
+
+[useImperativeHandle](https://react.dev/reference/react/useImperativeHandle) is a React Hook that lets you customize the handle exposed as a ref. See [Exposing a subset of the API with an imperative handle](https://react.dev/learn/manipulating-the-dom-with-refs#exposing-a-subset-of-the-api-with-an-imperative-handle).
+
+
 ## useReducer
 
 [useReducer](https://react.dev/reference/react/useReducer) is an alternative to useState and is usually preferable when you have complex state logic that involves multiple sub-values or when the next state depends on the previous one. 
@@ -516,10 +664,6 @@ TODO...
 ## useMemo
 
 TODO...
-
-## useImperativeHandle
-
-[useImperativeHandle](https://react.dev/reference/react/useImperativeHandle) is a React Hook that lets you customize the handle exposed as a ref. See [Exposing a subset of the API with an imperative handle](https://react.dev/learn/manipulating-the-dom-with-refs#exposing-a-subset-of-the-api-with-an-imperative-handle).
 
 
 ## useLayoutEffect
@@ -637,24 +781,20 @@ export default Demo;
 This custom hook will automatically update localStorage whenever a state value changes. When initializing the state value, it will check first to see if there is a local storage item.
 
 ```javascript
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 function useLocalStorage(key, defaultValue) {
-  // Set up state
+  const itemKey = useRef(key);
   const [state, setState] = useState(() => {
     // Check if anything exists in localStorage, if not, use defaultValue
-    let value = window.localStorage.getItem(key);
+    let value = window.localStorage.getItem(itemKey);
     return value ? JSON.parse(value) : defaultValue;
   });
 
   // update localStorage when state changes
-  // Note that we also hve to pass they key into the dependency array. 
-  // Without it, the side-effect may run with an outdated key (also called stale)
-  // if the key changed between renders.
   useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(state));
-  }, [state, key]);
-
+    window.localStorage.setItem(itemKey, JSON.stringify(state));
+  }, [state]);
   // return state value and a function to update it
   return [state, setState];
 }
