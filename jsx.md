@@ -1,5 +1,7 @@
 # JSX
 
+> :warning: When I started learning React, it was all class components. As a result, most of the examples here use class components. I have left them in tact in case I ever have to deal with legacy code. That being said, the concepts are basically the same and when necessary, I've added function component examples as well and/or links to other notes.
+
 ## Table of Contents
 
 <!-- toc -->
@@ -16,6 +18,7 @@
   * [Loops](#loops)
 - [Keys](#keys)
   * [uuid](#uuid)
+  * [Keys identify components as being unique](#keys-identify-components-as-being-unique)
 - [Breaking code into chunks](#breaking-code-into-chunks)
 - [Conditionally render content](#conditionally-render-content)
 - [React Fragments](#react-fragments)
@@ -268,7 +271,7 @@ Note that with the above, you'll get a **Warning** in the console that reads: `W
 
 The reason for this is...
 
-> Keys help React identify which items have changed, are added, or are removed. Keys should be given to the elements inside the array to give the elements a stable identity
+> Keys help React identify which items have changed, are added, or are removed. Keys should be given to the elements inside the array to give the elements a stable identity.
 
 Using the example above, the solution is:
 
@@ -276,7 +279,7 @@ Using the example above, the solution is:
 { msgs.map(m => <li key={m.id}>{m.text}</li>) }
 ```
 
-Note that this seems to happen as a result of using `map()`. In the following example I received the same warning:
+Note that this will always be recommended when using `map()` to generate jsx DOM elements. In the following example I received the same warning:
 
 ```javascript
 <div className="Pokedex">
@@ -313,11 +316,9 @@ const todoItems = todos.map((todo, index) => (
 ));
 ```
 
-> We don’t recommend using indexes for keys if the order of items may change. This can negatively impact performance and may cause issues with component state. [Source](https://reactjs.org/docs/lists-and-keys.html#keys)
+> You might be tempted to use an item’s index in the array as its key. In fact, that’s what React will use if you don’t specify a key at all. But the order in which you render items will change over time if an item is inserted, deleted, or if the array gets reordered. Index as a key often leads to subtle and confusing bugs. [Source](https://react.dev/learn/rendering-lists#where-to-get-your-key)
 
 Instead, we can use an external library to help: [uuid](https://www.npmjs.com/package/uuid)
-
-First you would need to install it:
 
 ```bash
 npm install uuid
@@ -342,7 +343,106 @@ const todoItems = todos.map(todo => (
 ));
 ```
 
-Note that the act of installing and importing a module like this assumes that you are using a tool like [create-react-app](create_react_app.md) or [webpack](app_layout_advanced.md). Specifically, to install, you would need a `package.json` and to use `import`, you would need to set the `<script>` element's attribute `type="module"`. Since React apps need the `type` attribute to be set to `text/jsx`, we use one of the aforementioned tools to sort it out.
+Note that the act of installing and importing a module like this assumes that you are using a tool like [create-react-app](create_react_app.md) or [vite](vitejs.md). Specifically, to install, you would need a `package.json` and to use `import`, you would need to set the `<script>` element's attribute `type="module"`. Since React apps need the `type` attribute to be set to `text/jsx`, we use one of the aforementioned tools to sort it out.
+
+
+### Keys identify components as being unique
+
+Note that when you pass a prop to component, if that prop changes, anywhere that prop is being used will be updated but any other state values in that component will not be affected. For example, consider [this situation from the React.dev docs](https://react.dev/learn/you-might-not-need-an-effect#resetting-all-state-when-a-prop-changes):
+
+```javascript
+import { useState } from "react";
+
+function ProfilePage({ userId }) {
+  const [comment, setComment] = useState('');
+
+  return (
+     <div>
+       <p>userId: {userId}</p>
+       <p>comment: {comment}</p>
+       <input type="text" value={comment} onChange={e => setComment(e.target.value)}/>
+     </div>
+  );
+}
+
+export default ProfilePage;
+```
+
+I have a `userId` prop passed down from the parent component and I have the ability to add a comment. If the `userId` prop changes, the `userId` being displayed will change, but the comment state will remain untouched. You can demonstrate this by passing in a new `userId`: 
+
+```javascript
+// App.js
+import { useState } from 'react';
+import ProfilePage from './ProfilePage';
+import './App.css';
+
+function App() {
+  const [userId, setUserId] = useState('1');
+
+  return (
+    <div className="App">
+      <ProfilePage userId={userId} />
+      <button onClick={() => setUserId('1')}>go to userid 1</button>
+      <button onClick={() => setUserId('2')}>go to userid 2</button>
+    </div>
+  );
+}
+
+export default App;
+```
+
+I we want the `comment` state to reset when the `userId` changes, we need to tell React that each `ProfilePage` is conceptually a different profile by giving it an explicit key. 
+
+```javascript
+// App.js
+import { useState } from 'react';
+import ProfilePage from './ProfilePage';
+import './App.css';
+
+function App() {
+  const [userId, setUserId] = useState('1');
+
+  return (
+    <div className="App">
+      {/* Now whenever userId changes, the component will re-render */} 
+      <ProfilePage userId={userId} key={userId} />
+      <button onClick={() => setUserId('1')}>go to userid 1</button>
+      <button onClick={() => setUserId('2')}>go to userid 2</button>
+    </div>
+  );
+}
+
+export default App;
+```
+
+> Normally, React preserves the state when the same component is rendered in the same spot. By passing userId as a key to the Profile component, you’re asking React to treat two Profile components with different userId as two different components that should not share any state. Whenever the key (which you’ve set to userId) changes, React will recreate the DOM and reset the state of the Profile component and all of its children. Now the comment field will clear out automatically when switching between users.
+
+If you did have some state elements that you DID want to retain between users, you would instead create a new component inside `ProfilePage` that contains the elements you want to reset and set a `key={userId}` on that one.
+
+```javascript
+import { useState } from "react";
+
+function ProfilePage({ userId }) {
+  return (
+     <div>
+       <Profile userId={userId} key={userId} />
+     </div>
+  );
+}
+
+function Profile({ userId }) {
+  const [comment, setComment] = useState('');
+  return (
+     <div>
+       <p>userId: {userId}</p>
+       <p>comment: {comment}</p>
+       <input type="text" value={comment} onChange={e => setComment(e.target.value)}/>
+     </div>
+  );
+}
+
+export default ProfilePage;
+```
 
 
 ## Breaking code into chunks
