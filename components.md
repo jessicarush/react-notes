@@ -270,7 +270,7 @@ See <https://reactjs.org/docs/hooks-state.html> for a very good comparison betwe
 
 See [state_with_hooks.md](https://github.com/jessicarush/react-notes/blob/master/state_with_hooks.md) for my notes.
 
-The `useEffect()` hook can be used to replicate lifecycle behavior. See: [hooks.md](hooks.md).
+The `useEffect()` hook can be used to replicate lifecycle behavior. See: [effects.md](effects.md).
 
 ```javascript
 import React, { useEffect, useState } from 'react';

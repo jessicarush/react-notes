@@ -400,7 +400,7 @@ useEffect(() => {
 }, [counter]);
 ```
 
-Read more about `useEffect()` in [hooks.md](hooks.md).
+Read more about `useEffect()` in [effects.md](effects.md).
 
 
 ## Filtering Example
