@@ -91,7 +91,7 @@ Images can be placed in the public directory and referenced as normal. If you cr
 />
 ```
 
-Note: you should always reference public assets using root absolute path - for example, `public/icon.png` should be referenced in source code as `/icon.png`. Assets in public cannot be imported from JavaScript. When the dist build in created, those images will be left as-is in the img folder.
+Note: you should always reference public assets using root absolute path - for example, `public/icon.png` should be referenced in source code as `/icon.png`. Assets in public cannot be imported from JavaScript. When the dist build is created, those images will be left as-is in the img folder.
 
 You can also import images from the `src` directory. In my case, `src/img/`:
 
@@ -106,7 +106,7 @@ import img1 from './img/img1.svg';
 />
 ```
 
-When the dist is build, all images will be renamed and placed flat in the assets dir.
+When the dist is built, all images will be renamed and placed flat in the assets dir.
 
 
 ## Import SVGs as components
