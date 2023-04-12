@@ -1,5 +1,7 @@
 # React Lifecycle Methods
 
+> :warning: Lifecycle Methods are a class component thing. You can achieve similar effects in function components with the useEffect() hook. See [effects.md](effects.md)
+
 ## Table of Contents
 
 <!-- toc -->

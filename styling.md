@@ -1,5 +1,7 @@
 # Styling React Components
 
+> :warning: When I started learning React, it was all class components. As a result, some of the examples here use class components. I have left them in tact in case I ever have to deal with legacy code. That being said, the concepts are basically the same and when necessary, I've added function component examples as well and/or links to other notes.
+
 ## Table of Contents
 
 <!-- toc -->
