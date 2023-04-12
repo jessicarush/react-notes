@@ -13,6 +13,7 @@
 - [Example - Using an async function](#example---using-an-async-function)
 - [Multiple requests](#multiple-requests)
 - [axios in functional components](#axios-in-functional-components)
+- [AbortController](#abortcontroller)
 
 <!-- tocstop -->
 
@@ -395,7 +396,7 @@ let [someResult, anotherResult] = await Promise.all([
 
 ## axios in functional components
 
-See the `useEffect` section in [hooks.md](hooks.md).
+See the `UseEffect API example` section in [effects.md](effects.md).
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -457,7 +458,7 @@ To send a post request see: *examples/react_with_flask_api*
 
 ## AbortController
 
-If you want to [abort the fetch call](https://axios-http.com/docs/cancellation) in the event that the component unmounts before the fetch has completed, you can implement a "cleanup" function using the AbortController Web API and `useEffect`. See the `useEffect` section in [hooks.md](hooks.md#fetching-data). 
+If you want to [abort the fetch call](https://axios-http.com/docs/cancellation) in the event that the component unmounts before the fetch has completed, you can implement a "cleanup" function using the AbortController Web API and `Fetching data`. See the `Fetching data` section in [effects.md](effects.md#fetching-data). 
 
 You can also pass set a timeout signal along with request so it automatically aborts after a given amount of time. Both of these are demonstrated in examples/axios_demo.
 
