@@ -348,9 +348,29 @@ Also:
 
 See [concurrent_features.md](concurrent_features.md) for `useTransition` and `useDeferredValue`.
 
+
 ## useSyncExternalStore
 
+`useSyncExternalStore` is a hook that's specifically designed for subscribing to an external store/value. Most components will only read data from props, state, and context. However, sometimes a component needs to read some data from some store outside of React that changes over time. This includes:
+
+- Third-party state management libraries that hold state outside of React.
+- Browser APIs that expose a mutable value and events to subscribe to its changes.
+
+To see an example using a browser API, see *Subscribing to an external store* in [effects.md](effects.md#subscribing-to-an-external-store).
+
+```
+useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?)
+```
+
 TODO...
+
+Call useSyncExternalStore at the top level of your component to read a value from an external data store.
+
+
+
+
+
+
 
 ## Custom hooks
 
