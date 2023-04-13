@@ -17,18 +17,21 @@ The [Effect Hook](https://react.dev/reference/react/useEffect) lets you perform 
     + [Subscribing to events](#subscribing-to-events)
     + [Triggering animations](#triggering-animations)
     + [Fetching data](#fetching-data)
-- [When NOT to useEffect](#when-not-to-useeffect)
+- [When to not use useEffect](#when-to-not-use-useeffect)
   * [Initializing the application](#initializing-the-application)
   * [To transform data for rendering](#to-transform-data-for-rendering)
   * [To handle user events](#to-handle-user-events)
   * [To reset state when a prop changes](#to-reset-state-when-a-prop-changes)
   * [To adjust some state when a prop changes](#to-adjust-some-state-when-a-prop-changes)
+  * [Subscribing to an external store](#subscribing-to-an-external-store)
+- [Final thoughts](#final-thoughts)
+- [Reference](#reference)
 
 <!-- tocstop -->
 
 ## Effects as lifecycle methods
 
-If comparing to class component lifecycle methods, you can think of `useEffect` as `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` combined.
+If comparing to class component lifecycle methods, `useEffect` can be used to simulate `componentDidMount`, `componentDidUpdate` and `componentWillUnmount` but it is not a lifecycle method, as in it does not follow a components lifecycle but has its own synchronization cycle. See [Lifecycle of Reactive Effects](https://react.dev/learn/lifecycle-of-reactive-effects).
 
 See also:
 
@@ -240,7 +243,7 @@ function Demo() {
 export default Demo;
 ```
 
-And finally, with a loading indicator:
+And finally, with a **loading** indicator:
 
 ```javascript
 import React, { useState, useEffect } from 'react';
@@ -338,6 +341,8 @@ useEffect(() => {
 
 #### Subscribing to events 
 
+> "Subscribing to events" typically refers to the process of registering a component as a listener for a specific event emitted by some other part of the application (e.g., a DOM element, a WebSocket connection, or a custom event emitter). This involves using a function like addEventListener() to register the component as a listener for the event, and providing a callback function that will be called when the event occurs.
+
 If your Effect subscribes to something, the cleanup function should unsubscribe:
 
 ```javascript
@@ -368,7 +373,7 @@ useEffect(() => {
 
 #### Fetching data
 
-If your Effect fetches something, the cleanup function should either abort the fetch or ignore its result:
+If your Effect fetches something, the cleanup function should either **abort** the fetch or **ignore** its result:
 
 ```javascript
 useEffect(() => {
@@ -389,7 +394,9 @@ useEffect(() => {
 }, [userId]);
 ```
 
-Here's an example of the [AbortController API](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) implemented through [axios](https://axios-http.com/docs/cancellation).
+See *hooks/usefetch* for a functioning example using the `fetch()` API.
+
+Here's an example of the [AbortController API](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) implemented with [axios](https://axios-http.com/docs/cancellation):
 
 ```jsx
 import { useEffect, useState } from 'react';
@@ -433,7 +440,10 @@ function GithubZen(props) {
 export default GithubZen;
 ```
 
-## When NOT to useEffect 
+> Note that there are other things to consider when fetching data, like caching responses (so that the user can click Back and see the previous screen instantly), how to fetch data on the server (so that the initial server-rendered HTML contains the fetched content instead of a spinner), and how to avoid network waterfalls (so that a child can fetch data without waiting for every parent). These issues apply to any UI library, not just React. Solving them is not trivial, which is why modern frameworks provide more efficient built-in data fetching mechanisms than fetching data in Effects
+
+
+## When to not use useEffect 
 
 ### Initializing the application 
 
@@ -502,3 +512,104 @@ function List({ items }) {
 ```
 
 React documentation suggests that it might be better to avoid this pattern when possible. The reason for this is that updating state in response to a prop change can sometimes cause unnecessary re-renders, especially if the state update is computationally expensive.
+
+### Subscribing to an external store 
+
+First of all, the following example may seem similar to the [Subscribing to events](#subscribing-to-events), but the difference here is in the former we are subscribing to a *browser event* (i.e., the scroll event), where in the following example we are subscribing to a *browser API*.
+
+In the context of React, "subscribing" typically refers to the process of registering a component as a listener for changes to some external *data source* or *event source*. 
+
+*Subscribing to events* typically refers to the process of registering a component as a listener for a specific event emitted by some other part of the application (e.g., a DOM element, a WebSocket connection, or a custom event emitter). This involves using a function like `addEventListener()` to register the component as a listener for the event, and providing a callback function that will be called when the event occurs.
+
+*Subscribing to an external store* typically refers to the process of connecting a component to a data source outside of React. This could be a third-party state management library like Redux or MobX, which allows the component to receive updates whenever the store's state changes. In this case, the component subscribes to the store by using a special function provided by the library (e.g., `connect()` in Redux), which sets up a subscription behind the scenes. 
+
+We can also think of built-in browser APIs as being like external stores. For example, the `navigator.geolocation` API can be used to get the user's current location, and this location data is external to your React component's state. Similarly, the `navigator.onLine` API used below is also external to your component's state, since it represents the online/offline status of the browser, rather than some state managed by your React component.
+
+```javascript
+function useOnlineStatus() {
+  // Not ideal: Manual store subscription in an Effect
+  const [isOnline, setIsOnline] = useState(true);
+  useEffect(() => {
+    function updateState() {
+      setIsOnline(navigator.onLine);
+    }
+
+    updateState();
+
+    window.addEventListener('online', updateState);
+    window.addEventListener('offline', updateState);
+    return () => {
+      window.removeEventListener('online', updateState);
+      window.removeEventListener('offline', updateState);
+    };
+  }, []);
+  return isOnline;
+}
+
+function ChatIndicator() {
+  const isOnline = useOnlineStatus();
+  // ...
+}
+```
+
+Although it’s common to use Effects for this, React has a purpose-built Hook for subscribing to an external store that is preferred instead. Delete the Effect and replace it with a call to `useSyncExternalStore`:
+
+```javascript
+function subscribe(callback) {
+  window.addEventListener('online', callback);
+  window.addEventListener('offline', callback);
+  return () => {
+    window.removeEventListener('online', callback);
+    window.removeEventListener('offline', callback);
+  };
+}
+
+function getSnapshot() {
+  return navigator.onLine;
+}
+
+function getServerSnapshot() {
+  return true;
+}
+
+function useOnlineStatus() {
+  // ✅ Good: Subscribing to an external store with a built-in Hook
+  return useSyncExternalStore(
+    subscribe, // React won't resubscribe for as long as you pass the same function
+    getSnapshot, // How to get the value on the client
+    getServerSnapshot // How to get the value on the server (for the initial render)
+  );
+}
+
+function ChatIndicator() {
+  const isOnline = useOnlineStatus();
+  // ...
+}
+```
+
+This approach is less error-prone than manually syncing mutable data to React state with an Effect. Typically, you’ll write a custom Hook like `useOnlineStatus()` above so that you don’t need to repeat this code in the individual components. See also: [hooks.md#usesyncexternalstore](hooks.md#usesyncexternalstore)
+
+## Final thoughts
+
+- By default, Effects run after every render (including the initial one).
+- Effects are reactive blocks of code. They re-synchronize when the values you read inside of them change. Unlike event handlers, which only run once per interaction, Effects run whenever synchronization is necessary.
+- React will call your cleanup function before the Effect runs next time, and during the unmount.
+- Each Effect in your code should represent a separate and independent synchronization process.
+- Code that runs because a component was displayed should be in Effects, the rest should be in event handlers.
+- You can’t “choose” your dependencies. Your dependencies are determined by every *reactive* value you read in the Effect.
+- Props, state, and all variables declared in the component body are *reactive*. If one of these in used in the Effect, it must be a dependency.
+- If a `const` is defined outside the component body, it is not a dependency, because it will never change on a re-render.
+- A variable defined inside the Effect isn't a dependency. They aren’t calculated during rendering, so they’re not reactive.
+- A mutable value like `ref.current` can’t be a dependency, because it is not reactive (doesn’t trigger a re-render).
+- A mutable value like `location.pathname` can’t be a dependency, because it is not reactive. Instead, you should read and subscribe to an external mutable value with `useSyncExternalStore`.
+- React will skip the Effect if all of its dependencies have the same values as during the last render.
+
+
+## Reference 
+
+- [Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects)
+- [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
+- [Lifecycle of Reactive Effects](https://react.dev/learn/lifecycle-of-reactive-effects)
+- [Separating Events from Effects](https://react.dev/learn/separating-events-from-effects)
+- [Removing Effect Dependencies](https://react.dev/learn/removing-effect-dependencies)
+
