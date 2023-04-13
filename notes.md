@@ -76,9 +76,9 @@ This article: [Bad Habits of Mid-Level React Developers](https://dev.to/srmagura
 
 There is a new way to render your app using `createRoot` which is from `react-dom/client`. 
 
-Note that in strict dev mode, react calls some of the code twice. This will result in double console logs and API calls. It is a mechanism to help you verify that you have implemented proper "cleanup" if needed. See: [Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed).
+Note that in strict dev mode, react calls some of the code twice. This will result in double console logs and API calls. It is a mechanism to help you verify that you have implemented proper "cleanup" code in effects (if needed). See: [Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed).
 
-This behaviour won't happen in the production build. You can disable strict mode temporarily to turn it off.
+This behaviour won't happen in the production build. You can disable strict mode temporarily to turn it off. That being said, you shouldn't. This feature is meant to help you catch bugs from not defining proper abort/cancel/cleanup code in Effects.
 
 
 ```jsx
@@ -90,9 +90,9 @@ import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  // <React.StrictMode>
+  <React.StrictMode>
     <App />
-  // </React.StrictMode>
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
