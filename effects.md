@@ -24,6 +24,8 @@ The [Effect Hook](https://react.dev/reference/react/useEffect) lets you perform 
   * [To reset state when a prop changes](#to-reset-state-when-a-prop-changes)
   * [To adjust some state when a prop changes](#to-adjust-some-state-when-a-prop-changes)
   * [Subscribing to an external store](#subscribing-to-an-external-store)
+- [Effect events](#effect-events)
+- [Removing unnecessary dependencies](#removing-unnecessary-dependencies)
 - [Final thoughts](#final-thoughts)
 - [Reference](#reference)
 
