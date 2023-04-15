@@ -9,6 +9,7 @@
 - [useState](#usestate)
 - [useContext](#usecontext)
 - [useEffect](#useeffect)
+- [useEffectEvent](#useeffectevent)
 - [useRef](#useref)
 - [useImperativeHandle](#useimperativehandle)
 - [useReducer](#usereducer)
@@ -32,6 +33,7 @@ In React, there are basic [built-in hooks](https://react.dev/reference/react):
 - `useState` for creating stateful values as previously done with `this.state`
 - `useContext` for creating common data that can be accessed throughout the component hierarchy without passing the props down manually to each level
 - `useEffect` for replicating lifecycle behavior or synchronizing a component with an external system
+- `useEffectEvent` *experimental* to extract non-reactive logic out of your Effect
 - `useRef` lets you reference a value that’s not needed for rendering
 - `useImperativeHandle` lets you customize the handle exposed as a ref
 - `useReducer` lets you add a reducer to your component
@@ -74,6 +76,10 @@ Context provides a way to pass data through the component tree without having to
 
 The [Effect Hook](https://react.dev/reference/react/useEffect) lets you perform *side effects* in function components. Effects let you run some code **after rendering** and can be used to synchronize your component with a system outside of React. See my notes in [effects.md](effects.md) and [Escape Hatches](https://react.dev/learn/escape-hatches) in the React docs.
 
+
+## useEffectEvent
+
+The [useEffectEvent](https://react.dev/reference/react/experimental_useEffectEvent) is a new (experimental) hook to extract non-reactive logic out of your Effect. See [effects.md](effects.md).
 
 ## useRef 
 
