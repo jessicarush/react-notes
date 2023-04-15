@@ -589,6 +589,153 @@ function ChatIndicator() {
 
 This approach is less error-prone than manually syncing mutable data to React state with an Effect. Typically, you’ll write a custom Hook like `useOnlineStatus()` above so that you don’t need to repeat this code in the individual components. See also: [hooks.md#usesyncexternalstore](hooks.md#usesyncexternalstore)
 
+## Effect events 
+
+Things get more tricky when you want to mix reactive logic with non-reactive logic. For example, imagine that you want to show a notification when the user connects to the chat. You read the current theme (dark or light) from the props so that you can show the notification in the correct color:
+
+```javascript
+function ChatRoom({ roomId, theme }) {
+  useEffect(() => {
+    const connection = createConnection(serverUrl, roomId);
+    connection.on('connected', () => {
+      showNotification('Connected!', theme);
+    });
+    connection.connect();
+    // ...
+```
+
+If we add the theme as a dependency, any time the theme changes, the effect will run again and a new connection will be made. Not what we want. Instead, we can extract this bit out and use a `useEffectEvent` hook:
+
+```javascript
+function ChatRoom({ roomId, theme }) {
+  const onConnected = useEffectEvent(() => {
+    showNotification('Connected!', theme);
+  });
+
+  useEffect(() => {
+    const connection = createConnection(serverUrl, roomId);
+    connection.on('connected', () => {
+      onConnected();
+    });
+    connection.connect();
+    return () => connection.disconnect();
+  }, [roomId]); // ✅ All dependencies declared
+  // ...
+```
+
+You can think of Effect Events as being very similar to event handlers. The main difference is that event handlers run in response to a user interactions, whereas Effect Events are triggered by you from Effects. Effect Events let you “break the chain” between the reactivity of Effects and code that should not be reactive.
+
+Another example would be if you have an analytics function that logs visits. This effect might happen whenever `url` changes. If you then decided to send additional information, like the number of items currently in a cart. However, you don’t want the `logVisit` call to be reactive to `numberOfItems` so you put this in a `useEffectEvent`.
+
+```javascript
+function Page({ url }) {
+  const { items } = useContext(ShoppingCartContext);
+  const numberOfItems = items.length;
+
+  const onVisit = useEffectEvent(visitedUrl => {
+    logVisit(visitedUrl, numberOfItems);
+  });
+
+  useEffect(() => {
+    onVisit(url);
+  }, [url]); // ✅ All dependencies declared
+  // ...
+}
+```
+
+Then there's the example of the [dot that should only move when the box is checked](https://react.dev/learn/separating-events-from-effects#is-it-okay-to-suppress-the-dependency-linter-instead). 
+
+The first example puts the function in the Effect and lists `canMove` as a dependency so if it changes, the effect is re-run and the ability to move the dot is added or not through the condition:
+
+```javascript
+import { useState, useEffect } from 'react';
+
+export default function App() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [canMove, setCanMove] = useState(true);
+
+  useEffect(() => {
+    function handleMove(e) {
+      if (canMove) {
+        setPosition({ x: e.clientX, y: e.clientY });
+      }
+    }
+    window.addEventListener('pointermove', handleMove);
+    return () => window.removeEventListener('pointermove', handleMove);
+  }, [canMove]);
+
+  return (
+    <>
+      <label>
+        <input type="checkbox"
+          checked={canMove}
+          onChange={e => setCanMove(e.target.checked)} 
+        />
+        The dot is allowed to move
+      </label>
+      <hr />
+      <div style={{
+        position: 'absolute',
+        backgroundColor: 'pink',
+        borderRadius: '50%',
+        opacity: 0.6,
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        pointerEvents: 'none',
+        left: -20,
+        top: -20,
+        width: 40,
+        height: 40,
+      }} />
+    </>
+  );
+}
+```
+
+However this might be better:
+
+```javascript
+import { useState, useEffect } from 'react';
+import { experimental_useEffectEvent as useEffectEvent } from 'react';
+
+export default function App() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [canMove, setCanMove] = useState(true);
+
+  const onMove = useEffectEvent(e => {
+    if (canMove) {
+      setPosition({ x: e.clientX, y: e.clientY });
+    }
+  });
+
+  useEffect(() => {
+    window.addEventListener('pointermove', onMove);
+    return () => window.removeEventListener('pointermove', onMove);
+  }, []);
+  // ...
+}
+```
+
+This makes sense because we don't want the Effect’s code to be reactive `canMove`. That’s why it makes sense to extract an Effect Event.
+
+Effect Events are very limited in how you can use them:
+
+- Only call them from inside Effects.
+- Never pass them to other components or Hooks.
+
+Always declare Effect Events directly next to the Effects that use them.
+
+
+## Removing unnecessary dependencies
+
+Ask yourself:
+
+- Should this code move to an event handler? 
+- Is your Effect doing several unrelated things? If so, split the logic into separate Effects.
+- Are you reading some state to calculate the next state (e.g. `setMessages([...messages, receivedMessage])`)? If so, do a function update like `setMessages(msgs => [...msgs, receivedMessage])`.
+- Do you want to read a value without “reacting” to its changes? If so, move that logic into an Effect Event.
+- Does some reactive value change unintentionally? For example, an object defined outside an effect is considered reactive because it is created from scratch on every re-render. In JavaScript, each newly created object or function is considered distinct from all the others. It doesn’t matter that the contents inside of them may be the same! This is why, whenever possible, you should try to avoid objects and functions as your Effect’s dependencies. Instead, try moving them outside the component, inside the Effect, or extracting primitive values out of them.
+
+
 ## Final thoughts
 
 - By default, Effects run after every render (including the initial one).
@@ -597,12 +744,16 @@ This approach is less error-prone than manually syncing mutable data to React st
 - Each Effect in your code should represent a separate and independent synchronization process.
 - Code that runs because a component was displayed should be in Effects, the rest should be in event handlers.
 - You can’t “choose” your dependencies. Your dependencies are determined by every *reactive* value you read in the Effect.
-- Props, state, and all variables declared in the component body are *reactive*. If one of these in used in the Effect, it must be a dependency.
+- Props, state, and all variables declared in the component body are *reactive*.
+- Logic inside event handlers is not reactive. It will not run again unless the user performs the same interaction (e.g. a click) again. Event handlers can read reactive values without “reacting” to their changes.
+- Logic inside Effects is reactive. If your Effect reads a reactive value, you have to specify it as a dependency. Then, if a re-render causes that value to change, React will re-run your Effect’s logic with the new value.
 - If a `const` is defined outside the component body, it is not a dependency, because it will never change on a re-render.
 - A variable defined inside the Effect isn't a dependency. They aren’t calculated during rendering, so they’re not reactive.
 - A mutable value like `ref.current` can’t be a dependency, because it is not reactive (doesn’t trigger a re-render).
 - A mutable value like `location.pathname` can’t be a dependency, because it is not reactive. Instead, you should read and subscribe to an external mutable value with `useSyncExternalStore`.
 - React will skip the Effect if all of its dependencies have the same values as during the last render.
+- You can move non-reactive logic from Effects into Effect Events but only call Effect Events from inside Effects.
+- Try to avoid object and function dependencies. Move them outside the component or inside the Effect, or extract primitive values out of them.
 
 
 ## Reference 
