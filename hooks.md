@@ -81,6 +81,7 @@ The [Effect Hook](https://react.dev/reference/react/useEffect) lets you perform 
 
 The [useEffectEvent](https://react.dev/reference/react/experimental_useEffectEvent) is a new (experimental) hook to extract non-reactive logic out of your Effect. See [effects.md](effects.md).
 
+
 ## useRef 
 
 [useRef](https://react.dev/reference/react/useRef) is used when:
@@ -303,6 +304,7 @@ function TodoList({ todos, filter }) {
 
 TODO...
 
+
 ## useId 
 
 New to React 18, [useId](https://react.dev/reference/react/useId) is a hook for generating unique IDs on both the client and server. For example:
@@ -362,27 +364,66 @@ See [concurrent_features.md](concurrent_features.md) for `useTransition` and `us
 - Third-party state management libraries that hold state outside of React.
 - Browser APIs that expose a mutable value and events to subscribe to its changes.
 
-To see an example using a browser API, see *Subscribing to an external store* in [effects.md](effects.md#subscribing-to-an-external-store).
-
 ```
 useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?)
 ```
 
-TODO...
+Call useSyncExternalStore at the top level of your component to read a value from an external data store. It returns the snapshot of the data in the store.
 
-Call useSyncExternalStore at the top level of your component to read a value from an external data store.
+This example uses `useSyncExternalStore` to create a custom hook.
 
+```javascript
+import { useSyncExternalStore } from 'react';
 
+/**
+ * useOnlineStatus.js
+ *
+ * - A custom hook that checks if network is online.
+ * - For example:
+ *   const isOnline = useOnlineStatus();
+ *   // ...
+ *   <p>Network status: { isOnline ? 'online' : 'offline' }</p>
+ *
+ * @returns {boolean} indicating if network is online
+ */
+function useOnlineStatus(initialValue=false) {
+  return useSyncExternalStore(
+    subscribe, // React won't resubscribe for as long as you pass the same function
+    getSnapshot, // How to get the value on the client
+    getServerSnapshot // How to get the value on the server (for the initial render)
+  );
+}
 
+function subscribe(callback) {
+  window.addEventListener('online', callback);
+  window.addEventListener('offline', callback);
+  return () => {
+    window.removeEventListener('online', callback);
+    window.removeEventListener('offline', callback);
+  };
+}
 
+function getSnapshot() {
+  return navigator.onLine;
+}
 
+function getServerSnapshot() {
+  return true;
+}
+
+export default useOnlineStatus;
+```
 
 
 ## Custom hooks
 
 Building your own Hooks lets you extract component logic into reusable functions.
 
-This simple example creates a toggle hook that will toggle a boolean state value. Good practice is to create your custom hooks in separate files in a `hooks` directory. It's also customary to name your hook `use...` to follow React's built-in hooks.
+- Custom Hooks let you share stateful logic, not state itself.
+- Hook names must start with use followed by a capital letter, like `useState` (built-in) or `useLocalStorage`. Hooks may return arbitrary values.
+- Keep your custom Hooks focused on concrete high-level use cases.
+
+The following example creates a toggle hook that will toggle a boolean state value. Good practice is to create your custom hooks in separate files in a `hooks` directory. It's also customary to name your hook `use...` to follow React's built-in hooks.
 
 
 ```javascript
@@ -426,7 +467,7 @@ export default Demo;
 
 ### Custom hook example: localStorage
 
-This custom hook will automatically update localStorage whenever a state value changes. When initializing the state value, it will check first to see if there is a local storage item.
+The following custom hook will automatically update localStorage whenever a state value changes. When initializing the state value, it will check first to see if there is a local storage item.
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -448,6 +489,8 @@ function useLocalStorage(key, defaultValue) {
 
 export default useLocalStorage;
 ```
+
+In use: 
 
 ```javascript
 import useLocalStorage from './hooks/useLocalStorage';;

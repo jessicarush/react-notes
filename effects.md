@@ -717,7 +717,7 @@ export default function App() {
 }
 ```
 
-This makes sense because we don't want the Effect’s code to be reactive `canMove`. That’s why it makes sense to extract an Effect Event.
+This makes sense because we don't want the Effect’s code to be reactive to `canMove`. That’s why it makes sense to extract an Effect Event.
 
 Effect Events are very limited in how you can use them:
 
@@ -754,8 +754,8 @@ Ask yourself:
 - A mutable value like `ref.current` can’t be a dependency, because it is not reactive (doesn’t trigger a re-render).
 - A mutable value like `location.pathname` can’t be a dependency, because it is not reactive. Instead, you should read and subscribe to an external mutable value with `useSyncExternalStore`.
 - React will skip the Effect if all of its dependencies have the same values as during the last render.
-- You can move non-reactive logic from Effects into Effect Events but only call Effect Events from inside Effects.
-- Try to avoid object and function dependencies. Move them outside the component or inside the Effect, or extract primitive values out of them.
+- You can move non-reactive logic from Effects into *Effect Events* but only call Effect Events from inside Effects.
+- Try to avoid object and function dependencies. Move them outside the component or inside the Effect, or extract primitive values out of them, or move to a `useEffectEvent` if appropriate.
 
 
 ## Reference 
