@@ -188,6 +188,8 @@ class Demo extends React.Component {
 ReactDOM.render(<Demo />, document.getElementById('root'));
 ```
 
+The conditional before the `&&` should resolve to a pure boolean.
+
 #### if/else
 
 This example uses an if/else to set a variable containing content. The content is then added at the end. Note that even in this variable (msg), we can return only one element. In other words, multiple elements should be wrapped in one.
