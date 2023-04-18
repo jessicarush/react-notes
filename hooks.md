@@ -368,6 +368,12 @@ See [concurrent_features.md](concurrent_features.md) for `useTransition` and `us
 useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?)
 ```
 
+`subscribe`: A function that takes a single callback argument and subscribes it to the store. When the store changes, it should invoke the provided callback. This will cause the component to re-render. The subscribe function should return a function that cleans up the subscription.
+
+`getSnapshot`: A function that returns a snapshot of the data in the store that’s needed by the component. While the store has not changed, repeated calls to getSnapshot must return the same value. If the store changes and the returned value is different (as compared by Object.is), React re-renders the component.
+
+**optional** `getServerSnapshot`: A function that returns the initial snapshot of the data in the store. It will be used only during server rendering and during hydration of server-rendered content on the client. The server snapshot must be the same between the client and the server, and is usually serialized and passed from the server to the client. If you omit this argument, rendering the component on the server will throw an error.
+
 Call useSyncExternalStore at the top level of your component to read a value from an external data store. It returns the snapshot of the data in the store.
 
 This example uses `useSyncExternalStore` to create a custom hook.
