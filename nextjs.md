@@ -2,9 +2,9 @@
 
 > Next.js is an open-source development framework built on top of Node.js enabling React based web applications functionalities such as server-side rendering and generating static websites. React documentation mentions Next.js among "Recommended Toolchains" advising it to developers as a solution when "Building a server-rendered website with Node.js". Where traditional React apps render all their content in the client-side browser, Next.js is used to extend this functionality to include applications rendered on the server side.
 
-It's important to underline the fact that Next.js is a framework (as opposed to just a library). It enforces a structure and allows for advanced features like hybrid *server side + client side rendering*. It replaces `create-react-app` and has its own routing features, analytics, static file serving and more.
+It's important to underline the fact that Next.js is a framework (as opposed to just a library). It enforces a structure and allows for advanced features like hybrid *server side + client side rendering*. It has its own routing features, analytics, static file serving and more.
 
-Also noteworthy is the documentation looks very good and includes a [nice tutorial section](https://nextjs.org/learn/foundations/about-nextjs?utm_source=next-site&utm_medium=nav-cta&utm_campaign=next-website).
+Also noteworthy is the documentation looks very good and includes a [nice tutorial section](https://nextjs.org/learn/foundations/about-nextjs).
 
 ## Table of Contents
 
@@ -15,14 +15,23 @@ Also noteworthy is the documentation looks very good and includes a [nice tutori
   * [Manual setup](#manual-setup)
   * [Automatic setup](#automatic-setup)
 - [Server side rendering](#server-side-rendering)
+- [Directory structure](#directory-structure)
+  * [pages/_app.js](#pages_appjs)
+  * [pages/index.js](#pagesindexjs)
 - [Automatic server side routing in pages](#automatic-server-side-routing-in-pages)
 - [Client side routing with Link](#client-side-routing-with-link)
+- [Scripts](#scripts)
+- [Images](#images)
 - [Styles](#styles)
+  * [Inline](#inline)
   * [Global styles](#global-styles)
-  * [Component-level css](#component-level-css)
-- [pages/_app.js](#pages_appjs)
+  * [CSS Modules](#css-modules)
+- [CSS-in-JS](#css-in-js)
+- [Using a template](#using-a-template)
+- [Notes](#notes)
 - [Q&As](#qas)
   * [If I build a react app using Next.js, do I have to deploy on Vercel, or can I deploy on my own server?](#if-i-build-a-react-app-using-nextjs-do-i-have-to-deploy-on-vercel-or-can-i-deploy-on-my-own-server)
+  * [Requires more reading:](#requires-more-reading)
 
 <!-- tocstop -->
 
@@ -98,6 +107,38 @@ event - compiled client and server successfully in 82 ms (125 modules)
 About render
 ```
 
+## Directory structure
+
+Todo..
+
+
+### pages/_app.js
+
+As noted above, this file is where you import global css files. In addition, you can use this file to place anything that should appear an all pages (it's like like App.js in create-react-app). For example:
+
+```jsx
+import Nav from '../components/Nav';
+import Footer from '../components/Footer';
+import '../styles.css';
+
+function MyApp({ Component, pageProps }) {
+  return (
+    <div>
+      <Nav />
+      <Component {...pageProps} />
+      <Footer />
+    </div>
+  );
+}
+
+export default MyApp;
+```
+
+### pages/index.js 
+
+Note `<Head>` is a React Component that is built into Nextjs. It allows you to modify the `<head>` of any page.
+
+
 ## Automatic server side routing in pages
 
 Any `.js`, `.jsx`, `.ts`, or `.tsx` file in the pages directory will automatically be mapped to a (server-side) route based on their file name. For example pages/about.js is mapped to /about. You can even add dynamic route parameters with the filename (e.g. /pic/:id).
@@ -119,7 +160,7 @@ function LandingPage() {
   return (
     <div>
       <h1>Hello</h1>
-      <Link href="/about"><a>About</a></Link>
+      <Link href="/about">About</Link>
     </div>
   );
 }
@@ -129,42 +170,136 @@ export default LandingPage;
 
 When clicking the link we will see no page refresh and no console logging on the server-side.
 
-Note the child of `<Link>` should be an `<a>`, but if you wanted to use a custom component, you need to add `passHref` to the `<link>` and wrap the component in React.forwardRef:
+If you are linking to an external site, use the `<a>` element.
+
+
+## Scripts 
+
+`next/script` is an extension of the HTML `<script>` element and optimizes when additional scripts are fetched and executed. This is generally used for third-party scripts but for demo purposes only, I'm using my own:
 
 ```jsx
-import React from 'react';
-import Link from 'next/link';
+import Head from 'next/head';
+import Script from 'next/script';
 
-// Use React.forwardRef and pass `onClick`, `href`, and `ref`
-// to the DOM element for proper handling
-const CustomLink = React.forwardRef((props, ref) => {
-  const { onClick, href, children } = props;
+function FirstPost() {
   return (
-    <a href={href} onClick={onClick} ref={ref}>
-      Custom link: {children}
-    </a>
-  );
-});
+    <>
+      <Head>
+        <title>First Post</title>
+      </Head>
+      <Script
+        src="/js/myscript.js"
+        strategy="afterInteractive"
+        onLoad={() =>
+          console.log(`script loaded`)
+        }
+      />
 
-function LandingPage() {
-  console.log('Index render');
-  return (
-    <div>
-      <h1>Hello</h1>
-      {/* add passHref */}
-      <Link href="/about" passHref>
-        <CustomLink>About</CustomLink>
-      </Link>
-    </div>
-  );
+      <h1>First post</h1>
+    </>
+  )
 }
 
-export default LandingPage;
+export default FirstPost;
+```
+
+- `strategy` controls when the third-party script should load. `beforeInteractive`: Load the script before any Nextjs code and before any page hydration occurs. `afterInteractive`: (default) Load the script early but after some hydration on the page occurs. `lazyOnload`: Load the script later during browser idle time.
+- `onLoad` is used to run any JavaScript code immediately after the script has finished loading. There is also an `onReady` which runs after the script has finished loading and every time the component is mounted and `onError` which runs if the script fails to load.
+
+To test `strategy`, I'm importing this:
+
+```javascript
+// Test script for Script component
+
+function doSomething() {
+  console.log('I have done something!');
+}
+
+function doAnother() {
+  console.log('I have done another.');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  doSomething();
+});
+
+doAnother();
+```
+
+The output for each:
+
+```console
+// With beforeInteractive:
+// I have done another.
+// I have done something!
+
+// With afterInteractive:
+// I have done another
+// script loaded
+
+// With lazyOnload:
+// I have done another.
+// script loaded
+```
+
+Clearly the event listener for `DOMContentLoaded` doesn't fire with `afterInteractive` and `lazyOnload`. 
+
+Note that `onLoad` does not work when used with the `beforeInteractive` strategy.
+
+To load a third-party script in a single route, import `next/script` and include the script directly in your page component. The script will only be fetched and executed when this specific page is loaded on the browser. 
+
+To load a third-party script for all routes, import `next/script` and include the script directly in pages/_app.js:
+
+```javascript
+import Script from 'next/script'
+
+export default function MyApp({ Component, pageProps }) {
+  return (
+    <>
+      <Script src="https://example.com/script.js" />
+      <Component {...pageProps} />
+    </>
+  )
+}
+```
+
+Keep in mind, for a lot of scripts, you can just `npm install` and `import` them:
+
+```bash
+npm install moment
+```
+
+```javascript
+import moment from 'moment';
+```
+
+## Images 
+
+Next has a built-in Image component that handles things like:
+
+- Ensuring your image is responsive on different screen sizes
+- Optimizing your images with a third-party tool or library
+- Only loading images when they enter the viewport
+
+Instead of optimizing images at build time, Next.js optimizes images on-demand, as users request them and images are rendered in such a way as to avoid *Cumulative Layout Shift*.
+
+Note the height and width props should be the desired rendering size, with an aspect ratio identical to the source image:
+
+```jsx
+<Image
+  src="/img/headshot.jpg" // path to file from the public dir
+  className={styles.profilePic} // css modules
+  height={144} // Desired size with correct aspect ratio
+  width={144} // Desired size with correct aspect ratio
+  alt="Jessica Rush"
+/>
 ```
 
 ## Styles
 
 See: <https://nextjs.org/docs/basic-features/built-in-css-support>
+
+### Inline
 
 You can apply css inline as usual:
 
@@ -210,21 +345,21 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../styles.css'
 ```
 
-### Component-level css
+### CSS Modules
 
 Next.js supports CSS Modules using the `[name].module.css` file naming convention. CSS Modules locally scope CSS by automatically creating a unique class name. This allows you to use the same CSS class name in different files without worrying about collisions.
 
-In this example, both Nav.js and Nav.module.css are saved in a directory called components.
+In this example, both `nav.js` and `nav.module.css` are saved in a directory called components.
 
 ```jsx
 import React from 'react';
 import Link from 'next/link';
-import styles from './Nav.module.css';
+import styles from './nav.module.css';
 
 function Nav() {
 
   return (
-    <div className={styles.Nav}>
+    <div className={styles.nav}>
       <Link href="/"><a>Index</a></Link>
       <Link href="/about"><a>About</a></Link>
     </div>
@@ -237,27 +372,28 @@ export default Nav;
 CSS Modules are an optional feature and are only enabled for files with the .module.css extension. Regular <link> stylesheets and global CSS files are still supported.
 
 
-## pages/_app.js
+> :warning: with css modules, class names with hyphens will break. The recommendation is to use camelCase instead but you can also use bracket notation instead of dot notation: `<div className={styles.['nav-wrapper']}>`.
 
-As noted above, this file is where you import global css files. In addition, you can use this file to place anything that should appear an all pages (it's like like App.js in create-react-app). For example:
+## CSS-in-JS 
 
-```jsx
-import Nav from '../components/Nav';
-import Footer from '../components/Footer';
-import '../styles.css';
+Todo...
 
-function MyApp({ Component, pageProps }) {
-  return (
-    <div>
-      <Nav />
-      <Component {...pageProps} />
-      <Footer />
-    </div>
-  );
-}
 
-export default MyApp;
+## Using a template 
+
+`create-next-app`, which bootstraps a Next.js app for you, can then use a template through the `--example flag`.
+
+```bash
+npx create-next-app@latest nextjs-blog --use-npm --example "https://github.com/vercel/next-learn/tree/master/basics/learn-starter"
 ```
+
+
+## Notes
+
+- page components must export as a `default` export.
+- in a production build of Next.js, whenever Link components appear in the browser’s viewport, Next.js automatically prefetches the code for the linked page in the background
+- serve static assets, like images, robots.txt, under the top-level public directory
+
 
 ## Q&As
 
@@ -273,3 +409,10 @@ To deploy a Next.js app on your own server or a different hosting platform, you 
 - Optionally, configure your server environment to handle routing, caching, and other optimizations for your Next.js app.
 
 Note that deploying a Next.js app on your own server may require additional setup and configuration compared to deploying on Vercel, as Vercel provides a lot of automation and optimization for Next.js apps out of the box. However, with the proper setup, you can deploy your Next.js app on any server that supports Node.js applications.
+
+### Requires more reading:
+
+- In Next.js, you can opt to server-side render pages by using getServerSideProps.
+- In Next.js, you can opt to statically generate pages by using getStaticProps.
+
+
