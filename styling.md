@@ -291,7 +291,7 @@ function Card(props) {
 export default Card;
 ```
 
-> :lightning: `import styled from 'styled-components/macro';` to see more helpful class names when debugging in the browser dev tools.
+> :lightning: `import styled from 'styled-components/macro';` to see more helpful class names when debugging in the browser dev tools. Note this trick does NOT work in Nextjs. Instead see instructions in [nextjs.md](nextjs.md) and to install `babel-plugin-styled-components` and create a `.babelrc`.
 
 You can access props like:
 
