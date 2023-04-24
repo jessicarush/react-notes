@@ -23,10 +23,15 @@ Also noteworthy is the documentation looks very good and includes a [nice tutori
 - [Scripts](#scripts)
 - [Images](#images)
 - [Styles](#styles)
-  * [Inline](#inline)
+  * [Inline styles](#inline-styles)
   * [Global styles](#global-styles)
   * [CSS Modules](#css-modules)
-- [CSS-in-JS](#css-in-js)
+  * [CSS-in-JS](#css-in-js)
+    + [styled-jsx](#styled-jsx)
+    + [styled-components](#styled-components)
+  * [Tailwind](#tailwind)
+  * [SASS](#sass)
+  * [Google fonts](#google-fonts)
 - [Using a template](#using-a-template)
 - [Notes](#notes)
 - [Q&As](#qas)
@@ -114,18 +119,18 @@ Todo..
 
 ### pages/_app.js
 
-As noted above, this file is where you import global css files. In addition, you can use this file to place anything that should appear an all pages (it's like like App.js in create-react-app). For example:
+The default export of `_app.js` is a top-level React component that wraps all the pages in your application. You can use this component to keep state when navigating between pages, to add global styles or place anything that should appear an all pages. For example:
 
 ```jsx
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
-import '../styles.css';
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   return (
     <div>
       <Nav />
-      <Component {...pageProps} />
+      <Component {...pageProps} /> {/* The active page */}
       <Footer />
     </div>
   );
@@ -299,7 +304,7 @@ Note the height and width props should be the desired rendering size, with an as
 
 See: <https://nextjs.org/docs/basic-features/built-in-css-support>
 
-### Inline
+### Inline styles
 
 You can apply css inline as usual:
 
@@ -313,7 +318,7 @@ function Nav() {
     padding: ".5rem"
   };
   return (
-    <div className="Nav" style={styles}>
+    <div style={styles}>
       <Link href="/about"><a>Index</a></Link>
       <Link href="/about"><a>About</a></Link>
     </div>
@@ -328,21 +333,20 @@ export default Nav;
 To add a global stylesheet to your application, import the CSS file within pages/_app.js. This file is created automatically with `create-next-app`. For example:
 
 ```jsx
-import '../styles.css'
+import '../styles/globals.css';
 
-// This default export is required in a new `pages/_app.js` file.
 export default function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />
 }
 ```
 
-These styles (styles.css) will apply to all pages and components in your application. Due to the global nature of stylesheets, and to avoid conflicts, you may only import them inside pages/_app.js.
+These styles (styles.css) will apply to all pages and components in your application. Due to the global nature of stylesheets, and to avoid conflicts, **you may only import global styles inside pages/_app.js**.
 
 Other stylesheets from node_modules (e.g. bootstrap) should also be imported into _app.js:
 
 ```jsx
 import 'bootstrap/dist/css/bootstrap.css';
-import '../styles.css'
+import '../styles/globals.css';
 ```
 
 ### CSS Modules
@@ -374,9 +378,217 @@ CSS Modules are an optional feature and are only enabled for files with the .mod
 
 > :warning: with css modules, class names with hyphens will break. The recommendation is to use camelCase instead but you can also use bracket notation instead of dot notation: `<div className={styles.['nav-wrapper']}>`.
 
-## CSS-in-JS 
+### CSS-in-JS 
 
-Todo...
+See: <https://nextjs.org/docs/basic-features/built-in-css-support#css-in-js>
+
+#### styled-jsx 
+
+`styled-jsx` is a built-in CSS-in-JS library for Nextjs, so you don't need to install it separately when creating a new project with `create-next-app`. Nextjs originally chose to include `styled-jsx` as the built-in CSS-in-JS solution because it was specifically designed for Next.
+
+See: 
+
+- <https://nextjs.org/blog/styling-next-with-styled-jsx>
+- <https://github.com/vercel/styled-jsx>
+
+It looks like this:
+
+```jsx
+import Layout from '../components/layout';
+
+export default function Home() {
+  return (
+    <Layout>
+      <footer>
+        <p className='test'>Test footer</p>
+      </footer>
+
+      <style jsx>{`
+        footer {
+          width: 100%;
+          height: 100px;
+          border-top: 1px solid #eaeaea;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .test {
+          color: #fff;
+          background: blueviolet;
+        }
+      `}</style>
+
+      <style jsx global>{`
+        html,
+        body {
+          padding: 0;
+          margin: 0;
+          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+            sans-serif;
+        }
+        * {
+          box-sizing: border-box;
+        }
+      `}</style>
+    </Layout>
+  );
+}
+```
+
+#### styled-components
+
+See: 
+
+- <https://github.com/vercel/next.js/tree/canary/examples/with-styled-components>
+- <https://nextjs.org/docs/advanced-features/compiler#styled-components>
+
+First, install styled components:
+
+```bash
+npm install --save styled-components
+```
+
+You can use styled-components now but note you'll want to do more so that you can see class names in dev tools:
+
+```bash
+npm install --save-dev babel-plugin-styled-components
+```
+
+Then update your `next.config.js`:
+
+```javascript
+/** @type {import('next').NextConfig} */
+
+const nextConfig = {
+  reactStrictMode: true,
+  compiler: {
+    styledComponents: true,
+  },
+}
+
+module.exports = nextConfig
+```
+
+Instead of `true`, you can pass a [custom options object](https://nextjs.org/docs/advanced-features/compiler#styled-components).
+
+
+### Tailwind 
+
+See: 
+
+- <https://nextjs.org/learn/basics/assets-metadata-css/styling-tips>
+- <https://github.com/vercel/next.js/tree/canary/examples/with-tailwindcss>
+
+
+### SASS
+
+See: 
+
+- <https://nextjs.org/learn/basics/assets-metadata-css/styling-tips>
+- <https://nextjs.org/docs/basic-features/built-in-css-support#sass-support>
+
+
+### Google fonts 
+
+Automatically self-host any Google Font. Fonts are included in the deployment and served from the same domain as your deployment. No requests are sent to Google by the browser. See the [next/font API](https://nextjs.org/docs/api-reference/next/font#nextfontgoogle).
+
+
+They recommend using [variable fonts](https://fonts.google.com/variablefonts) for the best performance and flexibility.
+
+```jsx
+import { Inter } from 'next/font/google';
+import { Roboto } from 'next/font/google';
+
+// If loading a variable font, you don't need to specify the font weight
+const inter = Inter({ subsets: ['latin'] })
+
+const roboto = Roboto({
+  weight: '400',
+  subsets: ['latin'],
+})
+
+function Home() {
+  return (
+   <h2 className={inter.className}>Hello</h2>
+  )
+}
+```
+
+You can specify multiple weights and/or styles by using an array:
+
+```javascript
+const roboto = Roboto({
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+})
+```
+
+Use `_` for fonts with spaces in the name. For example Titillium Web should be `Titillium_Web`.
+
+To use the font in all your pages, add it to _app.js file under /pages as shown below:
+
+```jsx
+// pages/_app.js
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export default function MyApp({ Component, pageProps }) {
+  return (
+    <main className={inter.className}>
+      <Component {...pageProps} />
+    </main>
+  )
+}
+```
+
+You can also use the font without a wrapper and className by injecting it inside the <head> as follows:
+
+```jsx
+// pages/_app.js
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export default function MyApp({ Component, pageProps }) {
+  return (
+    <>
+      <style jsx global>{`
+        html {
+          font-family: ${inter.style.fontFamily};
+        }
+      `}</style>
+      <Component {...pageProps} />
+    </>
+  )
+}
+```
+
+Or set a css variable:
+
+```jsx 
+import '@/styles/globals.css';
+import { Exo } from 'next/font/google';
+
+const exo = Exo({ subsets: ['latin'] });
+
+export default function App({ Component, pageProps }) {
+  return (
+    <>
+      <style jsx global>{`
+        :root {
+          --main-font: ${exo.style.fontFamily}, -apple-system,
+            'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+            'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        }
+      `}</style>
+      <Component {...pageProps} />
+    </>
+  );
+}
+```
 
 
 ## Using a template 
