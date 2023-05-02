@@ -564,3 +564,17 @@ export default App;
 [styled-components](https://styled-components.com/) is a library for writing CSS-in-JS.
 
 See [styling.md](styling.md).
+
+
+## styled-jsx 
+
+[styled-jsx](https://github.com/vercel/styled-jsx) is a CSS-in-JS librray built specifically for Next.js.
+
+See [nextjs.md](nextjs.md)
+
+
+## gray-matter 
+
+[gray-matter](https://github.com/jonschlinkert/gray-matter) is a library for parsing YAML front-matter in documents. 
+
+See *courses/nextls/next_blog*.
