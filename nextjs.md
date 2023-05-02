@@ -95,23 +95,6 @@ To start the development server on http://localhost:3000
 - `npm run dev`
 
 
-## Server side rendering
-
-> Data fetching in Next.js allows you to render your content in different ways, depending on your application's use case. These include pre-rendering with Server-side Rendering or Static Generation, and updating or creating content at runtime with Incremental Static Regeneration.
-
-In a nutshell, Next.js allows for hybrid rendering. The initial page request can be rendered on the server, then additional content could be rendered on the client. The benefit of have some of the app render on the server is improved SEO and a potentially a faster experience for users on old, slow devices.
-
-Note: you can see the server-side rendering simply by placing a `console.log` in all your page components. You will see that these actually output in the node terminal where you are running `npm run dev` in addition to the browser console.
-
-```bash
-wait  - compiling / (client and server)...
-event - compiled client and server successfully in 101 ms (124 modules)
-Index render
-wait  - compiling /about (client and server)...
-event - compiled client and server successfully in 82 ms (125 modules)
-About render
-```
-
 ## Directory structure
 
 Todo..
@@ -591,6 +574,302 @@ export default function App({ Component, pageProps }) {
 ```
 
 
+## Pre-rendering 
+
+
+> Data fetching in Next.js allows you to render your content in different ways, depending on your application's use case. These include pre-rendering with Server-side Rendering or Static Generation, and updating or creating content at runtime with Incremental Static Regeneration.
+
+There are two forms of pre-rendering: *Static Generation* and *Server-side Rendering*. The benefit of have some pre-rendering is improved SEO and a potentially a faster experience for users on old, slow devices.
+
+- Static Generation is the pre-rendering method that generates the HTML at **build time**. The pre-rendered HTML is then reused on each request.
+- Server-side Rendering is the pre-rendering method that generates the HTML on each **request**.
+
+Next.js lets you choose which pre-rendering form to use for each page. You can create a "hybrid" Next.js app by using Static Generation for most pages and using Server-side Rendering for others.
+
+Data fetching in Static Generation is done with `getStaticProps`.
+Data fetching in Server-side rendering is done with `getServerSideProps` or `getInitialProps` (legacy). 
+
+Note: you can see the server-side rendering simply by placing a `console.log` in all your page components. You will see that these actually output in the node terminal where you are running `npm run dev` in addition to the browser console.
+
+```bash
+wait  - compiling / (client and server)...
+event - compiled client and server successfully in 101 ms (124 modules)
+Index render
+wait  - compiling /about (client and server)...
+event - compiled client and server successfully in 82 ms (125 modules)
+About render
+```
+
+### Static Generation 
+
+With static generation, HTML is generated at **build time** (`npm run build`) and is reused for each request. Static Generation can be done with data, and without data.
+
+Nextjs recommends using Static Generation (with and without data) whenever possible because your page can be built once and served by CDN, which makes it much faster than having a server render the page on every request.
+
+You can use Static Generation for many types of pages, including:
+
+- Marketing pages
+- Blog posts
+- Product listings
+- Help and documentation
+
+You should ask yourself: "Can I pre-render this page ahead of a user's request?" If the answer is yes, then you should choose Static Generation.
+
+Pages that do not require fetching external data will automatically be statically generated when the app is built for production.
+
+However, for some pages, you might not be able to render the HTML without first fetching some external data. Maybe you need to access the file system, fetch external API, or query your database at build time. That could be done with *static generation with data* using `getStaticProps`.
+
+When you export a page component, you can also export an async function called `getStaticProps`. Inside the function, you can fetch external data and send it as props to the page. The `getStaticProps` function runs at **build time** in production.
+
+> Note: In development mode, getStaticProps runs on each request instead.
+
+```javascript
+import Head from 'next/head';
+import Layout from '../components/layout';
+import { getSortedPostsData } from '../lib/posts';
+
+
+export async function getStaticProps() {
+  const allPostsData = getSortedPostsData();
+  return {
+    props: {
+      allPostsData,
+    },
+  };
+}
+
+export default function Home({ allPostsData }) {
+  return (
+    <Layout home>
+      {/* ... */}
+    </Layout>
+  );
+}
+```
+
+As for the actual getting of data, we could be getting from a file:
+
+```javascript
+import fs from 'fs';               // Node.js built-in module
+import path from 'path';           // Node.js built-in module
+import matter from 'gray-matter';  // npm install gray-matter
+
+const postsDirectory = path.join(process.cwd(), 'posts');
+
+export function getSortedPostsData() {
+  // Get file names under /posts
+  const fileNames = fs.readdirSync(postsDirectory);
+  const allPostsData = fileNames.map((fileName) => {
+    // Remove ".md" from file name to get id
+    const id = fileName.replace(/\.md$/, '');
+
+    // Read markdown file as string
+    const fullPath = path.join(postsDirectory, fileName);
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+
+    // Use gray-matter to parse the post metadata section
+    const matterResult = matter(fileContents);
+
+    // Combine the data with the id
+    return {
+      id,
+      ...matterResult.data,
+    };
+  });
+  // Sort posts by date
+  return allPostsData.sort((a, b) => a.date < b.date ? 1 : -1);
+}
+```
+
+Or from an API...
+
+```javascript
+export async function getSortedPostsData() {
+  // Fetch data from an external API endpoint
+  const res = await fetch('..');
+  const data = await res.json();
+  return data;
+}
+```
+
+Or from a database...
+
+```javascript
+import someDatabaseSDK from 'someDatabaseSDK'
+
+const databaseClient = someDatabaseSDK.createClient(...);
+
+export async function getSortedPostsData() {
+  // Fetch post data from a database
+  return databaseClient.query('SELECT posts...')
+}
+```
+
+NOTE: the Next docs don't say this but in order to get the API example to work, I also had to add an `await` to the `getStaticProps` function, otherwise I got a json serialization error. Others have said you can also use some `superjson` package.
+
+```javascript
+export async function getStaticProps() {
+  const randomColor = await getColorWithFetch(); // <-- await!
+  return {
+    props: {
+      randomColor,
+    },
+  };
+}
+```
+
+This is possible because getStaticProps only runs on the server-side. It will never run on the client-side. It won’t even be included in the JS bundle for the browser.
+
+- Remember, in development (npm run dev), `getStaticProps` runs on every request but in production, `getStaticProps` runs at build time. 
+- Because it’s meant to be run at build time, you won’t be able to use data that’s only available during request time, such as query parameters or HTTP headers.
+- `getStaticProps` can only be exported from a `page`. You can’t export it from non-page files.
+
+### Server-side rendering
+
+To fetch data a **request time** with Server-side Rendering, you need to export `getServerSideProps` instead of `getStaticProps` from your page.
+
+```javascript
+export async function getServerSideProps(context) {
+  return {
+    props: {
+      // props for your component
+    },
+  };
+}
+```
+
+Because `getServerSideProps` is called at request time, its parameter (`context`) contains request specific parameters. The context parameter is an object containing the following keys:
+
+- `params`: If this page uses a dynamic route, params contains the route parameters. If the page name is [id].js , then params will look like { id: ... }.
+- `req`: The HTTP IncomingMessage object, with an additional cookies prop, which is an object with string keys mapping to string values of cookies.
+- `res`: The HTTP response object.
+- `query`: An object representing the query string, including dynamic route parameters.
+- `preview`: preview is true if the page is in the Preview Mode and false otherwise.
+- `previewData`: The preview data set by setPreviewData.
+- `resolvedUrl`: A normalized version of the request URL that strips the _next/data prefix for client transitions and includes original query values.
+- `locale` contains the active locale (if enabled).
+- `locales` contains all supported locales (if enabled).
+- `defaultLocale` contains the configured default locale (if enabled).
+
+
+You should use `getServerSideProps` only if you need to pre-render a page whose data must be fetched at request time. Keep in mind, it will be slower than `getStaticProps`.
+
+You can also skip pre-rendering and use client-side JavaScript to populate frequently updated data.
+
+### Client-side rendering 
+
+If you do not need to pre-render data, you can also use the following strategy (client-side rendering):
+
+Statically generate (pre-render) parts of the page that do not require external data. When the page loads, fetch external data from the client using JavaScript and populate the remaining parts.
+
+This approach works well for user dashboard pages, for example. Because a dashboard is a private, user-specific page, SEO is not relevant, and the page doesn’t need to be pre-rendered. The data is frequently updated, which requires request-time data fetching.
+
+
+## Client-side fetching with SWR 
+
+The Next.js team has created a React hook for data fetching called [SWR](https://swr.vercel.app/docs/getting-started). They highly recommend it if you’re fetching data on the client side.
+
+The name “SWR” is derived from stale-while-revalidate, a HTTP cache invalidation strategy. SWR is a strategy to first return the data from cache (stale), then send the fetch request (revalidate), and finally come with the up-to-date data.
+
+With SWR, components will get a stream of data updates constantly and automatically.
+And the UI will be always fast and reactive. For example, if you click to another app or tab, when you reactive the tab with SWR, it will get new data.
+
+It is an external package, so you need to install it:
+
+```bash
+npm install swr
+```
+
+Example:
+
+```javascript
+import Head from 'next/head';
+import useSWR from 'swr';
+
+const url = 'https://log.zebro.id/api_demo_one';
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+export default function Home() {
+  const { data, error, isLoading } = useSWR(url, fetcher);
+  const name = data ? Object.keys(data)[0] : '';
+  const value = data ? Object.values(data)[0] : '';
+
+  let content;
+
+  if (error) content = 'Failed to load.';
+  if (isLoading) content = 'Loading...';
+  if (data)
+    content = (
+      <>
+        Your color is{' '}
+        <span style={{ color: value }}>
+          {name} {value}
+        </span>
+      </>
+    );
+
+  return (
+    <>
+      <p>{content}</p>
+    </>
+  );
+}
+```
+
+You could use axios as well:
+
+```javascript
+import axios from 'axios';
+
+const url = 'https://log.zebro.id/api_demo_one';
+// const fetcher = (...args) => fetch(...args).then((res) => res.json());
+const fetcher = url => axios.get(url).then(res => res.data);
+
+// ...
+```
+
+You can also fetch via a user event using `mutate`:
+
+```javascript
+import Head from 'next/head';
+import useSWR, { mutate } from 'swr'; // <-- import mutate
+
+const url = 'https://log.zebro.id/api_demo_one';
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+export default function Home() {
+  const { data, error, isLoading } = useSWR(url, fetcher);
+  const name = data ? Object.keys(data)[0] : '';
+  const value = data ? Object.values(data)[0] : '';
+
+  const fetchNewColor = async () => {  // <-- create a handler
+    mutate(url);
+  }
+
+  let content;
+
+  if (error) content = 'Failed to load.';
+  if (isLoading) content = 'Loading...';
+  if (data)
+    content = (
+      <>
+        Your color is{' '}
+        <span style={{ color: value }}>
+          {name} {value}
+        </span>
+      </>
+    );
+
+  return (
+    <>
+      <p>{content}</p>
+      <button onClick={fetchNewColor}>get another</button>
+    </>
+  );
+}
+```
+
+
 ## Using a template 
 
 `create-next-app`, which bootstraps a Next.js app for you, can then use a template through the `--example flag`.
@@ -605,6 +884,7 @@ npx create-next-app@latest nextjs-blog --use-npm --example "https://github.com/v
 - page components must export as a `default` export.
 - in a production build of Next.js, whenever Link components appear in the browser’s viewport, Next.js automatically prefetches the code for the linked page in the background
 - serve static assets, like images, robots.txt, under the top-level public directory
+- If you use `fs` (`import fs from 'fs'`), be sure it's only within `getInitialProps` or `getServerSideProps`.
 
 
 ## Q&As
