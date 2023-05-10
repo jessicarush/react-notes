@@ -14,7 +14,6 @@ Also noteworthy is the documentation looks very good and includes a [nice tutori
 - [Getting started](#getting-started)
   * [Manual setup](#manual-setup)
   * [Automatic setup](#automatic-setup)
-- [Server side rendering](#server-side-rendering)
 - [Directory structure](#directory-structure)
   * [pages/_app.js](#pages_appjs)
   * [pages/index.js](#pagesindexjs)
@@ -32,6 +31,19 @@ Also noteworthy is the documentation looks very good and includes a [nice tutori
   * [Tailwind](#tailwind)
   * [SASS](#sass)
   * [Google fonts](#google-fonts)
+- [Pre-rendering](#pre-rendering)
+  * [Static Generation](#static-generation)
+  * [Server-side rendering](#server-side-rendering)
+  * [Client-side rendering](#client-side-rendering)
+- [Client-side fetching with SWR](#client-side-fetching-with-swr)
+- [Dynamic Routes](#dynamic-routes)
+  * [Catch-all routes](#catch-all-routes)
+  * [Fallbacks](#fallbacks)
+    + [What about handling paths that don't exist?](#what-about-handling-paths-that-dont-exist)
+    + [How is the loading state implemented](#how-is-the-loading-state-implemented)
+- [404 Pages](#404-pages)
+- [Incremental Static Regeneration](#incremental-static-regeneration)
+- [API routes](#api-routes)
 - [Using a template](#using-a-template)
 - [Notes](#notes)
 - [Q&As](#qas)
@@ -576,7 +588,6 @@ export default function App({ Component, pageProps }) {
 
 ## Pre-rendering 
 
-
 > Data fetching in Next.js allows you to render your content in different ways, depending on your application's use case. These include pre-rendering with Server-side Rendering or Static Generation, and updating or creating content at runtime with Incremental Static Regeneration.
 
 There are two forms of pre-rendering: *Static Generation* and *Server-side Rendering*. The benefit of have some pre-rendering is improved SEO and a potentially a faster experience for users on old, slow devices.
@@ -705,7 +716,7 @@ export async function getSortedPostsData() {
 }
 ```
 
-NOTE: the Next docs don't say this but in order to get the API example to work, I also had to add an `await` to the `getStaticProps` function, otherwise I got a json serialization error. Others have said you can also use some `superjson` package.
+NOTE: the Next docs don't say this but in order to get the API example to work, I also had to add an `await` to the `getStaticProps` function, otherwise I got a json serialization error. In other words, since we are using `async/wait` in `getColorWithFetch`, we also need to `await` here were its called.
 
 ```javascript
 export async function getStaticProps() {
@@ -763,6 +774,8 @@ If you do not need to pre-render data, you can also use the following strategy (
 Statically generate (pre-render) parts of the page that do not require external data. When the page loads, fetch external data from the client using JavaScript and populate the remaining parts.
 
 This approach works well for user dashboard pages, for example. Because a dashboard is a private, user-specific page, SEO is not relevant, and the page doesn’t need to be pre-rendered. The data is frequently updated, which requires request-time data fetching.
+
+**Remember: client-side rendering is good for private, user-specific pages where SEO is not relevant.**
 
 
 ## Client-side fetching with SWR 
@@ -866,6 +879,312 @@ export default function Home() {
       <button onClick={fetchNewColor}>get another</button>
     </>
   );
+}
+```
+
+
+## Dynamic Routes
+
+Imagine a case where each page path depends on external data (e.g. blog posts). Next.js allows you to statically generate pages with paths that depend on external data. This enables dynamic URLs in Next.js.
+
+- First create a dynamic route file by naming it with square brackets: `[id].js`.
+- Create a page component as normal
+- Export an async function called `getStaticPaths` which should return an array of possible values for `id`. This array must be in a specific format: Each object must have a `params` key and contain an object with an `id` key (because we’re using `[id]` in the file name).
+- Export an async `getStaticProps` function to fetch the necessary data for a given `id`. This function should take `{ params }` as an argument.
+
+For example:
+
+```javascript
+import { getAllPostIds, getPostData } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  // getAllPostIds returns an array that looks like this:
+  // [
+  //   { params: { id: 'ssg-ssr' }},
+  //   { params: { id: 'pre-rendering' }}
+  // ]
+  const paths = getAllPostIds();
+  // These paths (and only these paths) get pre-rendered at build time.
+  // { fallback: false } means other routes should 404.
+  return {
+    paths,
+    fallback: false,
+  };
+}
+
+export async function getStaticProps({ params }) {
+  // getPostData returns an object that looks like this:
+  // {
+  //   id: 'ssg-ssr',
+  //   title: 'bla bla bla',
+  //   date: '2020-01-02'
+  // }
+  const postData = getPostData(params.id); // <-- params.id from getStaticPaths
+  return {
+    props: {
+      postData,
+    },
+  };
+}
+
+function Post({ postData }) {
+  return (
+    <main>
+      {postData.title}
+      <br />
+      {postData.id}
+      <br />
+      {postData.date}
+    </main>
+  )
+}
+
+export default Post;
+```
+
+As an example, `getAllPostIds` could be fetching from the file system:
+
+```javascript
+export function getAllPostIds() {
+  const fileNames = fs.readdirSync(postsDirectory);
+
+  return fileNames.map((fileName) => {
+    return {
+      params: {
+        id: fileName.replace(/\.md$/, ''),
+      },
+    };
+  });
+}
+```
+
+or an external API:
+
+```javascript
+export async function getAllPostIds() {
+  const res = await fetch('..');
+  const posts = await res.json();
+  return posts.map((post) => {
+    return {
+      params: {
+        id: post.id,
+      },
+    };
+  });
+}
+```
+
+Like `getStaticProps`, `getStaticPaths` will run on every request in development but in production, just at build time.
+
+### Catch-all routes
+
+Dynamic routes can be extended to catch all paths by adding three dots `...` inside the brackets. For example:
+
+`pages/posts/[...id].js` matches /posts/a, but also /posts/a/b, /posts/a/b/c and so on. If you do this, in `getStaticPaths`, you must return an array as the value of the id key like so:
+
+```javascript
+return [
+  {
+    params: {
+      // Statically Generates /posts/a/b/c
+      id: ['a', 'b', 'c'],
+    },
+  },
+  //...
+];
+```
+
+And `params.id` will be an array in `getStaticProps`:
+
+```javascript
+export async function getStaticProps({ params }) {
+  // params.id will be like ['a', 'b', 'c']
+}
+```
+
+Take a look at [catch all routes (docs)](https://nextjs.org/docs/pages/building-your-application/routing/dynamic-routes#catch-all-routes) to learn more.
+
+### Fallbacks
+
+Remember that `getStaticPaths` runs at build time. The option `fallback: false` will have any paths not returned by `getStaticPaths` result in a 404 page. If you need to add more paths, and you have `fallback: false`, you would need to run `next build` again so that the new paths can be generated. If you had a massive amount pages (say a product site), the builds would take a very long time.
+
+So this leads us to the `fallback` option having three possible values:
+
+1. `false`: If a path is not pre-rendered and a user requests it, Next.js will return a 404 page.
+2. `true`: If a path is not pre-rendered and a user requests it, Next.js will attempt to render the page on-demand (server-side render) and cache the result for all future requests. While the page is being generated, it will show a fallback version, usually a loading state.
+3. `blocking`: This works similarly to `true`, but the user will not see a fallback version. Instead, the request will be blocked until the page is generated and then served to the user.
+
+Instead, you could pre-render (statically generate) a small subset of pages and use `fallback: true` to have the rest be generated on first request. Keep in mind `fallback: true` and `fallback: blocking` will not update generated pages, for that take a look at [Incremental Static Regeneration](https://nextjs.org/docs/pages/building-your-application/data-fetching/incremental-static-regeneration) (more on it below).
+
+#### What about handling paths that don't exist?
+
+When using `fallback: true`, if a user requests a path that doesn't exist, Next.js will initially serve the fallback version of the page, which usually displays a loading state. Next.js then attempts to generate the page on the server-side. While generating the page, you can use the `getStaticProps` function to fetch data required for that path.
+
+Inside `getStaticProps`, is were you would handle the case where the data for the requested path doesn't exist. You can return a `notFound` property with a value of `true` as part of the `getStaticProps` return object, like this: 
+
+```javascript
+export async function getStaticProps({ params }) {
+  const data = await fetchDataForPath(params.id);
+
+  // If the data doesn't exist, return notFound: true
+  if (!data) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      data,
+    },
+  };
+}
+```
+
+Keep in mind that the fallback version will be shown initially, so users might see a loading state before being redirected to the 404 page. If you want to avoid showing the fallback version for non-existent paths, consider using fallback: 'blocking', which will block the request until the page is generated or the 404 response is determined.
+
+#### How is the loading state implemented
+
+The `fallback` is a state of your dynamic page. In the `fallback` state:
+
+- The page’s props will be empty.
+- Using the router, you can detect if the fallback is being rendered, `router.isFallback` will be true.
+
+For example:
+
+```javascript
+import { useRouter } from 'next/router';
+
+// This function gets called at build time
+export async function getStaticPaths() {
+  return {
+    // Only `/posts/1` and `/posts/2` are generated at build time
+    paths: [{ params: { id: '1' } }, { params: { id: '2' } }],
+    // Enable statically generating additional pages, e.g. `/posts/3`
+    fallback: true,
+  };
+}
+
+// This also gets called at build time
+export async function getStaticProps({ params }) {
+  // params contains the post `id`.
+  const res = await fetch(`https://.../posts/${params.id}`);
+  const post = await res.json();
+ 
+  // Pass post data to the page via props
+  return {
+    props: { post },
+  };
+}
+
+function Post({ post }) {
+  const router = useRouter();
+  // If the page is not yet generated, this will be displayed
+  // initially until getStaticProps() finishes running
+  if (router.isFallback) {
+    return <div>Loading...</div>;
+  }
+ 
+  // Render post...
+}
+ 
+export default Post;
+```
+
+
+## 404 Pages 
+
+To create a custom 404 page, create `pages/404.js`. This file is statically generated at build time.
+
+```javascript
+// pages/404.js
+export default function Custom404() {
+  return <h1>404 - Page Not Found</h1>;
+}
+```
+
+See [custom errors (docs)](https://nextjs.org/docs/pages/building-your-application/routing/custom-error).
+
+
+## Incremental Static Regeneration
+
+`revalidate` is an optional property that you can return from `getStaticProps` to enable Incremental Static Regeneration (ISR) for a statically generated page in Next.js. ISR allows you to update the statically generated content after the initial build without having to rebuild the entire application.
+
+In the example you provided, the `revalidate` property is set to 10 seconds:
+
+```javascript
+export async function getStaticProps() {
+  const res = await fetch('https://.../posts');
+  const posts = await res.json();
+ 
+  return {
+    props: {
+      posts,
+    },
+    // Next.js will attempt to re-generate the page:
+    // - When a request comes in
+    // - At most once every 10 seconds
+    revalidate: 10, // In seconds
+  };
+}
+```
+
+This means that Next.js will attempt to re-generate the page under the following conditions:
+
+- When a new request comes in for the page after the initial static generation.
+- At most once every 10 seconds, even if there are multiple requests during that time frame.
+
+Here's how it works:
+
+1. At build time, Next.js generates the static HTML for the page using the data fetched from the API.
+2. When a user visits the page, they receive the pre-generated static HTML.
+3. If another user visits the page within the next 10 seconds, they will also receive the same pre-generated static HTML.
+4. After 10 seconds have passed, if a new request comes in, Next.js will serve the existing static HTML to the user and, in the background, re-fetch the data from the API and re-generate the static HTML for the page. This updated HTML will be served to the next user.
+5. If multiple requests come in during the 10-second interval, Next.js will not re-generate the page multiple times. It will only do so once, after the 10-second interval has passed.
+
+Using `revalidate` with ISR is helpful when you have data that changes frequently but doesn't need to be updated in real-time for every user. It strikes a balance between fully static sites with long build times and dynamic sites that require server-side rendering for every request.
+
+`revalidate` can be used with both dynamic and regular (non-dynamic) routes in Next.js. Its primary purpose is to enable Incremental Static Regeneration (ISR) for pages with content that changes frequently but doesn't need to be updated in real-time for every user.
+
+**Dynamic Routes**: ISR is particularly helpful when dealing with dynamic routes, where the content for each route might change frequently, like a blog with many posts or an e-commerce site with multiple products. By using `revalidate`, you can ensure that the content is updated periodically without rebuilding the entire application every time there's a change.
+
+**Regular Routes**: ISR can also be beneficial for regular routes with content that updates frequently. For example, you might have a homepage with a "latest news" section that needs to be updated every few minutes. By using `revalidate` in the getStaticProps function of your regular route, you can update the content periodically without resorting to client-side fetching or server-side rendering.
+
+In both cases, `revalidate` helps strike a balance between fully static sites with long build times and dynamic sites that require server-side rendering for every request.
+
+
+## API routes
+
+Next.js has support for [API Routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes), which let you easily create an API endpoint as a *Node.js serverless function*. 
+
+A "Node.js serverless function" refers to a small, single-purpose piece of code written in Node.js (JavaScript runtime environment) that runs on a serverless computing platform.
+
+A serverless computing platform is a cloud-based service that enables developers to build, deploy, and run applications or functions without managing the underlying infrastructure, automatically scaling resources based on demand and billing only for the compute time used during execution. AWS Lambda, Google Cloud Functions, Azure Functions are examples of serverless computing platforms. Vercel, a cloud platform to deploy frontend applications, includes serverless functions support (called "Serverless Functions") for Node.js. 
+
+This leads me to think that using API routes would require deploying on Vercel.
+
+[API Routes](https://nextjs.org/learn/basics/api-routes/creating-api-routes) let you create an API endpoint inside a Next.js app. You can do so by creating a function inside the pages/api directory that has the following format:
+
+```javascript
+// pages/api/hello.js
+export default function handler(req, res) {
+  res.status(200).json({ text: 'Hello' });
+}
+```
+
+These can be deployed as Serverless Functions (also known as Lambdas).
+
+- `req` is an instance of [http.IncomingMessage](https://nodejs.org/api/http.html), plus some pre-built middlewares.
+- `res` is an instance of [http.ServerResponse](https://nodejs.org/api/http.html), plus some helper functions.
+- Do not fetch an API route (that itself fetches data from an external source) from `getStaticProps` or `getStaticPaths`. This produces an additional call, reducing performance. Instead, the logic for fetching the data from the external source can be shared by using a `lib/` directory, or use the `fetch()` API directly in `getStaticProps`.
+- API Routes can be dynamic, just like regular pages. Take a look at [Dynamic API Routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes#dynamic-api-routes)
+
+A good use case for API Routes is handling form input. For example, you can create a form on your page and have it send a `POST` request to your API Route. You can then write code to directly save it to your database. The API Route code will not be part of your client bundle, so you can safely write server-side code.
+
+```javascript
+export default function handler(req, res) {
+  const email = req.body.email;
+  // Then save email to your database, etc...
 }
 ```
 
