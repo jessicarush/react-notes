@@ -26,6 +26,10 @@ A list of react packages/libraries that I've used.
 - [html2canvas](#html2canvas)
 - [jspdf](#jspdf)
 - [styled-components](#styled-components)
+- [styled-jsx](#styled-jsx)
+- [gray-matter](#gray-matter)
+- [remark](#remark)
+- [date-fns](#date-fns)
 
 <!-- tocstop -->
 
@@ -568,7 +572,7 @@ See [styling.md](styling.md).
 
 ## styled-jsx 
 
-[styled-jsx](https://github.com/vercel/styled-jsx) is a CSS-in-JS librray built specifically for Next.js.
+[styled-jsx](https://github.com/vercel/styled-jsx) is a CSS-in-JS library built specifically for Next.js.
 
 See [nextjs.md](nextjs.md)
 
@@ -577,4 +581,17 @@ See [nextjs.md](nextjs.md)
 
 [gray-matter](https://github.com/jonschlinkert/gray-matter) is a library for parsing YAML front-matter in documents. 
 
-See *courses/nextls/next_blog*.
+See *courses/nextjs/next_blog*.
+
+
+## remark 
+
+[remark](https://github.com/remarkjs/remark) is a tool that transforms markdown with plugins. These plugins can inspect and change your markup.
+
+See *courses/nextjs/next_blog*.
+
+
+## date-fns 
+
+[date-fns](https://github.com/date-fns/date-fns) is a date utility library that provides a comprehensive toolset for manipulating JavaScript dates in a browser & Node.
+
