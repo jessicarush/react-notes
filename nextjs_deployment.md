@@ -6,6 +6,17 @@ See <https://nextjs.org/docs/pages/building-your-application/deploying>
 
 <!-- toc -->
 
+- [Deploy to Vercel](#deploy-to-vercel)
+- [Deploy to another provider](#deploy-to-another-provider)
+  * [Node.js server](#nodejs-server)
+  * [Static export](#static-export)
+  * [Deploy to Digitalocean](#deploy-to-digitalocean)
+    + [App Platform](#app-platform)
+    + [Droplet](#droplet)
+- [To investigate](#to-investigate)
+
+<!-- tocstop -->
+
 ## Deploy to Vercel 
 
 Vercel is made by the creators of Next.js and has first-class support for Next.js. When you deploy your Next.js app to Vercel, the following happens by default:
