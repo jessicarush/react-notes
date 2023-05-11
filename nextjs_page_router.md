@@ -1,10 +1,13 @@
 # Next.js
 
+Next used to use something called *Pages router* but now they are moving to a different setup called *App router* which is now officially recommended over *Page router*. Much of the information below is in the *Pages router* format because that's what their official tutorial still uses at the time of this writing. It would have been nice if they had posted a warning at the start of the tutorial that it's outdated and not using the recommended router. I would have skipped it since I now burned a week learning a bunch of features that don't exist in *App router*.
+
+ See [nextjs_app_router.md](nextjs_app_router.md) for *App router* information. Note that you can continue to use a pages directory with the *App router*.
+
 > Next.js is an open-source development framework built on top of Node.js enabling React based web applications functionalities such as server-side rendering and generating static websites. React documentation mentions Next.js among "Recommended Toolchains" advising it to developers as a solution when "Building a server-rendered website with Node.js". Where traditional React apps render all their content in the client-side browser, Next.js is used to extend this functionality to include applications rendered on the server side.
 
 It's important to underline the fact that Next.js is a framework (as opposed to just a library). It enforces a structure and allows for advanced features like hybrid *server side + client side rendering*. It has its own routing features, analytics, static file serving and more.
 
-Also noteworthy is the documentation looks very good and includes a [nice tutorial section](https://nextjs.org/learn/foundations/about-nextjs).
 
 ## Table of Contents
 
@@ -109,8 +112,7 @@ To start the development server on http://localhost:3000
 
 ## Directory structure
 
-Todo..
-
+Todo...
 
 ### pages/_app.js
 
@@ -133,8 +135,6 @@ function MyApp({ Component, pageProps }) {
 
 export default MyApp;
 ```
-
-### pages/index.js 
 
 Note `<Head>` is a React Component that is built into Nextjs. It allows you to modify the `<head>` of any page.
 
@@ -294,6 +294,8 @@ Note the height and width props should be the desired rendering size, with an as
   alt="Jessica Rush"
 />
 ```
+
+There are many more props, [see the docs](https://nextjs.org/docs/app/api-reference/components/image).
 
 ## Styles
 
@@ -1092,7 +1094,7 @@ export default Post;
 ```
 
 
-## 404 Pages 
+## 404 & 500 Pages 
 
 To create a custom 404 page, create `pages/404.js`. This file is statically generated at build time.
 
@@ -1100,6 +1102,15 @@ To create a custom 404 page, create `pages/404.js`. This file is statically gene
 // pages/404.js
 export default function Custom404() {
   return <h1>404 - Page Not Found</h1>;
+}
+```
+
+And 500:
+
+```javascript
+// pages/500.js
+export default function Custom500() {
+  return <h1>500 - Server-side error occurred</h1>;
 }
 ```
 
