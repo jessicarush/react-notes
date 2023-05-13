@@ -4,6 +4,16 @@
 
 <!-- toc -->
 
+- [HTTP status codes](#http-status-codes)
+  * [200](#200)
+  * [301/308](#301308)
+  * [404](#404)
+  * [500](#500)
+  * [503](#503)
+- [Robots.txt](#robotstxt)
+
+<!-- tocstop -->
+
 ## HTTP status codes 
 
 There are many status codes, but only a handful are meaningful in an SEO context.

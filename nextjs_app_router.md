@@ -8,6 +8,18 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 
 <!-- toc -->
 
+- [Getting started](#getting-started)
+- [Directory structure](#directory-structure)
+- [Server-side vs Client-side components](#server-side-vs-client-side-components)
+- [Server components can do API calls](#server-components-can-do-api-calls)
+- [Server components cannot contain hooks](#server-components-cannot-contain-hooks)
+- [loading.js](#loadingjs)
+- [error.js](#errorjs)
+- [Dynamic routes](#dynamic-routes)
+  * [catch-all routes](#catch-all-routes)
+
+<!-- tocstop -->
+
 ## Getting started
 
 See <https://nextjs.org/docs/app/api-reference/create-next-app>

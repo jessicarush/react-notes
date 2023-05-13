@@ -1,4 +1,4 @@
-# Next.js
+# Next.js (using Page Router)
 
 Next used to use something called *Pages router* but now they are moving to a different setup called *App router* which is now officially recommended over *Page router*. Much of the information below is in the *Pages router* format because that's what their official tutorial still uses at the time of this writing. It would have been nice if they had posted a warning at the start of the tutorial that it's outdated and not using the recommended router. I would have skipped it since I now burned a week learning a bunch of features that don't exist in *App router*.
 
@@ -19,7 +19,6 @@ It's important to underline the fact that Next.js is a framework (as opposed to 
   * [Automatic setup](#automatic-setup)
 - [Directory structure](#directory-structure)
   * [pages/_app.js](#pages_appjs)
-  * [pages/index.js](#pagesindexjs)
 - [Automatic server side routing in pages](#automatic-server-side-routing-in-pages)
 - [Client side routing with Link](#client-side-routing-with-link)
 - [Scripts](#scripts)
@@ -44,7 +43,7 @@ It's important to underline the fact that Next.js is a framework (as opposed to 
   * [Fallbacks](#fallbacks)
     + [What about handling paths that don't exist?](#what-about-handling-paths-that-dont-exist)
     + [How is the loading state implemented](#how-is-the-loading-state-implemented)
-- [404 Pages](#404-pages)
+- [404 & 500 Pages](#404--500-pages)
 - [Incremental Static Regeneration](#incremental-static-regeneration)
 - [API routes](#api-routes)
 - [Using a template](#using-a-template)
