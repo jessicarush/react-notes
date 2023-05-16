@@ -40,6 +40,8 @@ They recommend the **Develop, Preview, Ship** process:
 - **Preview**: Push changes to a branch on GitHub, and Vercel creates a preview deployment that’s available via a URL. You can share this preview URL with others for feedback. In addition to doing code reviews, you can do deployment previews.
 - **Ship**: Merged the pull request to main to ship to production.
 
+This all being said I have heard that [Vercel can get very expensive at scale](https://www.youtube.com/watch?v=JiuBeLDSGR0)... were users are getting bills for thousands of dollars.
+
 ## Deploy to another provider
 
 You have two options, you can deploy a Next.js app as a static site (some limitations), or with a Node.js server to use all the features.
