@@ -11,6 +11,11 @@
   * [500](#500)
   * [503](#503)
 - [Robots.txt](#robotstxt)
+- [Metadata files](#metadata-files)
+  * [favicon.ico, apple-icon.jpg, icon.jpg](#faviconico-apple-iconjpg-iconjpg)
+  * [opengraph-image](#opengraph-image)
+  * [robots.txt](#robotstxt)
+  * [sitemap.xml](#sitemapxml)
 
 <!-- tocstop -->
 
@@ -83,3 +88,63 @@ Todo...
 
 <https://nextjs.org/learn/seo/crawling-and-indexing/robots-txt>
 
+
+------------------------------------------------------------------------------
+
+> The above info is from the old tutorial that uses Page Router. This all needs to be translated to App Router. The following is App Router stuff.
+
+## Metadata files
+
+For most meta data see [nextjs_app_router.md](nextjs_app_router.md#meta-data).
+
+### favicon.ico, apple-icon.jpg, icon.jpg 
+
+### opengraph-image
+
+A custom image when the url is shared.
+
+Place a `png|jpeg|gif` image called `opengraph-image.png` in your `app` directory and to any route segment. This will get added as the meta tags like:
+
+```html
+<meta property="og:image" content="" />
+```
+
+See [metadata/opengraph-image](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/opengraph-image)
+
+Note you can also create this as a `.js` file: see the [open graph protocol](https://ogp.me/).
+
+### robots.txt 
+
+### sitemap.xml 
+
+Generate site maps at build time.
+
+Create `app/sitemap.js` and `export` and `async` function called `sitemap` that returns an array of objects that contain a url and last modified. This page will be read by web crawlers and be available at `http://localhost:3000/sitemap.xml`. For example:
+
+
+```javascript
+export default async function sitemap() {
+  // List regular routes
+  const pages = ['', 'about', 'color', 'login', 'signup'];
+
+  // Also fetch any dynamic routes
+  const res = await fetch(url);
+  const posts = await res.json()
+
+  // Create arrays:
+  const dynamicRoutes = posts.map((post) => {
+    return {
+      url: `http://localhost:3000/post/${post.id}`,
+      lastModified: new Date().toISOString()
+    }
+  });
+  const routes = pages.map((route) => {
+    return {
+      url: `http://localhost:3000/${route}`,
+      lastModified: new Date().toISOString()
+    }
+  });
+
+  return [...routes, ...dynamicRoutes];
+}
+```
