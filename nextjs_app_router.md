@@ -4,24 +4,36 @@ Next used to use something called *Pages router* but now they are moving to a di
 
 The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of the differences between the two routers.
 
+
 ## Table of Contents
 
 <!-- toc -->
 
 - [Getting started](#getting-started)
 - [Directory structure](#directory-structure)
+- [Special file hierarchy](#special-file-hierarchy)
+- [Pages and layouts](#pages-and-layouts)
+  * [layout.js](#layoutjs)
+- [Templates](#templates)
 - [Server-side vs Client-side components](#server-side-vs-client-side-components)
+- [context with server components](#context-with-server-components)
+- [server-only](#server-only)
 - [Server components can do API calls](#server-components-can-do-api-calls)
 - [Server components cannot contain hooks](#server-components-cannot-contain-hooks)
 - [loading.js](#loadingjs)
 - [error.js](#errorjs)
+- [Sharing data between server components](#sharing-data-between-server-components)
+  * [Sharing fetch request data between server components](#sharing-fetch-request-data-between-server-components)
+- [Linking and navigating](#linking-and-navigating)
+  * [Active links](#active-links)
+- [Route groups](#route-groups)
 - [Dynamic routes](#dynamic-routes)
+  * [Link to dynamic routes](#link-to-dynamic-routes)
   * [catch-all routes](#catch-all-routes)
 - [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch)
 - [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate)
-- [layout.js](#layoutjs)
-- [meta data](#meta-data)
 - [API Routes](#api-routes)
+- [meta data](#meta-data)
 
 <!-- tocstop -->
 
@@ -35,9 +47,10 @@ To start the development server on http://localhost:3000
 
 - `npm run dev`
 
+
 ## Directory structure
 
-Page routes are indicated by folders instead of files with App Router. Each folder represents a route and it will have a `page.js` file which is the content.
+Page routes are indicated by folders instead of files with App Router. Each folder represents a *route segment* (maps to a *URL segment*) and it will have a `page.js` file which is the content. The `layout.js` is where you can place UI that is shared accross pages.
 
 ```
 app
@@ -99,14 +112,170 @@ If I took away the brackets in the `auth` folder name, the routes would be:
 
 And, `/auth` would return a 404 since there is no `page.js` in that directory.
 
-## Server-side vs Client-side components
+Other files and folders that can be used:
 
-Components are now **server-side by default**, where previously you had to use `getServerSideProps`. Now, you need to specifically opt into client-side using `"use client"` at the start of your file.
+```
+app
+  ├─api
+  │  └─apiname
+  │    └─route.js
+  ├─components
+  ├─hooks
+  ├─lib
+  ├─pagename
+  │  ├─error.js
+  │  ├─layout.js
+  │  ├─loading.js
+  │  ├─Navbar.js
+  │  ├─Navbar.js
+  │  ├─Navbar.module.css
+  │  ├─Navbar.test.js
+  │  ├─page.js
+  │  └─page.module.css
+  ├─favicon.ico
+  ├─global-error.js
+  ├─globals.css
+  ├─layout.js
+  ├─not-found.js
+  ├─page.js
+  ├─page.module.css
+  └─sitemap.js
+public
+```
 
-You can test this with a `console.log`. Without `"use client"`, you will only see the log on the server where npm is running the app.
+**api**
+
+Its a good idea to create API routes in an API folder. Then inside that folder another folder will determine the route name. Finally, the route is defined in a file called `route.js`. This file name is specifically used for server-side API endpoints for a route.
+
+- **components**: Components which are shared throughout the app can go here. Components which are only used on ine page could be stored in that pages folder.
+- **hooks**: Put yer custom hooks in here.
+- **lib**: For library type functions and resources. Some people also call this `utils`.
+- **pages**: A page directory can contain its own `layout.js`. `loading.js` and `error.js` files get displayed automatically under certain conditions (they replace `page.js` in the layout).
+- **favicon.ico**: Yep.
+- **global-error.js**: Displayed when catching errors in the root layout.js.
+- **globals.css**: Global css file.
+- **layout.js**: Root layout. A layout wraps a page or child segment.
+- **not-found.js**: Create UI to show when the notFound function is thrown within a route segment or when a URL is not matched by any route (404).
+- **page.js**: index.html
+- **page.module.css**: Css module for index.html
+- **sitemap.js**: A file that can be used to generate an XML sitemap for web crawlers.
+- **public**: You can optionally create a public folder to store static assets such as images, fonts, etc. Files inside public directory can then be referenced by your code starting from the base URL (/).
+
+In addition:
+
+- **template.js**: Similar to layout.js, except a new component instance is mounted on navigation. Use layouts unless you need this behavior.
+- `.js`, `.jsx`, or `.tsx` file extensions can be used for special files.
+- You can place page/feature specific components in the page segment folder and reusable components in the root components folder.
+
+
+## Special file hierarchy 
+
+`pages.js`, `layout.js`, `route.js`, `error.js` are all examples of *special* files in Nextjs. The React components defined in the special files of a route segment are rendered in a specific hierarchy:
+
+For example: 
+
+- layout.js
+- template.js
+- error.js (React error boundary)
+- loading.js (React suspense boundary)
+- not-found.js (React error boundary)
+- page.js or nested layout.js
+
+Converts to:
 
 ```javascript
-"use client"
+<Layout>
+  <Template>
+    <ErrorBoundry fallback={<Error />}>
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundry fallback={<NotFound />}>
+          <Page />
+        </ErrorBoundry>
+      </Suspense>
+    </ErrorBoundry>
+  </Template>
+</Layout>
+```
+
+In a nested route, the components of a segment will be nested inside the components of its parent segment.
+
+
+## Pages and layouts 
+
+Pages are intended to show UI **unique** to a route, and layouts to show UI that is **shared** across multiple routes. You can have a root layout (required) and optional layouts in a page segments as well. 
+
+Define a layout by *default exporting* a React component from a `layout.js` file. The component should accept a `children` prop that will be populated with a child layout (if it exists) or a child page during rendering.
+
+- A page is always the leaf of the route subtree.
+- `.js`, `.jsx`, or `.tsx` file extensions can be used for pages and layouts.
+- A page.js file is required to make a route segment publicly accessible.
+- Pages and layouts are server components by default but can be set to a client component, except for the root layout, which **can not** be set to a client component.
+- On navigation, layouts preserve state, remain interactive, and do not re-render.
+- Layouts can be nested.
+- Layouts in a route are nested by default. Each parent layout wraps child layouts below it using the React children prop.
+- You can use *Route Groups* to opt specific route segments in and out of shared layouts.
+- Passing data between a parent layout and its children is not possible. However, you can fetch the same data in a route more than once, and React will automatically dedupe the requests without affecting performance.
+
+
+### layout.js 
+
+The app has a root `layout.js` in the `app` directory. All pages are rendered in `{children}`. The root layout must define <html> and <body> tags since Next.js does not automatically create them.
+
+```javascript
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+Each page can then optionally have its own layout. The page will be rendered again in the `{children}`. Note each layout can have its own metadata.
+
+```javascript
+export const metadata = {
+  title: 'Fetch color demo',
+  description: 'Fetching from an API demo.',
+}
+
+export default function ColorLayout({ children }) {
+  return (
+      <div>
+        <p>color page layout</p>
+        {children}
+      </div>
+  )
+}
+```
+
+- The app directory must include a root `layout.js`
+- The root layout must define `<html>` and `<body>` tags
+- You should **not** manually add `<head>` tags such as `<title>` and `<meta>` to root layouts. Instead, you should use the [Metadata API](https://nextjs.org/docs/app/api-reference/file-conventions/metadata) which automatically handles advanced requirements such as streaming and de-duplicating `<head>` elements.
+- You can use [route groups](https://nextjs.org/docs/app/building-your-application/routing/defining-routes#route-groups) to create multiple root layouts or opt specific routes out of shared layouts. Navigating across multiple root layouts will cause a full page load.
+
+
+## Templates 
+
+Templates are similar to layouts in that they wrap each child layout or page. Unlike layouts that persist across routes and maintain state, templates create a new instance for each of their children on navigation. This means that when a user navigates between routes that share a template, a new instance of the component is mounted, DOM elements are recreated, state is not preserved, and effects are re-synchronized.
+
+There may be cases where you need those specific behaviors, and templates would be a more suitable option than layouts. For example:
+
+- Enter/exit animations using CSS or animation libraries.
+- Features that rely on useEffect (e.g logging page views) and useState (e.g a per-page feedback form).
+- To change the default framework behavior. For example, Suspense Boundaries inside layouts only show the fallback the first time the Layout is loaded and not when switching pages. For templates, the fallback is shown on each navigation.
+
+These are created the same layouts but using the special name `template.js`.
+
+
+## Server-side vs Client-side components
+
+All Components inside `app` are **server-side by default**, where previously you had to use `getServerSideProps`. Now, you need to specifically opt into client-side using `'use client'` at the start of your file.
+
+You can test this with a `console.log`. Without `'use client'`, you will only see the log on the server where npm is running the app.
+
+```javascript
+'use client'
 
 export default function About() {
   console.log('About render');
@@ -118,6 +287,20 @@ export default function About() {
 }
 ```
 
+Once `'use client'` is defined in a file, all other modules *imported* into it are considered part of the client bundle. Technically, you don't need to put `'use client'` at the top of these imported components. 
+
+So if a server component is **imported** into a client component, it too becomes a client component.
+
+Instead, you could pass the server component as a **prop** to the client component. This will keep it a server component.
+
+In addition, if a server component is **nested** inside a client component, it remains a server component. for example:
+
+```jsx
+<MyClientComponent>
+  <MyServerComponent /> {/* Will remain a server component */}
+</MyClientComponent>
+```
+
 What do you need to do? | Server Component | Client Component
 :---------------------- | :--------------- | :---------------
 Fetch data | ✓ | ✕
@@ -125,12 +308,54 @@ Access backend resources (directly) | ✓ | ✕
 Keep sensitive information on the server (access tokens, API keys, etc) | ✓ | ✕
 Keep large dependencies on the server / Reduce client-side JavaScript | ✓ | ✕
 Add interactivity and event listeners (onClick(), onChange(), etc) | ✕ | ✓
-Use State and Lifecycle Effects (useState(), useReducer(), useEffect(), etc) | ✕ | ✓
+Use State and Lifecycle Effects (useState(), useReducer(), useEffect(), createContext) | ✕ | ✓
 Use browser-only APIs | ✕ | ✓
 Use custom hooks that depend on state, effects, or browser-only APIs | ✕ | ✓
 Use React Class components | ✕ | ✓
 
-It looks like if you have things like a react context provider, you can make the provider a client component and wrap it around server components.
+Props passed from server to client Components need to be serializable. This means that values such as functions, Dates, etc, cannot be passed directly to Client Components.
+
+
+## context with server components
+
+So, if you have things like a react context provider, you can make the provider a client component and wrap it around server components without issues. Keep in mind though, context **cannot** be created or consumed directly within server components. This is because server components have no React state (since they're not interactive). If you need to use a third-party package provider and you get an error, its probably because they haven't added `use-client` yet. So just create your own:
+
+```javascript
+'use client';
+ 
+import { ThemeProvider } from 'acme-theme';
+import { AuthProvider } from 'acme-auth';
+ 
+export function Providers({ children }) {
+  return (
+    <ThemeProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </ThemeProvider>
+  );
+}
+```
+
+Then in your server component:
+
+```javascript
+import { Providers } from './providers';
+ 
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}
+```
+
+
+## server-only
+
+If you have a module that it only intended to run on the server (in a server component), because it contains secrets, you can ensure it doesn't accidentally get used in a client component by installing the package `npm install server-only` then put `import 'server-only'` at the top of the file. Now, any client component that imports code from that file will receive a build-time error explaining that this module can only be used on the server. There in also a `client-only` package.
+
 
 ## Server components can do API calls
 
@@ -170,6 +395,7 @@ export async function getColorWithAxios() {
 }
 ```
 
+
 ## Server components cannot contain hooks
 
 This is because Server Components have no React state (since they're not interactive) and they rely on client-side APIs. As a result, it would be difficult to implement a loading state, so they have designed it so that we do this simply by adding a file to our page route folder:
@@ -192,6 +418,7 @@ export default Loading;
 ```
 
 Q: `loading.js` file is for **server components only**?
+
 
 ## error.js 
 
@@ -277,6 +504,108 @@ export default function GlobalError({ error, reset }) {
 }
 ```
 
+
+## Sharing data between server components
+
+You can use native JavaScript patterns like global singletons within module scope if you have common data that multiple Server Component need to access.
+
+For example, a module can be used to share a database connection across multiple components:
+
+```javascript
+// utils/database.js
+export const db = new DatabaseConnection();
+```
+
+```javascript
+// app/users/layout.js
+import { db } from '@utils/database';
+ 
+export async function UsersLayout() {
+  let users = await db.query();
+  // ...
+}
+```
+
+```javascript
+// app/users/[id]/page.js
+import { db } from '@utils/database';
+ 
+export async function DashboardPage() {
+  let user = await db.query();
+  // ...
+}
+```
+
+
+### Sharing fetch request data between server components
+
+When fetching data, you may want to share the result of a fetch between a page or layout and some of its children components. Next recommends that rather than passing props around, you put your data fetching code in the same place as the code that uses the data (colocating). If you do this and multiple components end up making the same fetch request, Next.js will automatically optimize this by only making the request once (deduping).
+
+
+## Linking and navigating 
+
+There are two ways to navigate between routes:
+
+- `<Link> `Component
+- `useRouter` Hook
+
+The `<Link>` component is done the same as in Page Router:
+
+```javascript
+import Link from 'next/link';
+ 
+export default function Home() {
+  return <Link href="/dashboard">Dashboard</Link>;
+}
+```
+
+Note, links will cause the page to be *prefetched* in the background. You can disable prefetching by passing `prefetch={false}`.
+
+
+### Active links
+
+Use the `usePathname` hook to determine if a link is active:
+
+```javascript
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import styles from './Navlinks.module.css';
+
+const links = [
+  { name: 'one', href: '/one' },
+  { name: 'two', href: '/two' },
+  { name: 'three', href: '/three' }
+];
+
+export default function Navlinks(props) {
+  const pathname = usePathname();
+
+  return (
+    <ul className={styles.navlinks}>
+      {links.map((link) => {
+        const isActive = pathname.startsWith(link.href);
+
+        return (
+          <li key={link.name}>
+            <Link href={link.href} className={isActive ? styles.active : ''}>
+              {link.name}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+```
+
+
+
+## Route groups 
+
+
+
 ## Dynamic routes 
 
 Create dynamic routes by doing the directory structure like: `app/post/[postid]/page.js`.
@@ -334,6 +663,20 @@ In this case, any routes not returned in by `generateStaticParams` will not be g
 
 **TODO... how to test a 404 is returned here?**
 
+
+### Link to dynamic routes
+
+
+```javascript
+<ul>
+  {allPostsData.map((post) => (
+    <li key={post.id}>
+      <Link href={`/posts/${post.id}`}>{post.title}</Link>
+    </li>
+  ))}
+</ul>
+```
+
 ### catch-all routes
 
 Note the `[postid]` directory name will only handle and exact match for that url structure. For example: `app/post/100` or `app/post/fart` will be handled but `app/post/100/another` would result in a 404. If I rename my folder `[...postid]`, this will catch all urls such as:
@@ -349,7 +692,7 @@ In this case `props.params/postid` would return an array like `[ '100', 'a', 'b'
 
 ## Caching/revalidating with `fetch()`
 
-Nextjs has extended the standard `fetch()` API. One of the main options is to do with caching and asa result whether the page is static or dynamic. By default, a fetch call will have its result cache set to `force-cache` which means it will fetch the data once during build time and return a static page with the result data. 
+Nextjs has extended the standard `fetch()` API. One of the main options is about caching and whether the page is static or dynamic. By default, a fetch call will have its result cache set to `force-cache` which means it will fetch the data once during build time and return a static page with the result data. 
 
 If you want the page to fetch new data on every request (thereby creating a dynamic page), you can add your own cache object to the `fetch()` call:
 
@@ -439,35 +782,35 @@ export default Color;
 
 See the [revalidate option](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#revalidate).
 
-Keep in mind this can be hard to test because with axios in dev, it runs on every page refresh. If you do a `npm run build`, teh output will tell you whether that page is dynamic or static.
+Keep in mind this can be hard to test because with axios in dev, it runs on every page refresh. If you do a `npm run build`, the output will tell you whether that page is dynamic or static.
 
 
-## layout.js 
+## API Routes
 
-The app has a root `layout.js` in the `app` directory. All pages are rendered in `{children}`.
-
-Each page can then optionally have its own layout. The page will be rendered again in the `{children}`. Note each layout can have its own metadata.
+In the app directory, create an `api` directory. Then, for every api route create a directory with the route name containing a file called `route.js`. Inside this file you will do a named export (not default) of an async function of a http verb like `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.
 
 ```javascript
-export const metadata = {
-  title: 'Fetch color demo',
-  description: 'Fetching from an API demo.',
-}
+// app/api/rogers/route.js
 
-export default function ColorLayout({ children }) {
-  return (
-      <div>
-        {children}
-        <p>color page layout</p>
-      </div>
-  )
+export async function GET(req) {
+  // Get search params from the request object
+  const { searchParams } = new URL(req.url);
+  const myparam = searchParams.get('myparam');
+  // Get response data
+  const quote = randomSelect(mrRogersQuotes);
+  // Response in a native Web API
+  return new Response(JSON.stringify({data: quote}))
 }
 ```
 
-- The app directory must include a root `layout.js`
-- The root layout must define `<html>` and `<body>` tags
-- You should **not** manually add `<head>` tags such as `<title>` and `<meta>` to root layouts. Instead, you should use the [Metadata API](https://nextjs.org/docs/app/api-reference/file-conventions/metadata) which automatically handles advanced requirements such as streaming and de-duplicating `<head>` elements.
-- You can use [route groups](https://nextjs.org/docs/app/building-your-application/routing/defining-routes#route-groups) to create multiple root layouts. Navigating across multiple root layouts will cause a full page load.
+For POST requests get access to the body like so:
+
+```javascript
+export async function POST(req) {
+  const body = await req.json();
+  console.log(body);
+}
+```
 
 
 ## meta data
@@ -519,32 +862,4 @@ export const metadata = {
     telephone: false,
   },
 };
-```
-
-
-## API Routes
-
-In the app directory, create an `api` directory. Then, for every api route create a directory with the route name containing a file called `route.js`. Inside this file you will do a named export (not default) of an async function of a http verb like `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.
-
-```javascript
-// app/api/rogers/route.js
-
-export async function GET(req) {
-  // Get search params from the request object
-  const { searchParams } = new URL(req.url);
-  const myparam = searchParams.get('myparam');
-  // Get response data
-  const quote = randomSelect(mrRogersQuotes);
-  // Response in a native Web API
-  return new Response(JSON.stringify({data: quote}))
-}
-```
-
-For POST requests get access to the body like so:
-
-```javascript
-export async function POST(req) {
-  const body = await req.json();
-  console.log(body);
-}
 ```
