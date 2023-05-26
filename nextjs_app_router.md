@@ -50,7 +50,7 @@ To start the development server on http://localhost:3000
 
 ## Directory structure
 
-Page routes are indicated by folders instead of files with App Router. Each folder represents a *route segment* (maps to a *URL segment*) and it will have a `page.js` file which is the content. The `layout.js` is where you can place UI that is shared accross pages.
+Page routes are indicated by folders instead of files with App Router. Each folder represents a *route segment* (maps to a *URL segment*) and it will have a `page.js` file which is the content. The `layout.js` is where you can place UI that is shared across pages.
 
 ```
 app
@@ -73,7 +73,7 @@ This will produce:
 /contact
 ```
 
-If you want to put a bunch of page folders in a folder just for your own organization, you can *opt out* of the routing structure by naming the folder with brackets `()`. These will be ignored in the url path.
+If you want to put a bunch of page folders in a folder just for your own organization, you can *opt out* of the routing structure by naming the folder with brackets `()`. This is called a *route group*. These folders will be ignored in the url path.
 
 ```
 app
@@ -409,7 +409,7 @@ This `loading.js` file in our page's route folder will be displayed until the ab
 const Loading = () => {
   return (
     <div>
-      <p>I am a skelelton/wireframe version or loading animation.</p>
+      <p>I am a skeleton/wireframe version or loading animation.</p>
     </div>
   );
 };
@@ -561,7 +561,6 @@ export default function Home() {
 
 Note, links will cause the page to be *prefetched* in the background. You can disable prefetching by passing `prefetch={false}`.
 
-
 ### Active links
 
 Use the `usePathname` hook to determine if a link is active:
@@ -600,10 +599,106 @@ export default function Navlinks(props) {
 }
 ```
 
+### Fragment links
+
+```javascript
+<Link href="/#test" scroll={false}>
+  Scroll to id.
+</Link>
+// ...
+<p id="test">Test fragment</p>
+```
+
+### useRouter 
+
+The `useRouter` hook can be used if you need to do some work before navigating.
+
+```javascript
+'use client'
+
+import { useRouter } from 'next/navigation';
+
+export default function Home() {
+  const router = useRouter();
+
+  const handleClick = () => {
+    // Do some other stuff
+    console.log('to color');
+    // Then go to route
+    router.push('/color');
+  };
+
+  return (
+    <main>
+      <button type='button' onClick={handleClick}>Go to color</button>
+    </main>
+  );
+}
+```
+
+> :warning: Don't let vscode fuck you here. When I imported `useRouter`, it autocompleted as `from next/router` which does not work. You need to import it from `next/navigation`!
+
+In addition is `push()` you can `refresh()`, `prefetch()`, `back()` and `forward()`.
 
 
 ## Route groups 
 
+The hierarchy of the app folder maps directly to URL paths. However, it’s possible to break out of this pattern by creating a route group. Route groups are created by using parenthesis in the filder name, e.g. `(auth)`. Route groups can be used to:
+
+- Organize routes without affecting the URL structure.
+- Opting-in specific route segments into a layout.
+- Create multiple root layouts by splitting your application.
+
+For example:
+
+```
+Organize routes without affecting the URL:
+
+app
+  ├─(auth)
+  │  ├─login
+  │  │  └─page.js
+  │  └─signup
+  │     └─page.js
+  ├─favicon.ico
+  ├─globals.css
+  ├─layout.js
+  └─page.js
+
+Opting-in routes that use the same layout:
+
+app
+  ├─(shop)
+  │  ├─account
+  │  │  └─page.js
+  │  ├─cart
+  │  │  └─page.js
+  │  └─layout.js
+  ├─favicon.ico
+  ├─globals.css
+  ├─layout.js
+  └─page.js
+
+Creating multiple root layouts:
+
+app
+  ├─(main)
+  │  ├─layout.js
+  │  └─...
+  ├─(auth)
+  │  ├─layout.js
+  │  └─...
+  ├─favicon.ico
+  └─globals.css
+```
+
+With multiple root layouts: 
+
+- the `<html>` and `<body>` tags need to be added to each root layout!
+- update the global css import to `import '../globals.css'`
+- one of the root groups should contain the `page.js` for `/`
+- make sure routes in different route groups don't resolve to the same URL!
+- Navigating across different root layouts will cause a full page load
 
 
 ## Dynamic routes 
