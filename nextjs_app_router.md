@@ -420,6 +420,31 @@ export default Loading;
 Q: `loading.js` file is for **server components only**?
 
 
+## Streaming with suspense 
+
+In addition to `loading.js`, you can also manually create Suspense Boundaries for your own components. This is great for isolating specific components that may take longer to fetch data on the server.
+
+`<Suspense> `works by wrapping a component that performs an asynchronous action (e.g. fetch data), showing fallback UI (e.g. skeleton, spinner) while it's happening, and then swapping in your component once the action completes.
+
+```javascript
+import { Suspense } from 'react';
+import { PostFeed, Weather } from './Components';
+ 
+export default function Posts() {
+  return (
+    <section>
+      <Suspense fallback={<p>Loading feed...</p>}>
+        <PostFeed />
+      </Suspense>
+      <Suspense fallback={<p>Loading weather...</p>}>
+        <Weather />
+      </Suspense>
+    </section>
+  );
+}
+```
+
+
 ## error.js 
 
 Similarly, if something goes wrong, Next.js uses Suspense magic to catch it and render the component in `error.js`. Error components need to be a client component because Next.js has to pass props to it implicitly. 
