@@ -10,22 +10,26 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 <!-- toc -->
 
 - [Getting started](#getting-started)
+- [Update](#update)
 - [Directory structure](#directory-structure)
 - [Special file hierarchy](#special-file-hierarchy)
 - [Pages and layouts](#pages-and-layouts)
   * [layout.js](#layoutjs)
 - [Templates](#templates)
-- [Server-side vs Client-side components](#server-side-vs-client-side-components)
-- [context with server components](#context-with-server-components)
+- [Server-side vs client-side components](#server-side-vs-client-side-components)
+- [Context with server components](#context-with-server-components)
 - [server-only](#server-only)
 - [Server components can do API calls](#server-components-can-do-api-calls)
 - [Server components cannot contain hooks](#server-components-cannot-contain-hooks)
 - [loading.js](#loadingjs)
+- [Streaming with suspense](#streaming-with-suspense)
 - [error.js](#errorjs)
 - [Sharing data between server components](#sharing-data-between-server-components)
   * [Sharing fetch request data between server components](#sharing-fetch-request-data-between-server-components)
 - [Linking and navigating](#linking-and-navigating)
   * [Active links](#active-links)
+  * [Fragment links](#fragment-links)
+  * [useRouter](#userouter)
 - [Route groups](#route-groups)
 - [Dynamic routes](#dynamic-routes)
   * [Link to dynamic routes](#link-to-dynamic-routes)
@@ -33,7 +37,7 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 - [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch)
 - [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate)
 - [API Routes](#api-routes)
-- [meta data](#meta-data)
+- [Meta data](#meta-data)
 
 <!-- tocstop -->
 
@@ -47,6 +51,12 @@ To start the development server on http://localhost:3000
 
 - `npm run dev`
 
+
+## Update 
+
+```
+npm i next@latest react@latest react-dom@latest eslint-config-next@latest
+```
 
 ## Directory structure
 
@@ -143,10 +153,7 @@ app
 public
 ```
 
-**api**
-
-Its a good idea to create API routes in an API folder. Then inside that folder another folder will determine the route name. Finally, the route is defined in a file called `route.js`. This file name is specifically used for server-side API endpoints for a route.
-
+- **api**: Its a good idea to create API routes in an API folder. Then inside that folder another folder will determine the route name. Finally, the route is defined in a file called `route.js`. This file name is specifically used for server-side API endpoints for a route.
 - **components**: Components which are shared throughout the app can go here. Components which are only used on ine page could be stored in that pages folder.
 - **hooks**: Put yer custom hooks in here.
 - **lib**: For library type functions and resources. Some people also call this `utils`.
@@ -166,7 +173,9 @@ In addition:
 - **template.js**: Similar to layout.js, except a new component instance is mounted on navigation. Use layouts unless you need this behavior.
 - `.js`, `.jsx`, or `.tsx` file extensions can be used for special files.
 - You can place page/feature specific components in the page segment folder and reusable components in the root components folder.
+- **default.js**: A *parallel route* fallback page
 
+See [Next.js Project Structure](https://nextjs.org/docs/getting-started/project-structure).
 
 ## Special file hierarchy 
 
@@ -268,7 +277,7 @@ There may be cases where you need those specific behaviors, and templates would 
 These are created the same layouts but using the special name `template.js`.
 
 
-## Server-side vs Client-side components
+## Server-side vs client-side components
 
 All Components inside `app` are **server-side by default**, where previously you had to use `getServerSideProps`. Now, you need to specifically opt into client-side using `'use client'` at the start of your file.
 
@@ -316,7 +325,7 @@ Use React Class components | ✕ | ✓
 Props passed from server to client Components need to be serializable. This means that values such as functions, Dates, etc, cannot be passed directly to Client Components.
 
 
-## context with server components
+## Context with server components
 
 So, if you have things like a react context provider, you can make the provider a client component and wrap it around server components without issues. Keep in mind though, context **cannot** be created or consumed directly within server components. This is because server components have no React state (since they're not interactive). If you need to use a third-party package provider and you get an error, its probably because they haven't added `use-client` yet. So just create your own:
 
@@ -528,6 +537,10 @@ export default function GlobalError({ error, reset }) {
   );
 }
 ```
+
+- Errors bubble up to the nearest parent error boundary. This means an `error.js` file will handle errors for all its nested child segments. More or less granular error UI can be achieved by placing `error.js` files at different levels in the nested folders of a route.
+- An `error.js` boundary will not handle errors thrown in a `layout.js` component in the same segment because the error boundary is nested inside that layouts component.
+- Even if a `global-error.js` is defined, it is still recommended to define a root `error.js` whose fallback component will be rendered within the root layout, which includes globally shared UI and branding.
 
 
 ## Sharing data between server components
@@ -933,7 +946,7 @@ export async function POST(req) {
 ```
 
 
-## meta data
+## Meta data
 
 There are [two ways to define Metadata](https://nextjs.org/docs/app/api-reference/functions/generate-metadata):
 
