@@ -10,6 +10,15 @@ The Nextjs App Router provides a set conventions to help you implement more adva
 
 <!-- toc -->
 
+- [Parallel routes](#parallel-routes)
+  * [simultaneously](#simultaneously)
+  * [conditionally](#conditionally)
+  * [Unmatched routes](#unmatched-routes)
+  * [Using parallel routes for modals](#using-parallel-routes-for-modals)
+- [Intercepting routes](#intercepting-routes)
+
+<!-- tocstop -->
+
 ## Parallel routes
 
 Parallel Routing allows you to *simultaneously* or *conditionally* render one or more pages in the same layout. This is helpful because each page can have it's own `loading.js` and `error.js`.
