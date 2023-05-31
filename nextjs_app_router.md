@@ -51,6 +51,9 @@ To start the development server on http://localhost:3000
 
 - `npm run dev`
 
+To run the build:
+
+- `npm run build && npm start`
 
 ## Update 
 
@@ -681,7 +684,7 @@ In addition is `push()` you can `refresh()`, `prefetch()`, `back()` and `forward
 
 ## Route groups 
 
-The hierarchy of the app folder maps directly to URL paths. However, it’s possible to break out of this pattern by creating a route group. Route groups are created by using parenthesis in the filder name, e.g. `(auth)`. Route groups can be used to:
+The hierarchy of the app folder maps directly to URL paths. However, it’s possible to break out of this pattern by creating a route group. Route groups are created by using parenthesis in the folder name, e.g. `(auth)`. Route groups can be used to:
 
 - Organize routes without affecting the URL structure.
 - Opting-in specific route segments into a layout.
@@ -761,7 +764,40 @@ export default Example;
 
 This would be equivalent to `getStaticPaths` with `fallback: true`. In other words, these will be dynamic pages so you will need to do your own handling for when the route doesn't exist. 
 
-**TODO... how to return a 404 when necessary here?**
+**Q: how to return a 404 when necessary here?**
+
+I couldn't find an example in the docs so I did this:
+
+```javascript
+import Image from 'next/image';
+import photos from '@/app/photos';
+import styles from './page.module.css';
+
+export default function PhotoPage({ params }) {
+  const photo = photos.find((p) => p.id === params.id);
+  const width = 600;
+
+  // If photo not found, return 404...
+
+  return photo ? (
+    <main>
+      <Image
+        alt=""
+        src={photo.imageSrc}
+        height={width * 1.25}
+        width={width}
+        className={styles.photo}
+      />
+    </main>
+  ) : (
+    <main>
+      <p>Not found</p>
+    </main>
+  );
+}
+```
+
+I did try to import the `NotFound` compoent from `not-found.js`, but it did not work.
 
 To pre-render static pages (like default `getStaticPaths` with `fallback: false`), you would create and export a special function called `generateStaticParams`. 
 
