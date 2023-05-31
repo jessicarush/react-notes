@@ -357,6 +357,16 @@ useEffect(() => {
 }, []);
 ```
 
+or...
+
+```javascript
+useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+    // Cleanup function
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onKeyDown]);
+```
+
 In development, your Effect will call `addEventListener()`, then immediately `removeEventListener()`, and then `addEventListener()` again with the same handler. So there would be only one active subscription (handler) at a time.
 
 #### Triggering animations 
