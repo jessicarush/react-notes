@@ -255,8 +255,75 @@ See:
 
 ## useCallback
 
-TODO...
+Call [useCallback](https://react.dev/reference/react/useCallback#usecallback) at the top level of your component to cache a function definition between re-renders (until its dependencies change). It should only be used as a performance optimization.
 
+```javascript
+const cachedFn = useCallback(fn, dependencies);
+```
+
+In JavaScript, a `function () {}` or `() => {}` always creates a different function, similar to how the `{}` object literal always creates a new object. Normally, this wouldn’t be a problem, but it means that if the function is passed to a child component, its props will never be the same, and if you're trying to do a memo optimization, it won’t work. This is where `useCallback` comes in handy.
+
+By wrapping a function in `useCallback`, you ensure that it’s the same function between the re-renders (until dependencies change). You don’t have to wrap a function in `useCallback` unless you do it for some specific reason. 
+
+Caching a function with `useCallback` is only valuable in a few cases:
+
+- You pass it as a prop to a component wrapped in memo. You want to skip re-rendering if the value hasn’t changed. Memoization lets your component re-render only if dependencies changed.
+- The function you’re passing is later used as a dependency of some Hook. For example, another function wrapped in `useCallback` depends on it, or you depend on this function from useEffect.
+
+There is no benefit to wrapping a function in `useCallback` in other cases. There is no significant harm to doing that either, so some teams choose to not think about individual cases, and memoize as much as possible. The downside is that code becomes less readable. Also, not all memoization is effective: a single value that’s “always new” is enough to break memoization for an entire component.
+
+For example:
+
+```javascript
+'use client'
+
+import { useCallback, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import styles from './Modal.module.css';
+
+
+function Modal({ children }) {
+  const overlay = useRef();
+  const router = useRouter();
+
+  const closeModal = useCallback(() => {
+    router.back();
+  }, [router]);
+  // const closeModal = () => {
+  //   router.back();
+  // };
+
+  const onClick = useCallback((e) => {
+    if (e.target === overlay.current) closeModal();
+  }, [closeModal, overlay]);
+  // const onClick = (e) => {
+  //   if (e.target === overlay.current) closeModal();
+  // };
+
+  const onKeyDown = useCallback((e) => {
+    if (e.key === 'Escape') closeModal();
+  }, [closeModal]);
+  // const onKeyDown = (e) => {
+  //   if (e.key === 'Escape') closeModal();
+  // };
+
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onKeyDown]);
+
+  return (
+    <div className={styles.wrapper} ref={overlay} onClick={onClick}>
+      <div className={styles.content}>
+        {children}
+        <button className={styles.close} onClick={closeModal}>close</button>
+      </div>
+    </div>
+  );
+};
+
+export default Modal;
+```
 
 ## useMemo
 
