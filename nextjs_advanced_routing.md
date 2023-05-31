@@ -62,7 +62,7 @@ export default function DashboardLayout({ children, team, projects }) {
 
 ### conditionally
 
-Parallel Routing also allow you to conditionally render a slot based on certain conditions, such as authentication state. This enables fully separated code on the same URL.
+Parallel Routing also allows you to conditionally render a slot based on certain conditions, such as authentication state. This enables fully separated code on the same URL.
 
 ```javascript
 import { getUser } from '@/lib/auth';
@@ -73,24 +73,92 @@ export default function Layout({ dashboard, login }) {
 }
 ```
 
-
 ### Unmatched routes
 
-[In the docs](https://nextjs.org/docs/app/building-your-application/routing/parallel-routes#unmatched-routes) they talk about creating a `default.js` file to handle situations where the other slot has another directory. I couldn't always get this to work though. The docs are way too thin here.
+[In the docs](https://nextjs.org/docs/app/building-your-application/routing/parallel-routes#unmatched-routes) they talk about creating a `default.js` file to handle situations where the other slot has another directory (url segment). It looks like this situation:
 
+```
+app
+  ├─dashboard
+  │  ├─@team
+  │  │  ├─settings    <-- This path doesn't exist for @projects
+  │  │  │  └─page.js
+  │  │  └─page.js
+  │  ├─@projects
+  │  │  └─page.js
+  │  ├─layout.js
+  │  └─page.js
+  ├─favicon.ico
+  ├─globals.css
+  ├─layout.js
+  ├─page.js
+  └─page.module.css
+```
+
+To resolve it, I need to add two `default.js` files. The one in `@projects` makes sense but the one in `dashboard` is a little less obvious. It turns out, during hard navigation, Next.js is unable to recover the active state for the `@projects` slot, and is looking for a `default.js` file in the dashboard segment.
+
+```
+app
+  ├─dashboard
+  │  ├─@team
+  │  │  ├─settings 
+  │  │  │  └─page.js
+  │  │  └─page.js
+  │  ├─@projects
+  │  │  ├─default.js    <-- This default.js makes sense
+  │  │  └─page.js
+  │  ├─default.js       <-- Needed for some reason when hard navigating
+  │  ├─layout.js
+  │  └─page.js
+  ├─favicon.ico
+  ├─globals.css
+  ├─layout.js
+  ├─page.js
+  └─page.module.css
+```
+
+If I don't want to render anything just do:
+
+```javascript
+// default.js
+export default function Default() {
+  return null;
+}
+```
 
 ### Using parallel routes for modals
 
-The [example in the docs](https://nextjs.org/docs/app/building-your-application/routing/parallel-routes#examples) is particularly lacking. There's simply not enough information there to be able to understand the usage and the benefit of using a parallel route. 
+The [example in the docs](https://nextjs.org/docs/app/building-your-application/routing/parallel-routes#examples) is particularly lacking. There's simply not enough information there to be able to understand the full usage. 
 
-For example, when navigating to `/login`, I get a 404 where `{ children }` is rendered. So I create a `default.js` for the root. Now I cannot see why I wouldn't just use a regular route.
+For example, if you navigate to the parallel route directly (or refresh while on the parallel route) Next.js cannot know which page should be showing in the background (`{children}` in the root layout). So in this case, you would want to define a root `default.js` for this situation specifically.
+
+The next issue is when you want to dismiss the modal, they say:
+
+> If a modal was initiated through client navigation, e.g. by using `<Link href="/login">`, you can dismiss the modal by calling `router.back()` or by using a `Link` component.
+
+However they don't provide any hints as to what to do if a modal was navigated to directly. In tis situation, `router.back()` would be empty. One would think you could do something like this:
+
+```javascript
+// ❌ Don't get excited, it doesn't work
+const closeModal = useCallback(() => {
+  if (typeof window !== "undefined" && window.history.length > 1) {
+    router.back();
+  } else {
+    router.push('/')
+  }
+  }, [router]);
+```
+
+But it doesn't work. First, the `history.length` is already at 2 on first navigate (is that just in dev? idk). Next, even if you bump the condition to `> 2`, the router goes to `/` but the modal remains open.
+
+You could fix this by using *Intercepting routes* instead, but I'm not sure why they put this as a parallel routes example.
 
 
 ## Intercepting routes 
 
 Intercepting routes allows you to load a route within the current layout while keeping the context for the current page. This routing paradigm can be useful when you want to "intercept" a certain route to show a different route.
 
-For example, when clicking on a photo from within a feed, a modal overlaying the feed should show up with the photo. In this case, Next.js intercepts the `/feed` route and "masks" this URL to show `/photo/123` instead.
+For example, when clicking on a photo from within a page, a modal overlaying the page should show up with a larger photo. In this case, Next.js intercepts the `/` route and "masks" this URL to show `/photo/123` instead.
 
 However, when navigating to the photo directly by for example when clicking a shareable URL or by refreshing the page, the entire photo page should render instead of the modal. No route interception should occur.
 
@@ -103,10 +171,137 @@ You can use:
 - `(..)(..)` to match segments two levels above
 - `(...)` to match segments from the root app directory
 
-
 Using this pattern to create modals overcomes some common challenges when working with modals, by allowing you to:
 
 - Make the modal content shareable through a URL
 - Preserve context when the page is refreshed, instead of closing the modal
 - Close the modal on backwards navigation rather than going to the previous route
 - Reopen the modal on forwards navigation
+
+For example:
+
+```
+app
+  ├─@modal
+  │  ├─(.)photos
+  │  │  └─[id]
+  │  │     └─page.js <-- This page will get rendered into the main page.js 
+  │  └─default.js    <-- This will prevent 404 not found when we're on other routes
+  ├─photos
+  │  └─[id]
+  │     └─page.js    <-- This page will get rendered if I navigate directly to 
+  ├─favicon.ico          /photos/[id] or refresh the while the modal is open.
+  ├─globals.css
+  ├─layout.js
+  ├─page.js          <-- This page has links to our dynamic routes /photos/[id]
+  └─page.module.css
+```
+
+My root layout will render the `@modal` parallel route:
+
+```javascript
+// ...
+
+// Root Layout
+export default function RootLayout({ children, modal }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        {modal} {/* <-- The name of the parallel route @modal */}
+      </body>
+    </html>
+  );
+}
+```
+
+My main `page.js` will contain links to the dynamic routes `/photos/${id}`:
+
+```javascript
+import Link from 'next/link';
+import photos from './photos';
+
+export default function Home() {
+  return (
+    <main>
+      {photos.map(({id, imageSrc}) => (
+        <Link key={id} href={`/photos/${id}`}>
+        {/* ... */}
+        </Link>
+      ))}
+    </main>
+  )
+}
+```
+
+`/photos/[id]/page.js` will be rendered if I navigate directly or refresh while
+the modal is open:
+
+```javascript
+import Image from 'next/image';
+import photos from '@/app/photos';
+
+export default function PhotoPage({ params }) {
+  const photo = photos.find((p) => p.id === params.id);
+  const width = 600;
+
+  // If photo not found, return 404...
+
+  return photo ? (
+    <main>
+      <Image
+        alt=""
+        src={photo.imageSrc}
+        height={width * 1.25}
+        width={width}
+        className={styles.photo}
+      />
+    </main>
+  ) : (
+    <main>
+      <p>Not found</p>
+    </main>
+  );
+}
+```
+
+`/@modal/[id]/page.js` will be shown when using interanl links to `/photos/[id]`:
+
+```javascript
+import Image from 'next/image';
+import photos from '@/app/photos';
+import Modal from '@/app/components/Modal';
+
+export default function PhotoModal({ params }) {
+  const photo = photos.find((p) => p.id === params.id);
+  const width = 450;
+
+  // We don't need a 404 here because a manual navigation will return
+  // the non-modal /photo/[id]/page above
+
+  return (
+    <Modal>
+      <Image
+        alt=""
+        src={photo.imageSrc}
+        height={width * 1.25}
+        width={width}
+      />
+    </Modal>
+  );
+}
+```
+
+`/@modal/default.js` is required so that nothing is shown when we're on other routes:
+
+```javascript
+// This default.js is needed so that on all routes other than /photos/[id],
+// {modal} in the root layout will return null. If we didn't do this, we would
+// get our not-found.js rendered in that spot on every route. In other words,
+// {modal} in our root layout will always return null *unless* we specifically
+// use a <Link> to go to /photos/[id].
+export default function Default() {
+  return null;
+}
+```
+
