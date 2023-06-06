@@ -265,7 +265,7 @@ export default function PhotoPage({ params }) {
 }
 ```
 
-`/@modal/[id]/page.js` will be shown when using interanl links to `/photos/[id]`:
+`/@modal/[id]/page.js` will be shown when using internal links to `/photos/[id]`:
 
 ```javascript
 import Image from 'next/image';
