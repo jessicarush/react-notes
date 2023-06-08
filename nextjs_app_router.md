@@ -809,7 +809,7 @@ export default function PhotoPage({ params }) {
 }
 ```
 
-I did try to import the `NotFound` compoent from `not-found.js`, but it did not work.
+I did try to import the `NotFound` component from `not-found.js`, but it did not work.
 
 To pre-render static pages (like default `getStaticPaths` with `fallback: false`), you would create and export a special function called `generateStaticParams`. 
 
@@ -817,7 +817,7 @@ To pre-render static pages (like default `getStaticPaths` with `fallback: false`
 
 ```javascript
 export async function generateStaticParams() {
-  // The key here should be the same as the filename [postid].js
+  // The key here should be the same as the filename [postid]
   return [
     { postid: '100' },
     { postid: '101' }
