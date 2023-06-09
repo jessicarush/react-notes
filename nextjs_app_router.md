@@ -774,6 +774,8 @@ function Example(props) {
 export default Example;
 ```
 
+Note that the dynamic segments are passed as the `params` prop to `layout`, `page`, `route`, and `generateMetadata` functions.
+
 This would be equivalent to `getStaticPaths` with `fallback: true`. In other words, these will be dynamic pages so you will need to do your own handling for when the route doesn't exist. 
 
 **Q: how to return a 404 when necessary here?**
