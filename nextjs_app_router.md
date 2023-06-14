@@ -813,9 +813,10 @@ This would be equivalent to `getStaticPaths` with `fallback: true`. In other wor
 
 **Q: how to return a 404 when necessary here?**
 
-I couldn't find an example in the docs so I did this:
+If the dynamic route doesn't exist, call `notFound()` from `next/navigation`. Calling this function will raise a `NEXT_NOT_FOUND` error which will then be caughtby the closest `not-found.js`.
 
 ```javascript
+import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import photos from '@/app/photos';
 import styles from './page.module.css';
@@ -824,9 +825,16 @@ export default function PhotoPage({ params }) {
   const photo = photos.find((p) => p.id === params.id);
   const width = 600;
 
-  // If photo not found, return 404...
+  // If photo not found, return 404.
+  // You want to call notFound() here and not just render a 404
+  // so that the 404 status code gets sent correctly. notFound()
+  // throws a NEXT_NOT_FOUND error which will then be caught by
+  // the closest not-found special file.
+  if (!photo) {
+    notFound();
+  }
 
-  return photo ? (
+  return (
     <main>
       <Image
         alt=""
@@ -836,15 +844,9 @@ export default function PhotoPage({ params }) {
         className={styles.photo}
       />
     </main>
-  ) : (
-    <main>
-      <p>Not found</p>
-    </main>
   );
 }
 ```
-
-I did try to import the `NotFound` component from `not-found.js`, but it did not work.
 
 To pre-render static pages (like default `getStaticPaths` with `fallback: false`), you would create and export a special function called `generateStaticParams`. 
 
@@ -876,8 +878,6 @@ In this case, any routes not returned in by `generateStaticParams` will not be g
 
 > During `next dev`, `generateStaticParams` will be called when you navigate to a route.
 > During `next build`, `generateStaticParams` runs before the corresponding Layouts or Pages are generated.
-
-**TODO... how to test a 404 is returned here?**
 
 
 ### Link to dynamic routes
