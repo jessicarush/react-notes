@@ -31,18 +31,18 @@ For example:
 
 ```
 app
-  ├─dashboard
-  │  ├─@team
-  │  │  └─page.js
-  │  ├─@projects
-  │  │  └─page.js
-  │  ├─layout.js    <-- This layout has props: children, team, projects
-  │  └─page.js
-  ├─favicon.ico
-  ├─globals.css
-  ├─layout.js
-  ├─page.js
-  └─page.module.css
+ ├─dashboard
+ │  ├─@team
+ │  │  └─page.js
+ │  ├─@projects
+ │  │  └─page.js
+ │  ├─layout.js    <-- This layout has props: children, team, projects
+ │  └─page.js
+ ├─favicon.ico
+ ├─globals.css
+ ├─layout.js
+ ├─page.js
+ └─page.module.css
 ```
 
 app/dashboard/layout.js
@@ -79,42 +79,42 @@ export default function Layout({ dashboard, login }) {
 
 ```
 app
-  ├─dashboard
-  │  ├─@team
-  │  │  ├─settings    <-- This path doesn't exist for @projects
-  │  │  │  └─page.js
-  │  │  └─page.js
-  │  ├─@projects
-  │  │  └─page.js
-  │  ├─layout.js
-  │  └─page.js
-  ├─favicon.ico
-  ├─globals.css
-  ├─layout.js
-  ├─page.js
-  └─page.module.css
+ ├─dashboard
+ │  ├─@team
+ │  │  ├─settings    <-- This path doesn't exist for @projects
+ │  │  │  └─page.js
+ │  │  └─page.js
+ │  ├─@projects
+ │  │  └─page.js
+ │  ├─layout.js
+ │  └─page.js
+ ├─favicon.ico
+ ├─globals.css
+ ├─layout.js
+ ├─page.js
+ └─page.module.css
 ```
 
 To resolve it, I need to add two `default.js` files. The one in `@projects` makes sense but the one in `dashboard` is a little less obvious. It turns out, during hard navigation, Next.js is unable to recover the active state for the `@projects` slot, and is looking for a `default.js` file in the dashboard segment.
 
 ```
 app
-  ├─dashboard
-  │  ├─@team
-  │  │  ├─settings 
-  │  │  │  └─page.js
-  │  │  └─page.js
-  │  ├─@projects
-  │  │  ├─default.js    <-- This default.js makes sense
-  │  │  └─page.js
-  │  ├─default.js       <-- Needed for some reason when hard navigating
-  │  ├─layout.js
-  │  └─page.js
-  ├─favicon.ico
-  ├─globals.css
-  ├─layout.js
-  ├─page.js
-  └─page.module.css
+ ├─dashboard
+ │  ├─@team
+ │  │  ├─settings 
+ │  │  │  └─page.js
+ │  │  └─page.js
+ │  ├─@projects
+ │  │  ├─default.js    <-- This default.js makes sense
+ │  │  └─page.js
+ │  ├─default.js       <-- Needed for some reason when hard navigating
+ │  ├─layout.js
+ │  └─page.js
+ ├─favicon.ico
+ ├─globals.css
+ ├─layout.js
+ ├─page.js
+ └─page.module.css
 ```
 
 If I don't want to render anything just do:
@@ -182,19 +182,19 @@ For example:
 
 ```
 app
-  ├─@modal
-  │  ├─(.)photos
-  │  │  └─[id]
-  │  │     └─page.js <-- This page will get rendered into the main page.js 
-  │  └─default.js    <-- This will prevent 404 not found when we're on other routes
-  ├─photos
-  │  └─[id]
-  │     └─page.js    <-- This page will get rendered if I navigate directly to 
-  ├─favicon.ico          /photos/[id] or refresh the while the modal is open.
-  ├─globals.css
-  ├─layout.js
-  ├─page.js          <-- This page has links to our dynamic routes /photos/[id]
-  └─page.module.css
+ ├─@modal
+ │  ├─(.)photos
+ │  │  └─[id]
+ │  │     └─page.js <-- This page will get rendered into the main page.js 
+ │  └─default.js    <-- This will prevent 404 not found when we're on other routes
+ ├─photos
+ │  └─[id]
+ │     └─page.js    <-- This page will get rendered if I navigate directly to 
+ ├─favicon.ico          /photos/[id] or refresh the while the modal is open.
+ ├─globals.css
+ ├─layout.js
+ ├─page.js          <-- This page has links to our dynamic routes /photos/[id]
+ └─page.module.css
 ```
 
 My root layout will render the `@modal` parallel route:
@@ -239,15 +239,24 @@ the modal is open:
 
 ```javascript
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
 import photos from '@/app/photos';
+import styles from './page.module.css';
 
 export default function PhotoPage({ params }) {
   const photo = photos.find((p) => p.id === params.id);
   const width = 600;
 
-  // If photo not found, return 404...
+  // If photo not found, return 404.
+  // You want to call notFound() here and not just render a 404
+  // so that the 404 status code gets sent correctly. notFound()
+  // throws a NEXT_NOT_FOUND error which will then be caught by
+  // the closest not-found special file.
+  if (!photo) {
+    notFound();
+  }
 
-  return photo ? (
+  return (
     <main>
       <Image
         alt=""
@@ -256,10 +265,6 @@ export default function PhotoPage({ params }) {
         width={width}
         className={styles.photo}
       />
-    </main>
-  ) : (
-    <main>
-      <p>Not found</p>
     </main>
   );
 }
