@@ -77,15 +77,15 @@ Page routes are indicated by folders instead of files with App Router. Each fold
 
 ```
 app
-  ├─about
-  │  └─page.js
-  ├─contact
-  │  └─page.js
-  ├─favicon.ico
-  ├─globals.css
-  ├─layout.js
-  ├─page.js
-  └─page.module.css
+ ├─about
+ │  └─page.js
+ ├─contact
+ │  └─page.js
+ ├─favicon.ico
+ ├─globals.css
+ ├─layout.js
+ ├─page.js
+ └─page.module.css
 ```
 
 This will produce:
@@ -100,20 +100,20 @@ If you want to put a bunch of page folders in a folder just for your own organiz
 
 ```
 app
-  ├─about
-  │  └─page.js
-  ├─(auth)
-  │  ├─login
-  │  │  └─page.js
-  │  └─signup
-  │     └─page.js
-  ├─contact
-  │  └─page.js
-  ├─favicon.ico
-  ├─globals.css
-  ├─layout.js
-  ├─page.js
-  └─page.module.css
+ ├─about
+ │  └─page.js
+ ├─(auth)
+ │  ├─login
+ │  │  └─page.js
+ │  └─signup
+ │     └─page.js
+ ├─contact
+ │  └─page.js
+ ├─favicon.ico
+ ├─globals.css
+ ├─layout.js
+ ├─page.js
+ └─page.module.css
 ```
 
 This will produce:
@@ -139,30 +139,30 @@ Other files and folders that can be used:
 
 ```
 app
-  ├─api
-  │  └─apiname
-  │    └─route.js
-  ├─components
-  ├─hooks
-  ├─lib
-  ├─pagename
-  │  ├─error.js
-  │  ├─layout.js
-  │  ├─loading.js
-  │  ├─Navbar.js
-  │  ├─Navbar.js
-  │  ├─Navbar.module.css
-  │  ├─Navbar.test.js
-  │  ├─page.js
-  │  └─page.module.css
-  ├─favicon.ico
-  ├─global-error.js
-  ├─globals.css
-  ├─layout.js
-  ├─not-found.js
-  ├─page.js
-  ├─page.module.css
-  └─sitemap.js
+ ├─api
+ │  └─apiname
+ │    └─route.js
+ ├─components
+ ├─hooks
+ ├─lib
+ ├─pagename
+ │  ├─error.js
+ │  ├─layout.js
+ │  ├─loading.js
+ │  ├─Navbar.js
+ │  ├─Navbar.js
+ │  ├─Navbar.module.css
+ │  ├─Navbar.test.js
+ │  ├─page.js
+ │  └─page.module.css
+ ├─favicon.ico
+ ├─global-error.js
+ ├─globals.css
+ ├─layout.js
+ ├─not-found.js
+ ├─page.js
+ ├─page.module.css
+ └─sitemap.js
 public
 ```
 
@@ -707,41 +707,41 @@ For example:
 Organize routes without affecting the URL:
 
 app
-  ├─(auth)
-  │  ├─login
-  │  │  └─page.js
-  │  └─signup
-  │     └─page.js
-  ├─favicon.ico
-  ├─globals.css
-  ├─layout.js
-  └─page.js
+ ├─(auth)
+ │  ├─login
+ │  │  └─page.js
+ │  └─signup
+ │     └─page.js
+ ├─favicon.ico
+ ├─globals.css
+ ├─layout.js
+ └─page.js
 
 Opting-in routes that use the same layout:
 
 app
-  ├─(shop)
-  │  ├─account
-  │  │  └─page.js
-  │  ├─cart
-  │  │  └─page.js
-  │  └─layout.js
-  ├─favicon.ico
-  ├─globals.css
-  ├─layout.js
-  └─page.js
+ ├─(shop)
+ │  ├─account
+ │  │  └─page.js
+ │  ├─cart
+ │  │  └─page.js
+ │  └─layout.js
+ ├─favicon.ico
+ ├─globals.css
+ ├─layout.js
+ └─page.js
 
 Creating multiple root layouts:
 
 app
-  ├─(main)
-  │  ├─layout.js
-  │  └─...
-  ├─(auth)
-  │  ├─layout.js
-  │  └─...
-  ├─favicon.ico
-  └─globals.css
+ ├─(main)
+ │  ├─layout.js
+ │  └─...
+ ├─(auth)
+ │  ├─layout.js
+ │  └─...
+ ├─favicon.ico
+ └─globals.css
 ```
 
 With multiple root layouts: 
@@ -750,8 +750,41 @@ With multiple root layouts:
 - update the global css import to `import '../globals.css'`
 - one of the root groups should contain the `page.js` for `/`
 - make sure routes in different route groups don't resolve to the same URL!
-- you'll need a `not-found.js` for each route group
 - Navigating across different root layouts will cause a full page load
+- use a catch-all dynamic route to get `not-found.js` to work (see below)
+
+**Getting `not-found.js` to work correctly:**
+
+- Initially I could not get `not-found.js` to work work is this setup. I figured you would place a `not-found.js` in each route group, but it does not work. See [this github issue#5211681](https://github.com/vercel/next.js/discussions/50034#discussion-5211681). The workaround is to use dynamic catch all routes:
+
+```
+app
+ ├─(main)
+ │  ├─[...not-found]    <-- dynamic catch-all route
+ │  │  ├─page.js        <-- page will call notFound() which raises an error 
+ │  ├─layout.js             which will be caught by the closest not-found.js
+ │  ├─not-found.js      <-- my normal not-found.js
+ │  └─...
+ ├─(auth)
+ │  ├─layout.js
+ │  └─...
+ ├─favicon.ico
+ └─globals.css
+```
+
+app/(main)/[...not-found]/page.js:
+
+```javascript
+import { notFound } from "next/navigation";
+
+export default function NotFoundCatchAll() {
+  // You want to call notFound() here and not just render a 404
+  // so that the 404 status code gets sent correctly. notFound()
+  // throws a NEXT_NOT_FOUND error which will then be caught by 
+  // the closest not-found special file.
+  notFound();
+}
+```
 
 
 ## Dynamic routes 

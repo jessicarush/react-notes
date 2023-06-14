@@ -24,14 +24,14 @@ In the `app`, create a dynamic route segment for the language `[lang]`. So all o
 
 ```
 app
-  ├─[lang]
-  │  ├─about
-  │  ├─layout.js     <-- root layout
-  │  ├─not-found.js  <-- TBD
-  │  └─page.js       <-- index page
-  ├─api
-  ├─favicon.ico
-  └─globals.css
+ ├─[lang]
+ │  ├─about
+ │  ├─layout.js     <-- root layout
+ │  ├─not-found.js  <-- we need to do more to get this to work, see below
+ │  └─page.js       <-- index page
+ ├─api
+ ├─favicon.ico
+ └─globals.css
 ```
 
 ## 2. i18n-config.js 
@@ -307,13 +307,44 @@ export default function Navlinks({ dictionary }) {
 
 ```
 
-You might be looking at this wondering why its a cleint component, well I pulled that stuff out for brevity. 
+You might be looking at this wondering why its a client component, well I pulled that stuff out for brevity. 
 
 I could probably serve this dictionary through context too.
 
 ## gotchas
 
-- notFound?!
+**Getting `not-found.js` to work correctly:**
+
+- Initially I could not get `not-found.js` to work work is this setup. Given everything I've read, you would think it goes in the same `app/[lang]` directory as the root layout but it does not work. See [this github issue#5211681](https://github.com/vercel/next.js/discussions/50034#discussion-5211681). The workaround is to use dynamic catch all routes:
+
+```
+app
+ ├─[lang]
+ │  ├─[...not-found]   <-- dynamic catch-all route
+ │  │  └─page.js       <-- page will call notFound() which raises an error 
+ │  ├─about                which will be caught by the closest not-found.js
+ │  ├─layout.js
+ │  ├─not-found.js     <-- my normal not-found.js
+ │  └─page.js
+ ├─api
+ ├─favicon.ico
+ └─globals.css
+```
+
+app/[lang]/[...not-found]/page.js:
+
+```javascript
+import { notFound } from "next/navigation";
+
+export default function NotFoundCatchAll() {
+  // You want to call notFound() here and not just render a 404
+  // so that the 404 status code gets sent correctly. notFound()
+  // throws a NEXT_NOT_FOUND error which will then be caught by 
+  // the closest not-found special file.
+  notFound();
+}
+```
+
 - Make sure `favicon.ico` is still in your app dir not `[lang]`
 - If you have an `api` dir, it should also be in app. If it has route segments, make sure the top level has a `route.js` as well, otherwise if they go to `/api`, there's an error where its trying to call `getDictionary` despite `/api` being ignored in the middleware. I just made it an api route that describes all my other api routes:
 
