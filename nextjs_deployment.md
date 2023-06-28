@@ -6,6 +6,9 @@ See <https://nextjs.org/docs/pages/building-your-application/deploying>
 
 <!-- toc -->
 
+- [Runtimes](#runtimes)
+  * [Node runtime](#node-runtime)
+  * [Edge runtime](#edge-runtime)
 - [Deploy to Vercel](#deploy-to-vercel)
 - [Deploy to another provider](#deploy-to-another-provider)
   * [Node.js server](#nodejs-server)
