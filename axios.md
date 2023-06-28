@@ -112,8 +112,8 @@ class Test extends Component {
     const url = 'https://log.zebro.id/api_demo_one';
     axios.get(url).then((response) => {
       this.setState({
-        colorName: Object.keys(response.data)[0],
-        colorHex: Object.values(response.data)[0]
+        colorName: response.data.name,
+        colorHex: response.data.value
       });
     });
   }
@@ -138,7 +138,10 @@ For reference, the python flask endpoint for this api:
 def api_demo():
     '''Demo API returns a random html color'''
     name, hex = random.choice(list(colors.items()))
-    response = jsonify({name: hex})
+    response = jsonify({
+      'name': name,
+      'value': hex
+      })
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 ```
@@ -170,8 +173,8 @@ class Test extends Component {
     };
     axios.get(url, config).then((response) => {
       this.setState({
-        colorName: Object.keys(response.data)[0],
-        colorHex: Object.values(response.data)[0]
+         colorName: response.data.name,
+        colorHex: response.data.value
       });
     });
   }

@@ -805,8 +805,8 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Home() {
   const { data, error, isLoading } = useSWR(url, fetcher);
-  const name = data ? Object.keys(data)[0] : '';
-  const value = data ? Object.values(data)[0] : '';
+  const name = data ? data.name : '';
+  const value = data ? data.value : '';
 
   let content;
 
@@ -853,8 +853,8 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Home() {
   const { data, error, isLoading } = useSWR(url, fetcher);
-  const name = data ? Object.keys(data)[0] : '';
-  const value = data ? Object.values(data)[0] : '';
+  const name = data ? data.name : '';
+  const value = data ? data.value : ''
 
   const fetchNewColor = async () => {  // <-- create a handler
     mutate(url);
