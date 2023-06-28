@@ -10,7 +10,7 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 <!-- toc -->
 
 - [Getting started](#getting-started)
-- [Update](#update)
+- [Updating](#updating)
 - [Directory structure](#directory-structure)
 - [Special file hierarchy](#special-file-hierarchy)
 - [Pages and layouts](#pages-and-layouts)
@@ -36,6 +36,10 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [catch-all routes](#catch-all-routes)
 - [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch)
 - [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate)
+- [Static vs dynamic rendering](#static-vs-dynamic-rendering)
+  * [Static rendering](#static-rendering)
+  * [Static data fetching](#static-data-fetching)
+  * [Dynamic Rendering](#dynamic-rendering)
 - [Route handlers (API routes)](#route-handlers-api-routes)
   * [request body](#request-body)
   * [url params](#url-params)
@@ -65,7 +69,7 @@ To run the build:
 
 - `npm run build && npm start`
 
-## Update 
+## Updating 
 
 ```
 npm i next@latest react@latest react-dom@latest eslint-config-next@latest
@@ -385,6 +389,41 @@ If you have a module that it only intended to run on the server (in a server com
 In *server* components you can do really easy API calls just by making the component async:
 
 ```javascript
+import { getColorWithFetch } from "@/lib/colors";
+
+async function Color() {
+  console.log('Color render');
+  const color = await getColorWithFetch();
+
+  return (
+    <main>
+      <p>Color. <span style={{ color: color.value }}>{color.name}</span></p>
+    </main>
+  )
+}
+
+export default Color;
+```
+
+And my fetch function looks like:
+
+```javascript
+const url = 'https://log.zebro.id/api_demo_one';
+
+export async function getColorWithFetch() {
+  const res = await fetch(url, options);
+  const data = await res.json();
+  const color = {
+    name: data.name,
+    value: data.value
+  }
+  return color;
+}
+```
+
+Or with axios:
+
+```javascript
 import { getColorWithAxios } from "@/lib/colors";
 
 async function Color() {
@@ -393,7 +432,7 @@ async function Color() {
 
   return (
     <main>
-      <p>Color. <span style={{ color: color.hex }}>{color.name}</span></p>
+      <p>Color. <span style={{ color: color.value }}>{color.name}</span></p>
     </main>
   )
 }
@@ -401,7 +440,7 @@ async function Color() {
 export default Color;
 ```
 
-And my function looks like this:
+And my axios function looks like this:
 
 ```javascript
 import axios from 'axios';
@@ -411,12 +450,22 @@ const url = 'https://log.zebro.id/api_demo_one';
 export async function getColorWithAxios() {
   const response = await axios.get(url);
   const color = {
-    name: Object.keys(response.data)[0],
-    hex: Object.values(response.data)[0]
+    name: response.data.name,
+    value: response.data.value
   }
   return color;
 }
 ```
+
+See also: [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch) and [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate) below.
+
+
+
+
+
+
+
+
 
 
 ## Server components cannot contain hooks
@@ -587,7 +636,6 @@ export async function DashboardPage() {
   // ...
 }
 ```
-
 
 ### Sharing fetch request data between server components
 
@@ -813,7 +861,7 @@ This would be equivalent to `getStaticPaths` with `fallback: true`. In other wor
 
 **Q: how to return a 404 when necessary here?**
 
-If the dynamic route doesn't exist, call `notFound()` from `next/navigation`. Calling this function will raise a `NEXT_NOT_FOUND` error which will then be caughtby the closest `not-found.js`.
+If the dynamic route doesn't exist, call `notFound()` from `next/navigation`. Calling this function will raise a `NEXT_NOT_FOUND` error which will then be caught by the closest `not-found.js`.
 
 ```javascript
 import { notFound } from 'next/navigation';
@@ -1001,6 +1049,47 @@ See the [revalidate option](https://nextjs.org/docs/app/api-reference/file-conve
 Keep in mind this can be hard to test because with axios in dev, it runs on every page refresh. If you do a `npm run build`, the output will tell you whether that page is dynamic or static.
 
 
+## Static vs dynamic rendering 
+
+In addition to client and server components, both can be either statically or dynamically rendered.
+
+- With Static Rendering, both Server and Client Components can be prerendered on the server at build time. The result of the work is cached and reused on subsequent requests. The cached result can also be revalidated.
+  - Client Components have their HTML and JSON prerendered and cached on the server. The cached result is then sent to the client for hydration.
+  - Server Components are rendered on the server by React, and their payload is used to generate HTML. The same rendered payload is also used to hydrate the components on the client, resulting in no JavaScript needed on the client.
+
+- With Dynamic Rendering, both Server and Client Components are rendered on the server at request time. The result of the work is not cached.
+
+### Static rendering 
+
+By default, Next.js statically renders routes to improve performance.
+
+### Static data fetching 
+
+By default, Next.js will cache the result of `fetch()` requests that do not specifically opt out of caching behavior. Dynamic data fetches are `fetch()` requests that specifically opt out of caching behavior by setting the `cache` option to `'no-store'` or `revalidate` to `0`.
+
+The caching options for all `fetch` requests in a layout or page can also be set using the [segment config object](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config).
+
+**Note** I'm still a bit confused by this.For example, when fetching a color from my random color API in a server-component:
+
+**With default 'force-cache'**
+
+- The same color will be served to two different users. Navigation between pages will serve the same color. A hard refresh will still serve the same color. *This seems to makes sense.*
+
+**With 'no-cache'**
+
+- Different colors will be served to different users. Navigation between pages will usually serve the same color... but then eventually/sometimes it will fetch a new color. *This makes no sense. You would think it would always serve the same color (to the same user) or always fetch a new color. It seems like there's a timeout, after x minutes has passed it fetches again.*
+A hard refresh will fetch a new color.
+
+### Dynamic Rendering
+
+During static rendering, if a *dynamic function* or a dynamic `fetch()` request *(no caching)* is discovered, Next.js will switch to dynamically rendering the whole route at request time. Any cached data requests can still be re-used during dynamic rendering.
+
+[Dynamic functions](https://nextjs.org/docs/app/building-your-application/rendering/static-and-dynamic-rendering#dynamic-functions) rely on information that can only be known at request time such as a user's cookies, current requests headers, or the URL's search params. In Next.js, these dynamic functions are:
+
+ - Using `cookies()` or `headers()` in a Server Component will opt the whole route into dynamic rendering at request time.
+- Using `useSearchParams()` in Client Components will skip static rendering and instead render all Client Components up to the nearest parent Suspense boundary on the client.
+
+
 ## Route handlers (API routes)
 
 Route Handlers allow you to create custom request handlers for a given route using the Web [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) and [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) APIs.
@@ -1181,12 +1270,13 @@ Some [fields](https://nextjs.org/docs/app/api-reference/functions/generate-metad
 
 ```javascript
 export const metadata = {
+  title: 'Next.js',
+  description: 'The React Framework for the Web',
   generator: 'Next.js',
   applicationName: 'Next.js',
   referrer: 'origin-when-cross-origin',
   keywords: ['Next.js', 'React', 'JavaScript'],
   authors: [{ name: 'Jessica' }, { name: 'Scott', url: 'https://nextjs.org' }],
-  colorScheme: 'dark',
   creator: 'Scott Volk',
   publisher: 'Jessica Rush',
   formatDetection: {
@@ -1194,8 +1284,16 @@ export const metadata = {
     address: false,
     telephone: false,
   },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
+  colorScheme: 'dark'
 };
 ```
+
+There's way more, e.g. for robots, icons, etc. See also the [HTML standard](https://html.spec.whatwg.org/multipage/semantics.html#the-meta-element).
 
 
 ## Route segment config
@@ -1218,9 +1316,9 @@ export default function MyComponent() {}
 
 Middleware allows you to run code before a request is completed. Then, based on the incoming request, you can modify the response by rewriting, redirecting, modifying the request or response headers, or responding directly.
 
-Middleware  runs before cached content and routes are matched.
+Middleware runs before cached content and routes are matched.
 
-Use the file middleware.js in the root of your project to define Middleware. In other wprds, it should be at the same level as your `app` directory.
+Use the file middleware.js in the root of your project to define Middleware. In other words, it should be at the same level as your `app` directory.
 
 ```javascript
 import { NextResponse } from 'next/server';
