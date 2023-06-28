@@ -406,7 +406,7 @@ useEffect(() => {
 }, [userId]);
 ```
 
-See *hooks/usefetch* for a functioning example using the `fetch()` API.
+See *hooks/useFetch.js* for a functioning example using the `fetch()` API.
 
 Here's an example of the [AbortController API](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) implemented with [axios](https://axios-http.com/docs/cancellation):
 
