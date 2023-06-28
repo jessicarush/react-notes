@@ -17,11 +17,30 @@ See <https://nextjs.org/docs/pages/building-your-application/deploying>
 
 <!-- tocstop -->
 
+## Runtimes 
+
+Next.js has two server runtimes where you can render parts of your application code. By default, the app directory uses the *Node.js* runtime. However, you can opt into the *Edge* runtime on a per-route basis.
+
+```javascript
+export const runtime = 'edge' // 'nodejs' (default) | 'edge'
+```
+
+### Node runtime
+
+Using the Node.js runtime gives you access to all Node.js APIs, and all npm packages that rely on them. However, it's not as fast to start up as routes using the Edge runtime.
+
+> Deploying your Next.js application to a Node.js server will require managing, scaling, and configuring your infrastructure. 
+
+### Edge runtime 
+
+Specific to Next.js, the lightweight [Edge Runtime](https://nextjs.org/docs/app/api-reference/edge) is a subset of available Node.js APIs. It can be appropriate for apps that only use small, simple function. It's faster but that can be limiting in many scenarios (e.g. cannot execute a lot of code).
+
+
 ## Deploy to Vercel 
 
 Vercel is made by the creators of Next.js and has first-class support for Next.js. When you deploy your Next.js app to Vercel, the following happens by default:
 
-- Pages that use Static Generation and assets (JS, CSS, images, fonts, etc) will automatically be served from the Vercel Edge Network, which is blazingly fast.
+- Pages that use Static Generation and assets (JS, CSS, images, fonts, etc) will automatically be served from the Vercel Edge Network, which is "blazingly" fast.
 - Pages that use Server-Side Rendering and API routes will automatically become isolated Serverless Functions. This allows page rendering and API requests to scale infinitely.
 
 They also have:
@@ -158,4 +177,7 @@ Then they use [PM2](https://pm2.keymetrics.io/) as the process manager to manage
 ## To investigate
 
 - [Deploying Next.js with Flask](https://blog.logrocket.com/deploying-next-js-flask/)
+
+
+
 
