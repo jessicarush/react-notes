@@ -221,6 +221,43 @@ function Demo() {
 export default Demo;
 ```
 
+While we're on the topic, here's a throttle example:
+
+```javascript
+import { useState, useRef } from 'react';
+
+function ThrottledButton({ onClick, children }) {
+  const lastCallTime = useRef(0);
+
+  return (
+    <button onClick={() => {
+      const now = Date.now();
+      if (now - lastCallTime.current >= 1000) {
+        onClick();
+        lastCallTime.current = now;
+      }
+    }}>
+      {children}
+    </button>
+  );
+}
+
+function Demo() {
+  return (
+    <>
+      <ThrottledButton
+        onClick={() => alert('Soup boiled!')}
+      >
+        Boil the soup
+      </ThrottledButton>
+    </>
+  )
+}
+
+export default Demo;
+```
+
+
 > Refs are an escape hatch. You should only use them when you have to “step outside React”. Common examples of this include managing focus, scroll position, measuring or calling browser APIs that React does not expose. [Source](https://react.dev/learn/manipulating-the-dom-with-refs#best-practices-for-dom-manipulation-with-refs)
 
 When to use refs:
