@@ -36,9 +36,10 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [catch-all routes](#catch-all-routes)
 - [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch)
 - [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate)
+- [Data fetching summary](#data-fetching-summary)
 - [Static vs dynamic rendering](#static-vs-dynamic-rendering)
   * [Static rendering](#static-rendering)
-  * [Static data fetching](#static-data-fetching)
+  * [Static/dynamic data fetching](#staticdynamic-data-fetching)
   * [Dynamic Rendering](#dynamic-rendering)
 - [Route handlers (API routes)](#route-handlers-api-routes)
   * [request body](#request-body)
@@ -458,14 +459,6 @@ export async function getColorWithAxios() {
 ```
 
 See also: [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch) and [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate) below.
-
-
-
-
-
-
-
-
 
 
 ## Server components cannot contain hooks
@@ -1049,6 +1042,30 @@ See the [revalidate option](https://nextjs.org/docs/app/api-reference/file-conve
 Keep in mind this can be hard to test because with axios in dev, it runs on every page refresh. If you do a `npm run build`, the output will tell you whether that page is dynamic or static.
 
 
+## Data fetching summary 
+
+> Whenever possible, we recommend fetching data in Server Components. It's still possible to fetch data client-side. We recommend using a third-party library such as SWR or React Query with Client Components. In the future, it'll also be possible to fetch data in Client Components using React's use() hook.
+
+Next.js recommends fetching data in Server Components whenever possible. This is because Server Components always fetch data on the server, which provides several benefits such as direct access to backend data resources, improved security, reduced client-server communication, and potentially improved performance due to reduced latency source (<https://nextjs.org/docs/app/building-your-application/data-fetching>).
+
+However, Next.js also acknowledges that there are valid situations where client-side data fetching is necessary, such as when dealing with user-specific data or frequently updating data. For example, user dashboard pages that are private, user-specific, and frequently updated can benefit from client-side data fetching source (<https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props>).
+
+As for the recommendation to use SWR or React Query for client-side data fetching, it's not that using a standard fetch in an async function triggered by an `onclick` is wrong. Rather, libraries like SWR and React Query provide additional features that can make client-side data fetching more efficient and easier to manage. For instance, SWR handles caching, revalidation, focus tracking, refetching on intervals, and more source (<https://nextjs.org/docs/pages/building-your-application/data-fetching/client-side>).
+
+In conclusion, while server-side data fetching is generally recommended for its benefits, client-side data fetching is still a valid approach in certain situations. The use of SWR or React Query is suggested for their additional features that can enhance client-side data fetching.
+
+- Whenever possible, fetch data on the server using Server Components.
+- Fetch data in parallel to minimize waterfalls and reduce loading times.
+- For Layouts, Pages and components, fetch data where it's used. Next.js will automatically dedupe requests in a tree.
+- Use `loading.js`, Streaming and Suspense to progressively render a page and show a result to the user while the rest of the content loads.
+- React extends fetch to provide automatic request deduping.
+- Next.js extends the fetch options object to allow each request to set its own caching and revalidating rules.
+- Static Data is data that doesn't change often. For example, a blog post.
+- Dynamic Data is data that changes often or can be specific to users. For example, a shopping cart list.
+- By default, Next.js automatically does static fetches. This means that the data will be fetched at build time, cached, and reused on each request.
+- If your data is personalized to the user or you want to always fetch the latest data, you can mark requests as dynamic and fetch data on each request without caching (`cache: 'no-store'` or `next: { revalidate: 0 }`).
+
+
 ## Static vs dynamic rendering 
 
 In addition to client and server components, both can be either statically or dynamically rendered.
@@ -1063,7 +1080,7 @@ In addition to client and server components, both can be either statically or dy
 
 By default, Next.js statically renders routes to improve performance.
 
-### Static data fetching 
+### Static/dynamic data fetching 
 
 By default, Next.js will cache the result of `fetch()` requests that do not specifically opt out of caching behavior. Dynamic data fetches are `fetch()` requests that specifically opt out of caching behavior by setting the `cache` option to `'no-store'` or `revalidate` to `0`.
 
