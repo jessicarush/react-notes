@@ -20,6 +20,7 @@
 - [useId](#useid)
 - [useTransition and useDeferredValue](#usetransition-and-usedeferredvalue)
 - [useSyncExternalStore](#usesyncexternalstore)
+- [coming soon: use](#coming-soon-use)
 - [Custom hooks](#custom-hooks)
   * [Custom hook example: localStorage](#custom-hook-example-localstorage)
 - [Docs references](#docs-references)
@@ -523,6 +524,10 @@ function getServerSnapshot() {
 
 export default useOnlineStatus;
 ```
+
+## coming soon: use
+
+`use` is a new React function that accepts a promise conceptually similar to `await`. `use` handles the promise returned by a function in a way that is compatible with components, hooks, and Suspense.
 
 
 ## Custom hooks
