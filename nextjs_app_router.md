@@ -19,7 +19,7 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 - [Server-side vs client-side components](#server-side-vs-client-side-components)
 - [Context with server components](#context-with-server-components)
 - [server-only](#server-only)
-- [Server components can do API calls](#server-components-can-do-api-calls)
+- [Server components can fetch](#server-components-can-fetch)
 - [Server components cannot contain hooks](#server-components-cannot-contain-hooks)
 - [loading.js](#loadingjs)
 - [Streaming with suspense](#streaming-with-suspense)
@@ -36,11 +36,15 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [catch-all routes](#catch-all-routes)
 - [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch)
 - [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate)
+- [Revalidation](#revalidation)
+- [Data fetching examples](#data-fetching-examples)
 - [Data fetching summary](#data-fetching-summary)
 - [Static vs dynamic rendering](#static-vs-dynamic-rendering)
   * [Static rendering](#static-rendering)
   * [Static/dynamic data fetching](#staticdynamic-data-fetching)
   * [Dynamic Rendering](#dynamic-rendering)
+- [Server Component Functions](#server-component-functions)
+- [Server actions (experimental)](#server-actions-experimental)
 - [Route handlers (API routes)](#route-handlers-api-routes)
   * [request body](#request-body)
   * [url params](#url-params)
@@ -384,8 +388,10 @@ export default function RootLayout({ children }) {
 
 If you have a module that it only intended to run on the server (in a server component), because it contains secrets, you can ensure it doesn't accidentally get used in a client component by installing the package `npm install server-only` then put `import 'server-only'` at the top of the file. Now, any client component that imports code from that file will receive a build-time error explaining that this module can only be used on the server. There in also a `client-only` package.
 
+Next.js recommends using `server-only` to make sure server data fetching functions are never used on the client.
 
-## Server components can do API calls
+
+## Server components can fetch
 
 In *server* components you can do really easy API calls just by making the component async:
 
@@ -422,42 +428,6 @@ export async function getColorWithFetch() {
 }
 ```
 
-Or with axios:
-
-```javascript
-import { getColorWithAxios } from "@/lib/colors";
-
-async function Color() {
-  console.log('Color render');
-  const color = await getColorWithAxios();
-
-  return (
-    <main>
-      <p>Color. <span style={{ color: color.value }}>{color.name}</span></p>
-    </main>
-  )
-}
-
-export default Color;
-```
-
-And my axios function looks like this:
-
-```javascript
-import axios from 'axios';
-
-const url = 'https://log.zebro.id/api_demo_one';
-
-export async function getColorWithAxios() {
-  const response = await axios.get(url);
-  const color = {
-    name: response.data.name,
-    value: response.data.value
-  }
-  return color;
-}
-```
-
 See also: [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch) and [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate) below.
 
 
@@ -468,7 +438,7 @@ This is because Server Components have no React state (since they're not interac
 
 ## loading.js
 
-This `loading.js` file in our page's route folder will be displayed until the above axios call is resolved:
+This `loading.js` file in our page's route folder will be displayed until the above fetch call is resolved:
 
 ```javascript
 const Loading = () => {
@@ -558,13 +528,13 @@ export default PageError;
 Reset is a function that will run whatever it was that triggered the error again. You can test the error by using a non existent url (404) or by temporarily adding:
 
 ```javascript
-import { getColorWithAxios } from "@/lib/colors";
+import { getColorWithFetch } from "@/lib/colors";
 
 const session = null;
 
 async function Color() {
   console.log('Color render');
-  const color = await getColorWithAxios();
+  const color = await getColorWithFetch();
   if (!session) throw new Error('Auth is required to access this page.');
 
   return (
@@ -1041,28 +1011,165 @@ See the [revalidate option](https://nextjs.org/docs/app/api-reference/file-conve
 
 Keep in mind this can be hard to test because with axios in dev, it runs on every page refresh. If you do a `npm run build`, the output will tell you whether that page is dynamic or static.
 
+Note that all signs seem to point to using `fetch()` over `axios`. `axios` is still awesome for as a js package but in Next.js, `fetch()` is preferred as they've extended it.
+
+
+## Revalidation
+
+There are two types of revalidation in Next.js:
+
+- Background: Revalidates the data at a specific time interval.
+- On-demand: Revalidates the data based on an event such as an update.
+
+**Background revalidation**
+
+To revalidate cached data at a specific interval, you can use the `next.revalidate` option in `fetch()` to set the cache lifetime of a resource (in seconds).
+
+```javascript
+fetch('https://...', { next: { revalidate: 60 } })
+```
+
+If you want to revalidate data that does not use fetch (i.e. using an external package or query builder), you can use the route segment config.
+
+```javascript
+export const revalidate = 60 // revalidate this page every 60 seconds
+```
+
+**On-demand revalidation**
+
+The [examples in the Next.js docs](https://nextjs.org/docs/app/building-your-application/data-fetching/revalidating#on-demand-revalidation) don't do much to shed light on how this works. Skipping.
+
+
+## Data fetching examples 
+
+Parallel data fetching:
+
+```javascript
+import Albums from './albums';
+ 
+async function getArtist(username) {
+  const res = await fetch(`https://api.example.com/artist/${username}`);
+  return res.json();
+}
+ 
+async function getArtistAlbums(username) {
+  const res = await fetch(`https://api.example.com/artist/${username}/albums`);
+  return res.json();
+}
+ 
+export default async function Page({ params: { username } }) {
+  // Initiate both requests in parallel
+  const artistData = getArtist(username);
+  const albumsData = getArtistAlbums(username);
+ 
+  // Wait for the promises to resolve
+  const [artist, albums] = await Promise.all([artistData, albumsData]);
+ 
+  return (
+    <>
+      <h1>{artist.name}</h1>
+      <Albums list={albums}></Albums>
+    </>
+  );
+}
+```
+
+Add a suspense boundary to break up the rendering work and show part of the result as soon as possible:
+
+```javascript
+import { getArtist, getArtistAlbums } from './api';
+ 
+export default async function Page({ params: { username } }) {
+  // Initiate both requests in parallel
+  const artistData = getArtist(username);
+  const albumData = getArtistAlbums(username);
+ 
+  // Wait for the artist's promise to resolve first
+  const artist = await artistData;
+ 
+  return (
+    <>
+      <h1>{artist.name}</h1>
+      {/* Send the artist information first,
+      and wrap albums in a suspense boundary */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <Albums promise={albumData} />
+      </Suspense>
+    </>
+  );
+}
+ 
+// Albums Component
+async function Albums({ promise }) {
+  // Wait for the albums promise to resolve
+  const albums = await promise;
+ 
+  return (
+    <ul>
+      {albums.map((album) => (
+        <li key={album.id}>{album.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Sequential data fetching:
+
+```javascript
+// ...
+ 
+async function Playlists({ artistID }) {
+  // Wait for the playlists
+  const playlists = await getArtistPlaylists(artistID);
+ 
+  return (
+    <ul>
+      {playlists.map((playlist) => (
+        <li key={playlist.id}>{playlist.name}</li>
+      ))}
+    </ul>
+  );
+}
+ 
+export default async function Page({ params: { username } }) {
+  // Wait for the artist
+  const artist = await getArtist(username);
+ 
+  return (
+    <>
+      <h1>{artist.name}</h1>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Playlists artistID={artist.id} />
+      </Suspense>
+    </>
+  );
+}
+```
 
 ## Data fetching summary 
 
 > Whenever possible, we recommend fetching data in Server Components. It's still possible to fetch data client-side. We recommend using a third-party library such as SWR or React Query with Client Components. In the future, it'll also be possible to fetch data in Client Components using React's use() hook.
 
-Next.js recommends fetching data in Server Components whenever possible. This is because Server Components always fetch data on the server, which provides several benefits such as direct access to backend data resources, improved security, reduced client-server communication, and potentially improved performance due to reduced latency source (<https://nextjs.org/docs/app/building-your-application/data-fetching>).
+Next.js recommends fetching data in Server Components whenever possible. This is because Server Components always fetch data on the server, which provides several benefits such as direct access to backend data resources, improved security, reduced client-server communication, and potentially improved performance due to reduced latency (<https://nextjs.org/docs/app/building-your-application/data-fetching>).
 
-However, Next.js also acknowledges that there are valid situations where client-side data fetching is necessary, such as when dealing with user-specific data or frequently updating data. For example, user dashboard pages that are private, user-specific, and frequently updated can benefit from client-side data fetching source (<https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props>).
+However, Next.js also acknowledges that there are valid situations where client-side data fetching is necessary, such as when dealing with user-specific data or frequently updating data. For example, user dashboard pages that are private, user-specific, and frequently updated can benefit from client-side data fetching.
 
-As for the recommendation to use SWR or React Query for client-side data fetching, it's not that using a standard fetch in an async function triggered by an `onclick` is wrong. Rather, libraries like SWR and React Query provide additional features that can make client-side data fetching more efficient and easier to manage. For instance, SWR handles caching, revalidation, focus tracking, refetching on intervals, and more source (<https://nextjs.org/docs/pages/building-your-application/data-fetching/client-side>).
+As for the recommendation to use SWR or React Query for client-side data fetching, it's not that using a standard fetch in an async function triggered by an `onclick` is wrong. Rather, libraries like SWR and React Query provide additional features that can make client-side data fetching more efficient and easier to manage. For instance, SWR handles caching, revalidation, focus tracking, refetching on intervals, and more.
 
-In conclusion, while server-side data fetching is generally recommended for its benefits, client-side data fetching is still a valid approach in certain situations. The use of SWR or React Query is suggested for their additional features that can enhance client-side data fetching.
 
 - Whenever possible, fetch data on the server using Server Components.
 - Fetch data in parallel to minimize waterfalls and reduce loading times.
+- By fetching data in a layout, rendering for all route segments beneath it can only start once the data has finished loading.
 - For Layouts, Pages and components, fetch data where it's used. Next.js will automatically dedupe requests in a tree.
+- Whenever possible, it's best to fetch data in the segment that uses it. This also allows you to show a loading state for only the part of the page that is loading, and not the entire page.
 - Use `loading.js`, Streaming and Suspense to progressively render a page and show a result to the user while the rest of the content loads.
 - React extends fetch to provide automatic request deduping.
 - Next.js extends the fetch options object to allow each request to set its own caching and revalidating rules.
 - Static Data is data that doesn't change often. For example, a blog post.
 - Dynamic Data is data that changes often or can be specific to users. For example, a shopping cart list.
 - By default, Next.js automatically does static fetches. This means that the data will be fetched at build time, cached, and reused on each request.
+- Caching at the fetch level with revalidate or cache: 'force-cache' stores the data across requests in a **shared cache**. You should avoid using it for user-specific data (i.e. requests that derive data from [cookies()](https://nextjs.org/docs/app/api-reference/functions/cookies) or [headers()](https://nextjs.org/docs/app/api-reference/functions/headers))
 - If your data is personalized to the user or you want to always fetch the latest data, you can mark requests as dynamic and fetch data on each request without caching (`cache: 'no-store'` or `next: { revalidate: 0 }`).
 
 
@@ -1106,6 +1213,110 @@ During static rendering, if a *dynamic function* or a dynamic `fetch()` request 
  - Using `cookies()` or `headers()` in a Server Component will opt the whole route into dynamic rendering at request time.
 - Using `useSearchParams()` in Client Components will skip static rendering and instead render all Client Components up to the nearest parent Suspense boundary on the client.
 
+
+## Server Component Functions
+
+Next.js provides helpful server functions you may need when fetching data in Server Components:
+
+- [cookies()](https://nextjs.org/docs/app/api-reference/functions/cookies)
+- [headers()](https://nextjs.org/docs/app/api-reference/functions/headers)
+
+For example: 
+
+
+```javascript
+import { headers } from 'next/headers';
+ 
+export default function Page() {
+  const headersList = headers();
+  const referer = headersList.get('referer');
+  // List all header keys:
+  console.log(Array.from(headersList.keys()));
+ 
+  return <div>Referer: {referer}</div>;
+}
+
+```
+
+`headers()` is a *dynamic function* whose returned values cannot be known ahead of time. Using it in a layout or page will opt a route into dynamic rendering at request time.
+
+
+## Server actions (experimental)
+
+[Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions) are an alpha feature in Next.js, built on top of [React Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions#actions). For example:
+
+app/actions.js
+
+```javascript
+'use server'
+ 
+export async function addItem(data) {
+  const cartId = cookies().get('cartId')?.value;
+  await saveToDb({ cartId, data });
+}
+```
+
+app/add-to-cart.js
+
+```javascript
+'use client'
+ 
+import { addItem } from './actions.js';
+ 
+// Server Action being called inside a Client Component
+export default function AddToCart({ productId }) {
+  return (
+    <form action={addItem}>
+      <button type="submit">Add to Cart</button>
+    </form>
+  );
+}
+```
+
+In addition to invoking with the `action` prop on a `<form>`, you can also invoke with the `formAction` prop to on elements such as `button`, i`nput type="submit"`, and i`nput type="image"`:
+
+```javascript
+ 
+import { addItem, addImage } from './actions.js';
+ 
+// Server Action being called inside a Client Component
+export default function AddToCart({ productId }) {
+  return (
+    <form action={addItem}>
+      <input type="image" formAction={addImage} />
+      <button type="submit">Add to Cart</button>
+    </form>
+  );
+}
+```
+
+For now you can enable Server Actions in your Next.js project by enabling the experimental serverActions flag.
+
+next.config.js
+
+```
+module.exports = {
+  experimental: {
+    serverActions: true,
+  },
+}
+```
+
+By default, the maximum size of the request body sent to a Server Action is 1MB. This prevents large amounts of data being sent to the server, which consumes a lot of server resource to parse. However, you can configure this limit using the experimental serverActionsBodySizeLimit option.
+
+```
+module.exports = {
+  experimental: {
+    serverActions: true,
+    serverActionsBodySizeLimit: '2mb',
+  },
+}
+```
+
+Server Actions can be defined in two places:
+
+- Inside the component that uses it (Server Components only)
+- In a separate file (Client and Server Components), for reusability. You can define multiple Server Actions in a single file.
 
 ## Route handlers (API routes)
 
