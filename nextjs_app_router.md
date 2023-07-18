@@ -43,8 +43,11 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [Static rendering](#static-rendering)
   * [Static/dynamic data fetching](#staticdynamic-data-fetching)
   * [Dynamic Rendering](#dynamic-rendering)
-- [Server Component Functions](#server-component-functions)
+- [Server functions](#server-functions)
 - [Server actions (experimental)](#server-actions-experimental)
+  * [Validation](#validation)
+  * [Headers](#headers)
+  * [Server Mutations](#server-mutations)
 - [Route handlers (API routes)](#route-handlers-api-routes)
   * [request body](#request-body)
   * [url params](#url-params)
@@ -57,6 +60,8 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [matcher](#matcher)
   * [conditional statements](#conditional-statements)
   * [response](#response)
+- [revalidatePath](#revalidatepath)
+- [revalidateTag](#revalidatetag)
 
 <!-- tocstop -->
 
@@ -1214,7 +1219,9 @@ During static rendering, if a *dynamic function* or a dynamic `fetch()` request 
 - Using `useSearchParams()` in Client Components will skip static rendering and instead render all Client Components up to the nearest parent Suspense boundary on the client.
 
 
-## Server Component Functions
+## Server functions
+
+> Functions that run on the server, but can be called on the client.
 
 Next.js provides helpful server functions you may need when fetching data in Server Components:
 
@@ -1243,13 +1250,15 @@ export default function Page() {
 
 ## Server actions (experimental)
 
-[Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions) are an alpha feature in Next.js, built on top of [React Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions#actions). For example:
+> Server Functions called as an action on forms or form elements.
+
+[Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions) are an alpha feature in Next.js, built on top of [React Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions#actions). They enable server-side data mutations, reduced client-side JavaScript, and progressively enhanced forms.
 
 app/actions.js
 
 ```javascript
 'use server'
- 
+
 export async function addItem(data) {
   const cartId = cookies().get('cartId')?.value;
   await saveToDb({ cartId, data });
@@ -1273,7 +1282,7 @@ export default function AddToCart({ productId }) {
 }
 ```
 
-In addition to invoking with the `action` prop on a `<form>`, you can also invoke with the `formAction` prop to on elements such as `button`, i`nput type="submit"`, and i`nput type="image"`:
+In addition to invoking with the `action` prop on a `<form>`, you can also invoke with the `formAction` prop to on elements such as `button`, `input type="submit"`, and `input type="image"`:
 
 ```javascript
  
@@ -1289,6 +1298,8 @@ export default function AddToCart({ productId }) {
   );
 }
 ```
+
+You can also do [custom invocation](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions#custom-invocation-using-starttransition) with `startTransition`: Invoke Server Actions without using `action` or `formAction` by using `startTransition`.
 
 For now you can enable Server Actions in your Next.js project by enabling the experimental serverActions flag.
 
@@ -1317,6 +1328,87 @@ Server Actions can be defined in two places:
 
 - Inside the component that uses it (Server Components only)
 - In a separate file (Client and Server Components), for reusability. You can define multiple Server Actions in a single file.
+
+
+### Validation 
+
+Data passed to a Server Action can be validated or sanitized before invoking the action. For example, you can create a wrapper function that receives the action as its argument, and returns a function that invokes the action if it's valid.
+
+app/actions.js
+
+```javascript
+'use server'
+ 
+import { withValidate } from 'lib/form-validation';
+ 
+export const action = withValidate((data) => {
+  // ...
+});
+```
+
+lib/form-validation.js
+
+```javascript
+export function withValidate(action) {
+  return async (formData) => {
+    'use server'
+ 
+    const isValidData = verifyData(formData);
+ 
+    if (!isValidData) {
+      throw new Error('Invalid input.')
+    }
+ 
+    const data = process(formData);
+    return action(data);
+  }
+}
+```
+
+
+### Headers
+
+You can read incoming request headers such as cookies and headers within a Server Action.
+
+```javascript
+'use server'
+
+import { cookies } from 'next/headers';
+ 
+export async function addItem(data) {
+  const cartId = cookies().get('cartId')?.value;
+  await saveToDb({ cartId, data });
+}
+```
+
+You can also modify cookies inside a server action:
+
+```javascript
+'use server'
+
+import { cookies } from 'next/headers';
+
+export async function create(data) {
+
+  const cart = await createCart():
+  cookies().set('cartId', cart.id)
+  // or
+  cookies().set({
+    name: 'cartId',
+    value: cart.id,
+    httpOnly: true,
+    path: '/'
+  })
+}
+```
+
+
+### Server Mutations
+
+> Server Actions that mutates your data and calls redirect, revalidatePath, or revalidateTag.
+
+Have not been able to find good examples of this.
+
 
 ## Route handlers (API routes)
 
@@ -1665,4 +1757,46 @@ export function middleware(request) {
     );
   }
 }
+```
+
+
+## revalidatePath
+
+`revalidatePath` allows you to revalidate data associated with a specific path. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire.
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
+ 
+export async function GET(request) {
+  const path = request.nextUrl.searchParams.get('path') || '/';
+  revalidatePath(path);
+  return NextResponse.json({ revalidated: true, now: Date.now() });
+}
+```
+
+`revalidatePath` only invalidates the cache when the path is next visited.
+
+
+## revalidateTag
+
+`revalidateTag` allows you to revalidate data associated with a specific cache tag. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire.
+
+app/api/revalidate/route.js
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
+ 
+export async function GET(request) {
+  const tag = request.nextUrl.searchParams.get('tag');
+  revalidateTag(tag);
+  return NextResponse.json({ revalidated: true, now: Date.now() });
+}
+```
+
+You can add tags to fetch as follows:
+
+```javascript
+fetch(url, { next: { tags: ['something'] } });
 ```
