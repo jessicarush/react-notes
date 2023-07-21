@@ -54,6 +54,11 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [headers](#headers)
   * [cookies](#cookies)
   * [redirects](#redirects)
+- [Images](#images)
+  * [sizes](#sizes)
+  * [fill](#fill)
+  * [priority](#priority)
+  * [warning](#warning)
 - [Meta data](#meta-data)
 - [Route segment config](#route-segment-config)
 - [Middleware](#middleware)
@@ -193,7 +198,7 @@ public
 - **page.js**: index.html
 - **page.module.css**: Css module for index.html
 - **sitemap.js**: A file that can be used to generate an XML sitemap for web crawlers.
-- **public**: You can optionally create a public folder to store static assets such as images, fonts, etc. Files inside public directory can then be referenced by your code starting from the base URL (/).
+- **public**: You can optionally create a public folder to store static assets such as images, fonts, etc. Files inside public directory can then be referenced by your code starting from the base URL (/) e.g. `src="/origami.png"`. If you are importing your image, you need to write the full path e.g. `import origami from '../public/origami.png'`.
 
 In addition:
 
@@ -1554,6 +1559,167 @@ export async function GET(request) {
   redirect('https://nextjs.org/');
 }
 ```
+
+
+## Images 
+
+Next has its own [Image component](https://nextjs.org/docs/app/api-reference/components/image) built on the native `<img>` element. The Image Component optimizes images for performance by lazy loading and automatically resizing images based on device size. See also [Using Images in Next.js video](https://www.youtube.com/watch?v=IU_qq_c_lKA).
+
+
+```javascript
+import Image from 'next/image';
+import profilePic from '../public/me.png';
+ 
+export default function Page() {
+  return (
+    <Image
+      src={profilePic}
+      alt="Picture of the author"
+      // width={500} automatically provided
+      // height={500} automatically provided
+      // blurDataURL="data:..." automatically provided
+      // placeholder="blur" // Optional blur-up while loading
+    />
+  );
+}
+```
+
+Next will automatically determine the width and height of your image based on the *imported file*. These values are used to prevent layout shift while your image is loading. If you are using a remote image src (e.g. `src="https://s3.amazonaws.com/my-bucket/profile.png"`), you will need to provide the `width`, `height` and optional `blurDataURL` props manually since Next does not have access to remote files during the build process. The width and height do not determine the rendered size of the image file, they're just used to prevent layout shift.
+
+> blurDataURL is a Data URL to be used as a placeholder image before the src image successfully loads. Only takes effect when combined with placeholder="blur".
+
+For example:
+
+```javascript
+import Image from 'next/image';
+import origami from '../public/origami.png';
+
+export default function Home() {
+  return (
+    <main>
+      <Image
+        src={origami}
+        alt="origami bird"
+        // no need to add width and height
+      />
+      <Image
+        src="/origami.png"
+        alt="origami bird"
+        width={500}
+        height={572}
+      />
+    </main>
+  )
+}
+```
+
+If your image src was a remote file (a URL) you will also want to set up some [config to list the domains](https://nextjs.org/docs/app/api-reference/components/image#remotepatterns) that we want to allow Next to optimize images from.
+
+### sizes 
+
+The `sizes` attribute is usually used with `srcset` to give the browser information about how wide the image will be at different breakpoints (media conditions).
+
+It sounds like Next creates a `srcset` and various optimzed images for you:
+
+> First, the value of sizes is used by the browser to determine which size of the image to download, from next/image's *automatically-generated source set*. 
+
+> Second, the sizes property configures how next/image automatically generates an image source set. If no sizes value is present, a small source set is generated, suitable for a fixed-size image. If sizes is defined, a large source set is generated, suitable for a responsive image
+
+For example:
+
+```javascript
+import Image from 'next/image';
+import origami from '../public/origami.png';
+
+export default function Home() {
+  return (
+    <main>
+      <Image
+        src={origami}
+        alt="origami bird"
+        sizes="100vw"
+      />
+      <Image
+        src={origami}
+        alt="origami bird"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      />
+    </main>
+  )
+}
+```
+
+### fill 
+
+The fill prop allows your image to be sized by its parent element. You can also use `object-fit` with `fill`, `contain`, or `cover`, and `object-position` to define how the image should occupy that space.
+
+When using fill, the parent element must have `position: relative` and `display: block`. In the browser, the image itself will be absolutely positioned within the parent with width and height set at 100%. 
+
+```javascript
+import Image from 'next/image';
+import mountains from '../public/mountains.jpg';
+ 
+export default function Fill() {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridGap: '8px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, auto))',
+      }}
+    >
+      <div style={{ position: 'relative', height: '400px' }}>
+        <Image
+          alt="Mountains"
+          src={mountains}
+          fill
+          sizes="(min-width: 808px) 50vw, 100vw"
+          style={{
+            objectFit: 'cover'
+          }}
+        />
+      </div>
+      {/* And more images in the grid... */}
+    </div>
+  )
+}
+```
+
+### priority
+
+You should add the priority property to the image that will be the Largest Contentful Paint (LCP) element for each page. Doing so allows Next.js to specially prioritize the image for loading.
+
+```javascript
+import Image from 'next/image';
+import profilePic from '../public/me.png';
+ 
+export default function Page() {
+  return <Image src={profilePic} alt="Picture of the author" priority />
+}
+```
+
+### warning 
+
+When you're not using Vercel and have a lot of traffic, the on-demand image optimization can put a significant load on your server because each image needs to be processed and served in an optimized format. This process involves resizing the images, converting them to a more efficient format (like WebP or AVIF), and then serving them to the client. All these operations consume CPU and memory resources on your server.
+
+However, once an image has been optimized, it is cached for future requests. This means that if another user (or the same user at a later time) requests the same image with the same parameters, the server can serve the cached, optimized image instead of having to optimize the image again.
+
+If you're self-hosting your Next.js application, the Image Optimization uses the default Next.js server for optimization. This server manages the rendering of pages and serving of static files.
+
+Vercel supposedly gives you a certain amount of image optimizations for free, then they start charging you. Apparently you can use a *"third-party Image Optimization provider"* which "usually charge based on the number of images processed or the amount of data transferred".
+
+If you're exporting static HTML (no Node.js server) which doesn’t include a server to optimize images, you can disable Image Optimization completely using next.config.js for all instances of next/image:
+
+```javascript
+module.exports = {
+ images: {
+ unoptimized: true,
+ },
+};
+```
+
+Overall the whole thing feels a bit sus... like a money trap. 
+
 
 ## Meta data
 
