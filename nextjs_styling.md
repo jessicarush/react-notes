@@ -266,4 +266,9 @@ h1 {
 }
 ```
 
-See the [Font API reference](https://nextjs.org/docs/app/api-reference/components/font).
+Lastly:
+
+
+- You can also [load local fonts](https://nextjs.org/docs/app/building-your-application/optimizing/fonts#local-fonts)
+- See [fonts with tailwind](https://nextjs.org/docs/app/building-your-application/optimizing/fonts#with-tailwind-css)
+- See the [Font API reference](https://nextjs.org/docs/app/api-reference/components/font).
