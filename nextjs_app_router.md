@@ -60,11 +60,18 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [priority](#priority)
   * [warning](#warning)
 - [Meta data](#meta-data)
+  * [Config-based metadata](#config-based-metadata)
+  * [file-based metadata](#file-based-metadata)
+  * [favicon.ico, apple-icon.jpg, icon.jpg](#faviconico-apple-iconjpg-iconjpg)
+  * [opengraph-image and twitter-image](#opengraph-image-and-twitter-image)
+  * [robots.txt](#robotstxt)
+  * [sitemap.xml](#sitemapxml)
 - [Route segment config](#route-segment-config)
 - [Middleware](#middleware)
   * [matcher](#matcher)
   * [conditional statements](#conditional-statements)
   * [response](#response)
+- [Scripts](#scripts)
 - [revalidatePath](#revalidatepath)
 - [revalidateTag](#revalidatetag)
 
@@ -1725,13 +1732,20 @@ Overall the whole thing feels a bit sus... like a money trap.
 
 There are [two ways to define Metadata](https://nextjs.org/docs/app/api-reference/functions/generate-metadata):
 
-- Config-based Metadata: Export a static metadata object or a dynamic generateMetadata function in a layout.js or page.js file.
-- File-based Metadata: Add static or dynamically generated special files to route segments.
+- **Config-based Metadata**: Export a static metadata object or a dynamic generateMetadata function in a layout.js or page.js file.
+- **File-based Metadata**: Add static or dynamically generated special files to route segments (e.g. `favicon.ico`, `apple-icon.jpg`, and `icon.jpg`, `opengraph-image.jpg` and `twitter-image.jpg`, `robots.txt`, `sitemap.xml`).
 
-Config-based looks like this:
+There are two default meta tags that are always added even if a route doesn't define metadata:
 
 ```javascript
-// either Static metadata
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+```
+
+### Config-based metadata
+
+```javascript
+// Static metadata object
 export const metadata = {
   title: '...',
 };
@@ -1749,7 +1763,7 @@ export async function generateMetadata({ params }) {
 }
 ```
 
-- The metadata object and `generateMetadata` function exports are only supported in **Server Components**.
+- The `metadata` object and `generateMetadata` function exports are only supported in **Server Components**.
 - You cannot export both the metadata object and generateMetadata function from the same route segment.
 
 Some [fields](https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadata-fields);
@@ -1780,6 +1794,104 @@ export const metadata = {
 ```
 
 There's way more, e.g. for robots, icons, etc. See also the [HTML standard](https://html.spec.whatwg.org/multipage/semantics.html#the-meta-element).
+
+### file-based metadata 
+
+These special files are available for metadata:
+
+- `favicon.ico`, `apple-icon.jpg`, and `icon.jpg`
+- `opengraph-image.jpg` and `twitter-image.jpg`
+- `robots.txt`
+- `sitemap.xml`
+
+See the [Metadata Files API Reference](https://nextjs.org/docs/app/api-reference/file-conventions/metadata)
+
+### favicon.ico, apple-icon.jpg, icon.jpg
+
+File convention | Supported file types | Valid locations
+--------------- | -------------------- | ---------------
+favicon | .ico | `app/`
+icon | .ico, .jpg, .jpeg, .png, .svg | `app/**/*`
+apple-icon | .jpg, .jpeg, .png | `app/**/*`
+
+You can set multiple icons by adding a number suffix to the file name. For example, `icon1.png`, `icon2.png`, etc. Numbered files will sort lexically.
+
+### opengraph-image and twitter-image
+
+These are useful for setting the images that appear on social networks and messaging apps when a user shares a link to your site. These files can be placed in any segment.
+
+File convention | Supported file types
+--------------- | --------------------
+opengraph-image | .jpg, .jpeg, .png, .gif
+twitter-image | .jpg, .jpeg, .png, .gif
+opengraph-image.alt | .txt
+twitter-image.alt | .txt
+
+### robots.txt 
+
+Add a static robots.txt file to your `app/` directory. For example:
+
+```
+User-Agent: *
+Allow: /
+Disallow: /private/
+
+Sitemap: https://acme.com/sitemap.xml
+```
+
+You can also [generate this file](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots#generate-a-robots-file) with a `robots.js` but I don't really see any added benefit.
+
+### sitemap.xml
+
+You can add a static xml file to your `app/` directory, however in this case it's easier automatically generate the file with a `app/sitemap.js`:
+
+```javascript
+export default function sitemap() {
+  return [
+    {
+      url: 'https://acme.com',
+      lastModified: new Date(),
+    },
+    {
+      url: 'https://acme.com/about',
+      lastModified: new Date(),
+    },
+    {
+      url: 'https://acme.com/blog',
+      lastModified: new Date(),
+    },
+  ]
+}
+```
+
+If you had dynamic routes, you could do:
+
+```javascript
+export default async function sitemap() {
+  // List regular routes
+  const pages = ['', 'about', 'login', 'signup'];
+
+  // Also fetch any dynamic routes
+  const res = await fetch(url);
+  const posts = await res.json()
+
+  // Create arrays:
+  const dynamicRoutes = posts.map((post) => {
+    return {
+      url: `http://localhost:3000/post/${post.id}`,
+      lastModified: new Date()
+    }
+  });
+  const routes = pages.map((route) => {
+    return {
+      url: `http://localhost:3000/${route}`,
+      lastModified: new Date()
+    }
+  });
+
+  return [...routes, ...dynamicRoutes];
+}
+```
 
 
 ## Route segment config
@@ -1924,6 +2036,64 @@ export function middleware(request) {
   }
 }
 ```
+
+
+## Scripts 
+
+Next has a [Script](https://nextjs.org/docs/app/building-your-application/optimizing/scripts) component for including third-party scripts.
+
+```javascript
+import Script from 'next/script'
+ 
+export default function DashboardLayout({ children }) {
+  return (
+    <>
+      <section>{children}</section>
+      <Script src="https://example.com/script.js" />
+    </>
+  )
+}
+```
+
+There are [options](https://nextjs.org/docs/app/building-your-application/optimizing/scripts#strategy) to control when the script loads as well as offloadig them to web workers. 
+
+You can also do inline scripts:
+
+```javascript
+// Inline scripts must have an id
+<Script id="show-banner">
+  {`document.getElementById('banner').classList.remove('hidden')`}
+</Script>
+```
+
+You can also use event with Script component to execute additional code after a certain event occurs:
+
+- `onLoad`: Execute code after the script has finished loading.
+- `onReady`: Execute code after the script has finished loading and every time the component is mounted.
+- `onError`: Execute code if the script fails to load.
+
+These handlers will only work when next/script is imported and used inside of a Client Component where `"use client"` is defined as the first line of code:
+
+```javascript
+'use client'
+ 
+import Script from 'next/script';
+ 
+export default function Page() {
+  return (
+    <>
+      <Script
+        src="https://example.com/script.js"
+        onLoad={() => {
+          console.log('Script has loaded')
+        }}
+      />
+    </>
+  );
+}
+```
+
+See also the [<Script> component API reference](https://nextjs.org/docs/app/api-reference/components/script).
 
 
 ## revalidatePath
