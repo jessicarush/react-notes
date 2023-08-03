@@ -74,6 +74,9 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 - [Scripts](#scripts)
 - [revalidatePath](#revalidatepath)
 - [revalidateTag](#revalidatetag)
+- [Lazy loading](#lazy-loading)
+  * [Loading External Libraries](#loading-external-libraries)
+  * [Lazy loading with loader](#lazy-loading-with-loader)
 
 <!-- tocstop -->
 
@@ -2136,3 +2139,94 @@ You can add tags to fetch as follows:
 ```javascript
 fetch(url, { next: { tags: ['something'] } });
 ```
+
+
+## Lazy loading
+
+Defer loading of Client Components and imported libraries, and only include them in the client bundle when they're needed. For example, you might want to defer loading a modal until a user clicks to open it.
+
+There are two ways you can implement lazy loading in Next.js:
+
+- Using Dynamic Imports with `next/dynamic`
+- Using `React.lazy()` with Suspense
+
+`next/dynamic` is a composite of `React.lazy()` and `Suspense`.
+
+By default, Server Components are automatically code split, and you can use [streaming](#streaming-with-suspense) to progressively send pieces of UI from the server to the client. Lazy loading applies to Client Components. If you dynamically import a Server Component, only the Client Components that are children of the Server Component will be lazy-loaded - not the Server Component itself.
+
+```javascript
+'use client'
+
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
+
+// Client Components:
+const ComponentA = dynamic(() => import('./_components/A'))
+const ComponentB = dynamic(() => import('./_components/B'))
+const ComponentC = dynamic(() => import('./_components/C'), { ssr: false })
+
+export default function Home() {
+  const [showMore, setShowMore] = useState(false);
+
+  return (
+    <main>
+      <p>Hello.</p>
+
+      {/* Load immediately, but in a separate client bundle */}
+      <ComponentA />
+
+      {/* Load on demand, only when/if the condition is met */}
+      {showMore && <ComponentB />}
+      <button onClick={() => setShowMore(!showMore)}>Toggle B</button>
+
+      {/* Load only on the client side */}
+      <ComponentC />
+
+    </main>
+  );
+}
+```
+
+When using `React.lazy()` and `Suspense`, Client Components will be pre-rendered (SSR) by default. If you want to disable pre-rendering for a Client Component, you can use the `ssr` option set to `false` as demonstrated with `ComponentC`.
+
+### Loading External Libraries
+
+External libraries can be loaded on demand using the `import()` function. This example uses the external library [fuse.js](https://www.fusejs.io/) for fuzzy search. The module is only loaded on the client after the user types in the search input.
+
+```
+npm install fuse.js
+```
+
+```javascript
+'use client';
+
+import { useState } from 'react';
+
+const names = ['Tim', 'Joe', 'Bel', 'Lee', 'Jessica', 'Scott'];
+
+export default function LoadExternalLibraryDemo() {
+  const [results, setResults] = useState();
+
+  const fuzzySearch = async (e) => {
+    const { value } = e.currentTarget;
+    // Dynamically load fuse.js
+    const Fuse = (await import('fuse.js')).default;
+    const fuse = new Fuse(names);
+    // Update state with results
+    setResults(fuse.search(value));
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Search"
+        onChange={fuzzySearch}
+      />
+      <pre>Results: {JSON.stringify(results, null, 2)}</pre>
+    </div>
+  );
+}
+```
+
+### Lazy loading with loader
