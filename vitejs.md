@@ -52,6 +52,8 @@ For steps to migrate a CRA project to Vite see: [How to migrate from CRA to Vite
 
 ## Set up ESlint 
 
+> UPDATE [Aug 2, 2023]: looks like Vite is now including an eslintrc.cjs file. This file type is used when running ESLint in JavaScript packages that specify `"type": "module"` in their `package.json`. It looks like it includes all the necessary react stuff. As far as I can tell, you no longer need to add the `.eslintrc` or edit the `vite.config.js` as shown below.
+
 ```bash
 npm install vite-plugin-eslint --save-dev
 npm install eslint --save-dev
@@ -60,6 +62,7 @@ touch .eslintrc
 ```
 
 .eslintrc
+
 ```javascript
 {
   "extends": [
@@ -69,6 +72,7 @@ touch .eslintrc
 ```
 
 vite.config.js 
+
 ```javascript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
