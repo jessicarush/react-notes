@@ -30,6 +30,7 @@ A list of react packages/libraries that I've used.
 - [gray-matter](#gray-matter)
 - [remark](#remark)
 - [date-fns](#date-fns)
+- [fuse.js](#fusejs)
 
 <!-- tocstop -->
 
@@ -595,3 +596,7 @@ See *courses/nextjs/next_blog*.
 
 [date-fns](https://github.com/date-fns/date-fns) is a date utility library that provides a comprehensive toolset for manipulating JavaScript dates in a browser & Node.
 
+
+## fuse.js 
+
+[fuse.js](https://www.fusejs.io/) is a nice simple library (no dependencies!) for doing fuzzy search. I have a very simple example in `React/examples/next_lazy_loading`.
