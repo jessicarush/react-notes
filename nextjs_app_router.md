@@ -2170,7 +2170,6 @@ export default function Home() {
 
   return (
     <main>
-      <p>Hello.</p>
 
       {/* Load immediately, but in a separate client bundle */}
       <ComponentA />
@@ -2230,3 +2229,27 @@ export default function LoadExternalLibraryDemo() {
 ```
 
 ### Lazy loading with loader
+
+```javascript
+import dynamic from 'next/dynamic';
+
+// Client Components:
+const ComponentD = dynamic(
+  () => import('./_components/D'),
+  {
+    loading: () => <p>Loading...</p>,
+  }
+)
+
+export default function Home() {
+
+  return (
+    <main>
+
+      {/* lazy loading a component with a custom loader */}
+      <ComponentD />
+
+    </main>
+  );
+}
+```
