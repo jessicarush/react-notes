@@ -41,7 +41,9 @@ Specific to Next.js, the lightweight [Edge Runtime](https://nextjs.org/docs/app/
 
 ## Deploy to Vercel 
 
-Vercel is made by the creators of Next.js and has first-class support for Next.js. When you deploy your Next.js app to Vercel, the following happens by default:
+Vercel is made by the creators of Next.js and has first-class support for Next.js. That being said it is known to be **very expensive** when compared to other options. I also read there's no way to set limits on spending which is a huge red flag.
+
+When you deploy your Next.js app to Vercel, the following happens by default:
 
 - Pages that use Static Generation and assets (JS, CSS, images, fonts, etc) will automatically be served from the Vercel Edge Network, which is "blazingly" fast.
 - Pages that use Server-Side Rendering and API routes will automatically become isolated Serverless Functions. This allows page rendering and API requests to scale infinitely.
