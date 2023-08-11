@@ -1520,9 +1520,12 @@ export async function GET(request) {
   const headersList = headers();
   const referer = headersList.get('referer');
  
-  return new Response('Hello, Next.js!', {
+  return new Response(JSON.stringify('Hello, Next.js!'), {
     status: 200,
-    headers: { referer: referer },
+    headers: { 
+      'referer': referer,
+      'Content-Type': 'application/json'
+      },
   });
 }
 ```
@@ -2253,3 +2256,87 @@ export default function Home() {
   );
 }
 ```
+
+
+## Eslint 
+
+Eslint is automatically setup when using `npx create-next-app@latest`. See the [docs on eslint] for details on disabling rules, adding additional directories and more.
+
+
+## Environment variables
+
+Next.js comes with built-in support for environment variables, which allows you to do the following:
+
+- use `.env.local` to load environment variables (server only)
+- bundle environment variables for the browser by prefixing with `NEXT_PUBLIC_`
+
+`.env.local` should be located in the root project folder (at the same level as `package.json` and `next.config.js`):
+
+```
+DB_HOST=localhost
+DB_USER=myuser
+DB_PASS=mypassword
+```
+
+This loads the variables into the Node.js environment allowing you to use them in Route Handlers (API routes).
+
+```javascript
+export async function GET() {
+  const db = await myDB.connect({
+    host: process.env.DB_HOST,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASS,
+  })
+  // ...
+}
+```
+
+These environment variables are only available in the Node.js environment, meaning they aren't accessible to the browser. 
+
+In order to make the value of an environment variable accessible in the browser, Next.js can inline insert a value at build time, into the js bundle that is delivered to the client. It just replaces all references to `process.env.[variable]` with a hard-coded value. To tell it to do this, you just have to prefix the variable with `NEXT_PUBLIC_`.
+
+```
+NEXT_PUBLIC_ANALYTICS_ID=abcdefghijk
+```
+
+Note: All `NEXT_PUBLIC_` variables will be frozen with the value evaluated at build time. If you need access to runtime environment values, you'll have to setup your own API to provide them to the client (either on demand or during initialization).
+
+In general only one `.env.local` file is needed. However, sometimes you might want to add some defaults for the development (next dev) or production (next start) environment.
+
+Next.js allows you to set **defaults** in `.env` (all environments), `.env.development` (development environment), and `.env.production` (production environment).
+
+`.env.local` always overrides the defaults set.
+
+`.env`, `.env.development`, and `.env.production` files should be included in your repository as they define defaults. `.env*.local` should be added to `.gitignore`, as those files are intended to be ignored. .`env.local` is where secrets can be stored.
+
+
+## Absolute import path alias
+
+You can use the `@/` alias making it easier to import modules. For example:
+
+```javascript
+// before
+import { Button } from '../../../_components/button';
+ 
+// after
+import { Button } from '@/app/_components/button';
+```
+
+
+## Other features
+
+There's additional topics in the Next documentation but from the sounds of it, these features require deploying to Vercel. These include:
+
+- [Analytics](https://nextjs.org/docs/app/building-your-application/optimizing/analytics) 
+- [OpenTelemetry](https://nextjs.org/docs/app/building-your-application/optimizing/open-telemetry)
+
+There are also some topics which would need further investigation because there's just not enough in the docs to know how/when/when to use:
+
+- [Instrumentation](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation)
+
+And others that are specific use cases:
+
+- [MDX](https://nextjs.org/docs/app/building-your-application/configuring/mdx)
+- [Draft Mode](https://nextjs.org/docs/app/building-your-application/configuring/draft-mode)
+
+
