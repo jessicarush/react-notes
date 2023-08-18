@@ -32,6 +32,7 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [useRouter](#userouter)
 - [Route groups](#route-groups)
 - [Dynamic routes](#dynamic-routes)
+  * [Pre-render static routes](#pre-render-static-routes)
   * [Link to dynamic routes](#link-to-dynamic-routes)
   * [catch-all routes](#catch-all-routes)
 - [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch)
@@ -77,6 +78,10 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 - [Lazy loading](#lazy-loading)
   * [Loading External Libraries](#loading-external-libraries)
   * [Lazy loading with loader](#lazy-loading-with-loader)
+- [Eslint](#eslint)
+- [Environment variables](#environment-variables)
+- [Absolute import path alias](#absolute-import-path-alias)
+- [Other features](#other-features)
 
 <!-- tocstop -->
 
@@ -93,6 +98,11 @@ To start the development server on http://localhost:3000
 To run the build:
 
 - `npm run build && npm start`
+
+Note: `next start` does not work with `output: export` (static exports... see [nextjs_deployment.md](nextjs_deployment.md)). Instead use: 
+
+- `npm run build && npx serve@latest out`
+
 
 ## Updating 
 
@@ -219,6 +229,7 @@ In addition:
 - **_private**: Private folders can be created by prefixing a folder with an underscore: `_folderName`. This indicates the folder is a private implementation detail and should not be considered by the routing system, thereby opting the folder and all its subfolders out of routing.
 
 See [Next.js Project Structure](https://nextjs.org/docs/getting-started/project-structure).
+
 
 ## Special file hierarchy 
 
@@ -827,11 +838,11 @@ Then we create a component in `page.js`:
 ```javascript
 function Example(props) {
   console.log(props); // { params: { postid: '100' }, searchParams: {} }
-  console.log(props.params.postid); // returns the postid of /app/post/100
+  const postid = props.params.postid; // returns the postid of /app/post/100
   return (
-    <div className='Example'>
-      <p>Post.</p>
-    </div>
+    <main>
+      <p>Post { postid }.</p>
+    </main>
   );
 }
 
@@ -879,40 +890,57 @@ export default function PhotoPage({ params }) {
 }
 ```
 
-To pre-render static pages (like default `getStaticPaths` with `fallback: false`), you would create and export a special function called `generateStaticParams`. 
+### Pre-render static routes
+
+To pre-render static pages (like `getStaticPaths` with `fallback: false`), you would create and export a special function called `generateStaticParams`. 
 
 > The `generateStaticParams` function can be used in combination with dynamic route segments to statically generate routes at build time instead of on-demand at request time.
 
 ```javascript
+// The object keys should be the same as the filename [postid].js
 export async function generateStaticParams() {
-  // The key here should be the same as the filename [postid]
   return [
     { postid: '100' },
     { postid: '101' }
   ]
 }
 
-function Example(props) {
+export default function Example(props) {
   const postid = props.params.postid;
-  console.log(postid);
   return (
-    <div className='Example'>
+    <main>
       <p>Post { postid }.</p>
-    </div>
+    </main>
   );
 }
-
-export default Example;
 ```
 
-In this case, any routes not returned in by `generateStaticParams` will not be generated and therefor result in a 404. NOTE: I haven't been able to test this yet... in dev mode, its dynamic.
+At this point you want to consider how you are deploying your app/site:
+
+1. If you are planning to build and deploy a [static export](https://nextjs.org/docs/app/building-your-application/deploying/static-exports) (see [nextjs_deployment.md](nextjs_deployment.md)), then this is all you need to do. In this case, any routes not returned in by `generateStaticParams` will not be generated and therefor result in a 404. Note that in `npm run dev` mode, you will still get on-demand generated routes, even if they are not included in `generateStaticParams`:
 
 > During `next dev`, `generateStaticParams` will be called when you navigate to a route.
 > During `next build`, `generateStaticParams` runs before the corresponding Layouts or Pages are generated.
 
+So, to test this properly you will need to first add the `output: 'export'` to your `next.config.js`, then build and run the export:
+
+- `npm run build && npx serve@latest out`
+
+2. If you are planning to build and deploy with Node.js, then you get to control what happens when a dynamic segment is visited that was not generated with `generateStaticParams`. This is done with the [dynamicParams](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamicparams) segment config option:
+
+
+```javascript
+// Control what happens when a dynamic segment is visited that was not
+// generated with generateStaticParams.
+export const dynamicParams = false;
+```
+
+- `true` (default): Dynamic segments not included in `generateStaticParams` are generated on demand.
+- `false`: Dynamic segments not included in `generateStaticParams` will return a `404`.
+
+With the `dynamicParams` route option set, you should be able to test this with `npm run dev` or `npm run build && npm start`.
 
 ### Link to dynamic routes
-
 
 ```javascript
 <ul>
@@ -1720,6 +1748,12 @@ However, once an image has been optimized, it is cached for future requests. Thi
 If you're self-hosting your Next.js application, the Image Optimization uses the default Next.js server for optimization. This server manages the rendering of pages and serving of static files.
 
 Vercel supposedly gives you a certain amount of image optimizations for free, then they start charging you. Apparently you can use a *"third-party Image Optimization provider"* which "usually charge based on the number of images processed or the amount of data transferred".
+
+In their [self-hosting deployment](https://nextjs.org/docs/app/building-your-application/deploying#nodejs-server) section they say:
+
+> If you are using next/image, consider adding `sharp` for more performant Image Optimization in your production environment by running `npm install sharp` in your project directory. On Linux platforms, `sharp` may require additional configuration to prevent excessive memory usage.
+
+Ok what?!
 
 If you're exporting static HTML (no Node.js server) which doesn’t include a server to optimize images, you can disable Image Optimization completely using next.config.js for all instances of next/image:
 
