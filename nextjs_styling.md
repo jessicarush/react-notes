@@ -225,13 +225,22 @@ Automatically self-host any Google Font. Fonts are included in the deployment an
 // Import the font you want to use from next/font/google as a function. 
 // Next recommends using variable fonts for the performance and flexibility.
 // Use an underscore (_) for font names with multiple words.
-import { Montserrat, Roboto } from 'next/font/google';
+import { Montserrat, Roboto, Commissioner } from 'next/font/google';
 import './globals.css';
 
+// If loading a variable font, you don't need to specify the font weight.
 // subsets reduce the size of the font file and improves performance.
 // You can find a list of all subsets on the Google Fonts page for your font.
 // variable lets you define a css variable name.
 const main = Montserrat({ subsets: ['latin'], variable: '--font-main' });
+
+// Some variable fonts have extra axes that can be included. By default,
+// only the font weight is included to keep the file size down.
+// The possible values of axes depend on the specific font.
+const alt = Commissioner({ 
+  subsets: ['latin'], 
+  axes: ['slnt'], 
+  variable: '--font-alt' });
 
 // If you can't use a variable font, you will need to specify a weight here.
 // You can specify multiple weights and/or styles by using an array.
@@ -245,7 +254,9 @@ const roboto = Roboto({
 // Root Layout. Pass the variables to the html ot body tags.
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${main.variable} ${roboto.variable}`}>
+    <html
+      lang="en"
+      className={`${main.variable} ${roboto.variable} ${alt.variable}`}>
       <body>
         {children}
       </body>
@@ -260,14 +271,32 @@ You can then reference your variable font names anywhere in your css:
 body {
   font-family: var(--font-main);
 }
- 
-h1 {
-  font-family: var(--font-roboto);
+```
+
+Variable font axes can be adjusted like so:
+
+```css
+.test_variable_font {
+  font-family: var(--font-alt);
+  font-size: 3rem;
+  /* variable font axis: weight */
+  font-weight: 250;
+  /* variable font axis: width */
+  font-stretch: 193%;
+  /* variable font axis: slant */
+  font-variation-settings: 'slnt' -5;
+  /* variable font axis: italic */
+  font-variation-settings: 'ital' -12;
+  /* variable font axis: optical size */
+  font-variation-settings: 'opsz' 48;
+  /* variable font axis: custom */
+  font-variation-settings: 'CASL' 0.15;
 }
 ```
 
-Lastly:
+See the list of [all google variable fonts and their axes](https://fonts.google.com/variablefonts#font-families).
 
+Lastly:
 
 - You can also [load local fonts](https://nextjs.org/docs/app/building-your-application/optimizing/fonts#local-fonts)
 - See [fonts with tailwind](https://nextjs.org/docs/app/building-your-application/optimizing/fonts#with-tailwind-css)
