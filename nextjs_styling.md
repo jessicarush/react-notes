@@ -294,10 +294,7 @@ Variable font axes can be adjusted like so:
 }
 ```
 
-See the list of [all google variable fonts and their axes](https://fonts.google.com/variablefonts#font-families).
-
-Lastly:
-
+- See the list of [all google variable fonts and their axes](https://fonts.google.com/variablefonts#font-families)
 - You can also [load local fonts](https://nextjs.org/docs/app/building-your-application/optimizing/fonts#local-fonts)
 - See [fonts with tailwind](https://nextjs.org/docs/app/building-your-application/optimizing/fonts#with-tailwind-css)
-- See the [Font API reference](https://nextjs.org/docs/app/api-reference/components/font).
+- See the [Font API reference](https://nextjs.org/docs/app/api-reference/components/font)
