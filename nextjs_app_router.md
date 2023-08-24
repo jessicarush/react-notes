@@ -39,7 +39,9 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 - [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate)
 - [Revalidation](#revalidation)
 - [Data fetching examples](#data-fetching-examples)
+- [Fetching user-specific data](#fetching-user-specific-data)
 - [Data fetching summary](#data-fetching-summary)
+- [Client-side fetching with SWR](#client-side-fetching-with-swr)
 - [Static vs dynamic rendering](#static-vs-dynamic-rendering)
   * [Static rendering](#static-rendering)
   * [Static/dynamic data fetching](#staticdynamic-data-fetching)
@@ -1195,6 +1197,31 @@ export default async function Page({ params: { username } }) {
 }
 ```
 
+## Fetching user-specific data 
+
+Keeping in mind that you shouldn't cache at the fetch level using `revalidate` or `cache: 'force-cache'` (because shared cache), this doesn't mean you can't fetch user-specific data in a server component.
+
+In fact, you could fetch user-specific data in both server and client components.
+
+In a server component, the user ID needed to fetch user-specific data can be obtained from the incoming request. Common ways to obtain the user ID in a server component:
+
+- Authentication: If your application has an authentication system in place, the user ID can be obtained from the authenticated user's session or token. When a user logs in or authenticates, their user ID is typically stored in the session or token, which can be accessed in the server component.
+
+- Request Headers: You can access request headers in the server component. For example, the user ID could be included in an "Authorization" header, which you can extract and use to fetch user-specific data.
+
+When it comes to data fetching in a client component, the approach for using authentication and request headers can be similar to that in a server component, but there are some differences to consider.
+
+In a client component, the user's authentication and authorization information is typically stored on the client-side, such as in local storage, session storage, or cookies. When making requests to fetch user-specific data, you can include the authentication information in the request headers to authenticate the user and authorize access to the data.
+
+Here are some considerations for using authentication and request headers in client components:
+
+- Authentication: In a client component, you would typically retrieve the authentication information, such as an authentication token, from the client-side storage where it was stored during the authentication process. This token can then be included in the request headers when making API calls to fetch user-specific data.
+
+- Request Headers: Similar to server components, you can include custom headers in the request to pass additional information, such as the user ID or any other necessary data, to the server. These headers can be used to authenticate the user and authorize access to the user-specific data.
+
+However, it's important to note that client-side authentication and request headers are generally less secure than server-side authentication and headers. Client-side code can be inspected and manipulated by users, so it's crucial to implement additional security measures, such as validating the authentication token on the server-side and implementing proper authorization checks, to ensure the integrity and security of the data.
+
+
 ## Data fetching summary 
 
 > Whenever possible, we recommend fetching data in Server Components. It's still possible to fetch data client-side. We recommend using a third-party library such as SWR or React Query with Client Components. In the future, it'll also be possible to fetch data in Client Components using React's use() hook.
@@ -1204,7 +1231,6 @@ Next.js recommends fetching data in Server Components whenever possible. This is
 However, Next.js also acknowledges that there are valid situations where client-side data fetching is necessary, such as when dealing with user-specific data or frequently updating data. For example, user dashboard pages that are private, user-specific, and frequently updated can benefit from client-side data fetching.
 
 As for the recommendation to use SWR or React Query for client-side data fetching, it's not that using a standard fetch in an async function triggered by an `onclick` is wrong. Rather, libraries like SWR and React Query provide additional features that can make client-side data fetching more efficient and easier to manage. For instance, SWR handles caching, revalidation, focus tracking, refetching on intervals, and more.
-
 
 - Whenever possible, fetch data on the server using Server Components.
 - Fetch data in parallel to minimize waterfalls and reduce loading times.
@@ -1219,6 +1245,93 @@ As for the recommendation to use SWR or React Query for client-side data fetchin
 - By default, Next.js automatically does static fetches. This means that the data will be fetched at build time, cached, and reused on each request.
 - Caching at the fetch level with revalidate or cache: 'force-cache' stores the data across requests in a **shared cache**. You should avoid using it for user-specific data (i.e. requests that derive data from [cookies()](https://nextjs.org/docs/app/api-reference/functions/cookies) or [headers()](https://nextjs.org/docs/app/api-reference/functions/headers))
 - If your data is personalized to the user or you want to always fetch the latest data, you can mark requests as dynamic and fetch data on each request without caching (`cache: 'no-store'` or `next: { revalidate: 0 }`).
+
+
+## Client-side fetching with SWR 
+
+Vercel created a React hook for data fetching called [SWR](https://swr.vercel.app/docs/getting-started). They recommend it if you’re fetching data on the client side.
+
+The name “SWR” is derived from stale-while-revalidate, a HTTP cache invalidation strategy. SWR is a strategy to first return the data from cache (stale), then send the fetch request (revalidate), and finally come with the up-to-date data.
+
+With SWR, components will get a stream of data updates constantly and automatically. For example, if you click to another app or tab, when you reactivate the tab with SWR, it will automatically get new data.
+
+```bash
+npm install swr
+```
+
+Example:
+
+```javascript
+import useSWR from 'swr';
+
+const url = 'https://log.zebro.id/api_demo_one';
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+export default function Home() {
+  const { data, error, isLoading } = useSWR(url, fetcher);
+  const name = data ? data.name : '';
+  const value = data ? data.value : '';
+
+  let content;
+  if (error) content = 'Failed to load.';
+  if (isLoading) content = 'Loading...';
+  if (data)
+    content = (
+      <>
+        Your color is{' '}
+        <span style={{ color: value }}>
+          {name} {value}
+        </span>
+      </>
+    );
+
+  return (
+    <>
+      <p>{content}</p>
+    </>
+  );
+}
+```
+
+You can also fetch via a user event using `mutate`:
+
+```javascript
+import useSWR, { mutate } from 'swr'; // <-- import mutate
+
+const url = 'https://log.zebro.id/api_demo_one';
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+export default function Home() {
+  const { data, error, isLoading } = useSWR(url, fetcher);
+  const name = data ? data.name : '';
+  const value = data ? data.value : ''
+
+  const fetchNewColor = async () => {  // <-- create a handler
+    mutate(url);
+  }
+
+  let content;
+
+  if (error) content = 'Failed to load.';
+  if (isLoading) content = 'Loading...';
+  if (data)
+    content = (
+      <>
+        Your color is{' '}
+        <span style={{ color: value }}>
+          {name} {value}
+        </span>
+      </>
+    );
+
+  return (
+    <>
+      <p>{content}</p>
+      <button onClick={fetchNewColor}>get another</button>
+    </>
+  );
+}
+```
 
 
 ## Static vs dynamic rendering 
@@ -2095,7 +2208,12 @@ export default function DashboardLayout({ children }) {
 }
 ```
 
-There are [options](https://nextjs.org/docs/app/building-your-application/optimizing/scripts#strategy) to control when the script loads as well as offloadig them to web workers. 
+You van use the [strategy property](https://nextjs.org/docs/app/building-your-application/optimizing/scripts#strategy) to control when the script loads as well as offloadig them to web workers. 
+
+- `beforeInteractive`: Load the script before any Next.js code and before any page hydration occurs.
+- `afterInteractive`: (default) Load the script early but after some hydration on the page occurs.
+- `lazyOnload`: Load the script later during browser idle time.
+- `worker`: (experimental) Load the script in a web worker.
 
 You can also do inline scripts:
 
