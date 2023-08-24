@@ -89,7 +89,9 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 
 ## Getting started
 
-See <https://nextjs.org/docs/app/api-reference/create-next-app>
+See the [create-next-app API reference](https://nextjs.org/docs/app/api-reference/create-next-app).
+
+There are many [official Next.js examples](https://github.com/vercel/next.js/tree/canary/examples) but they all seem to be using Pages Router.
 
 - `npx create-next-app@latest`
 
@@ -928,7 +930,7 @@ So, to test this properly you will need to first add the `output: 'export'` to y
 
 - `npm run build && npx serve@latest out`
 
-2. If you are planning to build and deploy with Node.js, then you get to control what happens when a dynamic segment is visited that was not generated with `generateStaticParams`. This is done with the [dynamicParams](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamicparams) segment config option:
+2. If you are NOT doing and static export but planning to build and deploy with Node.js, then you get to control what happens when a dynamic segment is visited that was not generated with `generateStaticParams`. This is done with the [dynamicParams](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamicparams) segment config option:
 
 
 ```javascript
@@ -1330,6 +1332,20 @@ export default function Home() {
       <button onClick={fetchNewColor}>get another</button>
     </>
   );
+}
+```
+
+Side note, it's perfectly fine to return different content too:
+
+```javascript
+export default function Home() {
+  const { data, error, isLoading } = useSWR(url, fetcher);
+  // ...
+ 
+  if (error) return <div>Failed to load.</div>
+  if (isLoading) return <div>Loading...</div>
+ 
+  return <div>{data.name}</div>
 }
 ```
 
