@@ -786,7 +786,7 @@ The Next.js team has created a React hook for data fetching called [SWR](https:/
 The name “SWR” is derived from stale-while-revalidate, a HTTP cache invalidation strategy. SWR is a strategy to first return the data from cache (stale), then send the fetch request (revalidate), and finally come with the up-to-date data.
 
 With SWR, components will get a stream of data updates constantly and automatically.
-And the UI will be always fast and reactive. For example, if you click to another app or tab, when you reactive the tab with SWR, it will get new data.
+And the UI will be always fast and reactive. For example, if you click to another app or tab, when you reactivate the tab with SWR, it will get new data.
 
 It is an external package, so you need to install it:
 
@@ -797,7 +797,6 @@ npm install swr
 Example:
 
 ```javascript
-import Head from 'next/head';
 import useSWR from 'swr';
 
 const url = 'https://log.zebro.id/api_demo_one';
@@ -845,7 +844,6 @@ const fetcher = url => axios.get(url).then(res => res.data);
 You can also fetch via a user event using `mutate`:
 
 ```javascript
-import Head from 'next/head';
 import useSWR, { mutate } from 'swr'; // <-- import mutate
 
 const url = 'https://log.zebro.id/api_demo_one';
