@@ -4,6 +4,7 @@
 
 <!-- toc -->
 
+- [Inline styles](#inline-styles)
 - [Global CSS](#global-css)
 - [CSS Modules](#css-modules)
 - [CSS-in-JS](#css-in-js)
@@ -12,6 +13,24 @@
 - [Fonts](#fonts)
 
 <!-- tocstop -->
+
+## Inline styles 
+
+You can apply css inline as usual:
+
+```javascript
+export default function Home() {
+  const inlineStyle = {
+    background: "#000",
+    padding: ".5rem"
+  };
+  return (
+    <main>
+      <p style={inlineStyle}>Hello.</p>
+    </main>
+  );
+}
+```
 
 ## Global CSS
 
@@ -70,6 +89,8 @@ Where `styles.dashboard` is a class in `layout.module.css`:
   padding: 24px;
 }
 ```
+
+> :warning: with css modules, class names with hyphens will break. The recommendation is to use camelCase instead but you can also use bracket notation instead of dot notation: `<div className={styles['nav-wrapper']}>`.
 
 
 ## CSS-in-JS
@@ -133,6 +154,9 @@ export default function RootLayout({ children }) {
   );
 }
 ```
+
+The registry for [styled-jsx](https://nextjs.org/docs/app/building-your-application/styling/css-in-js#styled-jsx) is a little different.
+
 
 ## Tailwind 
 
