@@ -1229,9 +1229,4 @@ To deploy a Next.js app on your own server or a different hosting platform, you 
 
 Note that deploying a Next.js app on your own server may require additional setup and configuration compared to deploying on Vercel, as Vercel provides a lot of automation and optimization for Next.js apps out of the box. However, with the proper setup, you can deploy your Next.js app on any server that supports Node.js applications.
 
-### Requires more reading:
-
-- In Next.js, you can opt to server-side render pages by using getServerSideProps.
-- In Next.js, you can opt to statically generate pages by using getStaticProps.
-
 
