@@ -212,24 +212,24 @@ public
 - **_components**: Components which are shared throughout the app can go here. Components which are only used on one page could be stored in that pages folder.
 - **_hooks**: Put custom hooks in here.
 - **_lib**: For library type functions and resources. Some people also call this `utils`.
-- **api**: Its a good idea to create API routes in an API folder. Then inside that folder another folder will determine the route name. Finally, the route is defined in a file called `route.js`. This file name is specifically used for server-side API endpoints for a route.
+- **api**: Its a good idea to create API routes in an API folder. Then inside that folder another folder will determine the route name. Finally, the route is defined in a *special file* called `route.js`. This file name is specifically used for server-side API endpoints for a route.
 - **pagename**: A page directory can contain its own `layout.js`. `loading.js` and `error.js` files get displayed automatically under certain conditions (they replace `page.js` in the layout).
-- **favicon.ico**: Yep.
-- **global-error.js**: Displayed when catching errors in the root layout.js.
-- **globals.css**: Global css file.
-- **layout.js**: Root layout. A layout wraps a page or child segment.
-- **not-found.js**: Create UI to show when the notFound function is thrown within a route segment or when a URL is not matched by any route (404).
-- **page.js**: index.html
+- **favicon.ico**: *special file* Also apple-icon.jpg, icon.jpg.
+- **global-error.js**: *special file* Displayed when catching errors in the root layout.js.
+- **globals.css**: *special file* Global css file.
+- **layout.js**: *special file* Root layout. A layout wraps a page or child segment.
+- **not-found.js**: *special file* Create UI to show when the notFound function is thrown within a route segment or when a URL is not matched by any route (404).
+- **page.js**: *special file* index.html
 - **page.module.css**: Css module for index.html
-- **sitemap.js**: A file that can be used to generate an XML sitemap for web crawlers.
-- **public**: You can optionally create a public folder to store static assets such as images, fonts, etc. Files inside public directory can then be referenced by your code starting from the base URL (/) e.g. `src="/origami.png"`. If you are importing your image, you need to write the full path e.g. `import origami from '../public/origami.png'`.
+- **sitemap.js**: *special file* A file that can be used to generate an XML sitemap for web crawlers.
+- **public**: You can optionally create a public folder to store static assets such as images, fonts, etc. Files inside public directory can then be referenced by your code starting from the base URL (/) e.g. `src="/origami.png"`. If you are importing your image, you need to write the full path e.g. `import origami from '../public/origami.png'` or `'@/public/origami.svg'`.
 
 In addition:
 
-- **template.js**: Similar to layout.js, except a new component instance is mounted on navigation. Use layouts unless you need this behavior.
+- **template.js**: *special file* Similar to layout.js, except a new component instance is mounted on navigation. Use layouts unless you need this behavior.
 - `.js`, `.jsx`, or `.tsx` file extensions can be used for special files.
 - You can place page/feature specific components in the page segment folder and reusable components in the root components folder.
-- **default.js**: A *parallel route* fallback page
+- **default.js**: *special file* A *parallel route* fallback page
 - **_private**: Private folders can be created by prefixing a folder with an underscore: `_folderName`. This indicates the folder is a private implementation detail and should not be considered by the routing system, thereby opting the folder and all its subfolders out of routing.
 
 See [Next.js Project Structure](https://nextjs.org/docs/getting-started/project-structure).
