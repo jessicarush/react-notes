@@ -182,12 +182,12 @@ Other files and folders that can be used:
 
 ```
 app
+ ├─_components
+ ├─_hooks
+ ├─_lib
  ├─api
  │  └─apiname
  │    └─route.js
- ├─components
- ├─hooks
- ├─lib
  ├─pagename
  │  ├─error.js
  │  ├─layout.js
@@ -209,11 +209,11 @@ app
 public
 ```
 
+- **_components**: Components which are shared throughout the app can go here. Components which are only used on one page could be stored in that pages folder.
+- **_hooks**: Put custom hooks in here.
+- **_lib**: For library type functions and resources. Some people also call this `utils`.
 - **api**: Its a good idea to create API routes in an API folder. Then inside that folder another folder will determine the route name. Finally, the route is defined in a file called `route.js`. This file name is specifically used for server-side API endpoints for a route.
-- **components**: Components which are shared throughout the app can go here. Components which are only used on ine page could be stored in that pages folder.
-- **hooks**: Put yer custom hooks in here.
-- **lib**: For library type functions and resources. Some people also call this `utils`.
-- **pages**: A page directory can contain its own `layout.js`. `loading.js` and `error.js` files get displayed automatically under certain conditions (they replace `page.js` in the layout).
+- **pagename**: A page directory can contain its own `layout.js`. `loading.js` and `error.js` files get displayed automatically under certain conditions (they replace `page.js` in the layout).
 - **favicon.ico**: Yep.
 - **global-error.js**: Displayed when catching errors in the root layout.js.
 - **globals.css**: Global css file.
