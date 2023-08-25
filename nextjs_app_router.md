@@ -289,6 +289,7 @@ Define a layout by *default exporting* a React component from a `layout.js` file
 The app has a root `layout.js` in the `app` directory. All pages are rendered in `{children}`. The root layout must define `<html>` and `<body>` tags since Next.js does not automatically create them.
 
 ```javascript
+// Note: The root layout cannot be a client component
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -319,7 +320,7 @@ export default function ColorLayout({ children }) {
 - The app directory must include a root `layout.js`
 - The root layout must define `<html>` and `<body>` tags
 - You should **not** manually add `<head>` tags such as `<title>` and `<meta>` to root layouts. Instead, you should use the [Metadata API](https://nextjs.org/docs/app/api-reference/file-conventions/metadata) which automatically handles advanced requirements such as streaming and de-duplicating `<head>` elements.
-- You can use [route groups](https://nextjs.org/docs/app/building-your-application/routing/defining-routes#route-groups) to create multiple root layouts or opt specific routes out of shared layouts. Navigating across multiple root layouts will cause a full page load.
+- You can use [route groups](#route-groups) to create multiple root layouts or opt specific routes out of shared layouts. Navigating across multiple root layouts will cause a full page load.
 
 
 ## Templates 
@@ -332,7 +333,7 @@ There may be cases where you need those specific behaviors, and templates would 
 - Features that rely on useEffect (e.g logging page views) and useState (e.g a per-page feedback form).
 - To change the default framework behavior. For example, Suspense Boundaries inside layouts only show the fallback the first time the Layout is loaded and not when switching pages. For templates, the fallback is shown on each navigation.
 
-These are created the same layouts but using the special name `template.js`.
+These are created the same as layouts but using the special name `template.js`.
 
 
 ## Server-side vs client-side components
@@ -370,7 +371,7 @@ In addition, if a server component is **nested** inside a client component, it r
 
 What do you need to do? | Server Component | Client Component
 :---------------------- | :--------------- | :---------------
-Fetch data | ✓ | ✕
+Fetch data | ✓ | ✕ (I disagree)
 Access backend resources (directly) | ✓ | ✕
 Keep sensitive information on the server (access tokens, API keys, etc) | ✓ | ✕
 Keep large dependencies on the server / Reduce client-side JavaScript | ✓ | ✕
@@ -385,7 +386,7 @@ Props passed from server to client Components need to be serializable. This mean
 
 ## Context with server components
 
-So, if you have things like a react context provider, you can make the provider a client component and wrap it around server components without issues. Keep in mind though, context **cannot** be created or consumed directly within server components. This is because server components have no React state (since they're not interactive). If you need to use a third-party package provider and you get an error, its probably because they haven't added `use-client` yet. So just create your own:
+If you have things like a react context provider, you can make the provider a client component and wrap it around server components without issues. Keep in mind though, context **cannot** be created or consumed directly within server components. This is because server components have no React state (since they're not interactive). If you need to use a third-party package provider and you get an error, its probably because they haven't added `use-client` yet. So just create your own:
 
 ```javascript
 'use client';
@@ -421,7 +422,7 @@ export default function RootLayout({ children }) {
 
 ## server-only
 
-If you have a module that it only intended to run on the server (in a server component), because it contains secrets, you can ensure it doesn't accidentally get used in a client component by installing the package `npm install server-only` then put `import 'server-only'` at the top of the file. Now, any client component that imports code from that file will receive a build-time error explaining that this module can only be used on the server. There in also a `client-only` package.
+If you have a module that is only intended to run on the server (in a server component), because it contains secrets, you can ensure it doesn't accidentally get used in a client component by installing the package `npm install server-only` then put `import 'server-only'` at the top of the file. Now, any client component that imports code from that file will receive a build-time error explaining that this module can only be used on the server. There in also a `client-only` package.
 
 Next.js recommends using `server-only` to make sure server data fetching functions are never used on the client.
 
@@ -488,6 +489,17 @@ export default Loading;
 ```
 
 Q: `loading.js` file is for **server components only**?
+
+Sort of and here's why... As per the [React docs on Suspense](https://react.dev/reference/react/Suspense):
+
+> Only Suspense-enabled data sources will activate the Suspense component. They include:
+>
+> - Data fetching with Suspense-enabled frameworks like Relay and Next.js
+> - Lazy-loading component code with lazy
+>
+> Suspense does not detect when data is fetched inside an Effect or event handler.
+
+If you were fetching data in a client component, you would be doing it in `useEffect` or an event handler. So `Suspense` and therefor `loading.js` will not work for these. Instead you would do the traditional manual custom loader using state. See examples/next_data_fetching.
 
 
 ## Streaming with suspense 
