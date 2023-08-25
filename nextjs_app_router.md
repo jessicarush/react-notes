@@ -214,22 +214,22 @@ public
 - **_lib**: For library type functions and resources. Some people also call this `utils`.
 - **api**: Its a good idea to create API routes in an API folder. Then inside that folder another folder will determine the route name. Finally, the route is defined in a *special file* called `route.js`. This file name is specifically used for server-side API endpoints for a route.
 - **pagename**: A page directory can contain its own `layout.js`. `loading.js` and `error.js` files get displayed automatically under certain conditions (they replace `page.js` in the layout).
-- **favicon.ico**: *special file* Also apple-icon.jpg, icon.jpg.
-- **global-error.js**: *special file* Displayed when catching errors in the root layout.js.
-- **globals.css**: *special file* Global css file.
-- **layout.js**: *special file* Root layout. A layout wraps a page or child segment.
-- **not-found.js**: *special file* Create UI to show when the notFound function is thrown within a route segment or when a URL is not matched by any route (404).
-- **page.js**: *special file* index.html
+- **favicon.ico**: (special file) Also apple-icon.jpg, icon.jpg.
+- **global-error.js**: (special file) Displayed when catching errors in the root layout.js.
+- **globals.css**: (special file) Global css file.
+- **layout.js**: (special file) Root layout. A layout wraps a page or child segment.
+- **not-found.js**: (special file) Create UI to show when the notFound function is thrown within a route segment or when a URL is not matched by any route (404).
+- **page.js**: (special file) index.html
 - **page.module.css**: Css module for index.html
-- **sitemap.js**: *special file* A file that can be used to generate an XML sitemap for web crawlers.
+- **sitemap.js**: (special file) A file that can be used to generate an XML sitemap for web crawlers.
 - **public**: You can optionally create a public folder to store static assets such as images, fonts, etc. Files inside public directory can then be referenced by your code starting from the base URL (/) e.g. `src="/origami.png"`. If you are importing your image, you need to write the full path e.g. `import origami from '../public/origami.png'` or `'@/public/origami.svg'`.
 
 In addition:
 
-- **template.js**: *special file* Similar to layout.js, except a new component instance is mounted on navigation. Use layouts unless you need this behavior.
+- **template.js**: (special file) Similar to layout.js, except a new component instance is mounted on navigation. Use layouts unless you need this behavior.
 - `.js`, `.jsx`, or `.tsx` file extensions can be used for special files.
 - You can place page/feature specific components in the page segment folder and reusable components in the root components folder.
-- **default.js**: *special file* A *parallel route* fallback page
+- **default.js**: (special file) A *parallel route* fallback page
 - **_private**: Private folders can be created by prefixing a folder with an underscore: `_folderName`. This indicates the folder is a private implementation detail and should not be considered by the routing system, thereby opting the folder and all its subfolders out of routing.
 
 See [Next.js Project Structure](https://nextjs.org/docs/getting-started/project-structure).
@@ -237,7 +237,7 @@ See [Next.js Project Structure](https://nextjs.org/docs/getting-started/project-
 
 ## Special file hierarchy 
 
-`pages.js`, `layout.js`, `route.js`, `error.js` are all examples of *special* files in Nextjs. The React components defined in the special files of a route segment are rendered in a specific hierarchy:
+`page.js`, `layout.js`, `route.js`, `error.js`, `loading.js`, `not-found.js` are all examples of *special files* in Nextjs. The React components defined in the special files of a route segment are rendered in a specific hierarchy:
 
 For example: 
 
@@ -275,7 +275,7 @@ Define a layout by *default exporting* a React component from a `layout.js` file
 
 - A page is always the leaf of the route subtree.
 - `.js`, `.jsx`, or `.tsx` file extensions can be used for pages and layouts.
-- A page.js file is required to make a route segment publicly accessible.
+- A `page.js` file is required to make a route segment publicly accessible.
 - Pages and layouts are server components by default but can be set to a client component, except for the root layout, which **can not** be set to a client component.
 - On navigation, layouts preserve state, remain interactive, and do not re-render.
 - Layouts can be nested.
@@ -286,7 +286,7 @@ Define a layout by *default exporting* a React component from a `layout.js` file
 
 ### layout.js 
 
-The app has a root `layout.js` in the `app` directory. All pages are rendered in `{children}`. The root layout must define <html> and <body> tags since Next.js does not automatically create them.
+The app has a root `layout.js` in the `app` directory. All pages are rendered in `{children}`. The root layout must define `<html>` and `<body>` tags since Next.js does not automatically create them.
 
 ```javascript
 export default function RootLayout({ children }) {
