@@ -506,7 +506,7 @@ If you were fetching data in a client component, you would be doing it in `useEf
 
 In addition to `loading.js`, you can also manually create Suspense Boundaries for your own components. This is great for isolating specific components that may take longer to fetch data on the server.
 
-`<Suspense> `works by wrapping a component that performs an asynchronous action (e.g. fetch data), showing fallback UI (e.g. skeleton, spinner) while it's happening, and then swapping in your component once the action completes.
+`<Suspense>` works by wrapping a component that performs an asynchronous action (e.g. fetch data), showing fallback UI (e.g. skeleton, spinner) while it's happening, and then swapping in your component once the action completes.
 
 ```javascript
 import { Suspense } from 'react';
@@ -526,6 +526,7 @@ export default function Posts() {
 }
 ```
 
+Remember: As notes above, `Suspense` does not detect when data is fetched inside an Effect or event handler.
 
 ## error.js 
 
@@ -618,7 +619,7 @@ export default function GlobalError({ error, reset }) {
 
 ## Sharing data between server components
 
-You can use native JavaScript patterns like global singletons within module scope if you have common data that multiple Server Component need to access.
+You can use native JavaScript patterns like global singletons within module scope if you have common data that multiple Server Components need to access.
 
 For example, a module can be used to share a database connection across multiple components:
 
@@ -659,7 +660,7 @@ There are two ways to navigate between routes:
 - `<Link> `Component
 - `useRouter` Hook
 
-The `<Link>` component is done the same as in Page Router:
+The `<Link>` component works like this:
 
 ```javascript
 import Link from 'next/link';
@@ -940,9 +941,11 @@ At this point you want to consider how you are deploying your app/site:
 
 So, to test this properly you will need to first add the `output: 'export'` to your `next.config.js`, then build and run the export:
 
-- `npm run build && npx serve@latest out`
+```
+npm run build && npx serve@latest out
+``````
 
-2. If you are NOT doing and static export but planning to build and deploy with Node.js, then you get to control what happens when a dynamic segment is visited that was not generated with `generateStaticParams`. This is done with the [dynamicParams](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamicparams) segment config option:
+2. If you are NOT doing a static export but planning to build and deploy with Node.js, then you get to control what happens when a dynamic segment is visited that was not generated with `generateStaticParams`. This is done with the [dynamicParams](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamicparams) segment config option:
 
 
 ```javascript
@@ -954,7 +957,7 @@ export const dynamicParams = false;
 - `true` (default): Dynamic segments not included in `generateStaticParams` are generated on demand.
 - `false`: Dynamic segments not included in `generateStaticParams` will return a `404`.
 
-With the `dynamicParams` route option set, you should be able to test this with `npm run dev` or `npm run build && npm start`.
+With the `dynamicParams` option set, you should be able to test this with `npm run dev` or `npm run build && npm start`.
 
 ### Link to dynamic routes
 
@@ -1016,7 +1019,7 @@ export async function getColorWithFetch() {
 
 The downside of this (ISR) is any `loading.js` is ignored because with this strategy we are still serving static pages. If you happen to be the one initiating the request causing the new fetch, you will just see the loading spinner in the tab.
 
-> NOTE: Caching at the fetch level via `revalidate` or `cache: 'force-cache'` stores the data across requests in a **shared cache**. You should avoid using it for user specific data (i.e. requests that derive data from cookies() or headers()).
+> :warning: NOTE: Caching at the fetch level via `revalidate` or `cache: 'force-cache'` stores the data across requests in a **shared cache**. You should avoid using it for user specific data (i.e. requests that derive data from cookies() or headers()).
 
 
 ## Caching/revalidating with `dynamic` and `revalidate`
