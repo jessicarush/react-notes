@@ -1078,7 +1078,7 @@ See the [revalidate option](https://nextjs.org/docs/app/api-reference/file-conve
 
 Keep in mind this can be hard to test because with axios in dev, it runs on every page refresh. If you do a `npm run build`, the output will tell you whether that page is dynamic or static.
 
-Note that all signs seem to point to using `fetch()` over `axios`. `axios` is still awesome for as a js package but in Next.js, `fetch()` is preferred as they've extended it.
+Note that all signs seem to point to using `fetch()` over `axios`. `axios` is still awesome as a js package but in Next.js, `fetch()` is preferred as they've extended it.
 
 
 ## Revalidation
@@ -1104,7 +1104,116 @@ export const revalidate = 60 // revalidate this page every 60 seconds
 
 **On-demand revalidation**
 
-The [examples in the Next.js docs](https://nextjs.org/docs/app/building-your-application/data-fetching/revalidating#on-demand-revalidation) don't do much to shed light on how this works. Skipping.
+The [examples in the Next.js docs](https://nextjs.org/docs/app/building-your-application/data-fetching/revalidating#on-demand-revalidation) don't really explain how this would be used practically but here's what they say.
+
+You can use `revalidateTag` or `revalidatePath` to force a refresh of fetched data on-demand. They say this can be done inside a *Route Handler* or a *Server Action*.
+
+Using `revalidateTag` in a *Route Handler*, first you would add a tag to the options that are passed to `fetch()`:
+
+```javascript
+async function getColor() {
+  // ...
+  const options = {
+    cache: 'force-cache',
+    next: { tags: ['color'] }
+  };
+  const res = await fetch(url, options);
+  // ...
+}
+```
+
+Then, create a route handler to revalidate a given tag.
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
+
+// e.g a webhook to `your-website.com/api/revalidate?tag=color`
+export async function GET(request) {
+  const tag = request.nextUrl.searchParams.get('tag');
+
+  if (!tag) {
+    return NextResponse.json({ message: 'Missing tag param' }, { status: 400 });
+  }
+
+  revalidateTag(tag);
+
+  return NextResponse.json({ tag: tag, revalidated: true, now: Date.now() });
+}
+```
+
+So I will need to navigate to `my-website.com/api/revalidate?tag=color`. This tells Next.js that the **next request** to a page that does a fetch with that tag should be refreshed. 
+
+Instead of returning json, you could also redirect to the page thereby triggering the refresh right away;
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
+
+// e.g a webhook to `your-website.com/api/revalidate?tag=color`
+export async function GET(request) {
+  const tag = request.nextUrl.searchParams.get('tag');
+
+  if (!tag) {
+    return NextResponse.json({ message: 'Missing tag param' }, { status: 400 });
+  }
+
+  revalidateTag(tag);
+  redirect('/server-side');
+}
+```
+
+If you want to protect who can revalidate you could use a token:
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
+ 
+// e.g a webhook to `your-website.com/api/revalidate?tag=color&secret=<token>`
+export async function POST(request) {
+  const secret = request.nextUrl.searchParams.get('secret')
+  const tag = request.nextUrl.searchParams.get('tag')
+ 
+  if (secret !== process.env.MY_SECRET_TOKEN) {
+    return NextResponse.json({ message: 'Invalid secret' }, { status: 401 })
+  }
+ 
+  if (!tag) {
+    return NextResponse.json({ message: 'Missing tag param' }, { status: 400 })
+  }
+ 
+  revalidateTag(tag)
+ 
+  return NextResponse.json({ revalidated: true, now: Date.now() })
+}
+```
+
+`revalidatePath` works the same way except you don't need to add options to the fetch call:
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
+
+// e.g a webhook to `your-website.com/api/revalidate?path=/server-side`
+export async function GET(request) {
+  const path = request.nextUrl.searchParams.get('path');
+
+  console.log(path);
+  if (!path) {
+    return NextResponse.json(
+      { message: 'Missing path param' },
+      { status: 400 }
+    );
+  }
+
+  revalidatePath(path);
+
+  return NextResponse.json({ path: path, revalidated: true, now: Date.now() });
+}
+```
+
+Still not sure of the practical application of this. 
 
 
 ## Data fetching examples 
