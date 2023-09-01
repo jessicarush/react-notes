@@ -1474,6 +1474,74 @@ export default function Home() {
 ```
 
 
+## Fetching Data on the client with route handlers
+
+> If you need to fetch data in a client component, you can call a Route Handler from the client. Route Handlers execute on the server and return the data to the client. This is useful when you don't want to expose sensitive information to the client, such as API tokens.
+
+They don;t give an example but I'm guessing they mean doing something like this:
+
+```javascript
+export async function GET(req) {
+  const url = 'https://log.zebro.id/api_demo_two';
+  const options = {
+    cache: 'no-store'
+  };
+  const params = new URLSearchParams({ value: 'rgb' });
+  const res = await fetch(`${url}?${params}`, options);
+  const data = await res.json()
+
+  // Response in a native Web API
+  return new Response(JSON.stringify( data ));
+}
+```
+
+Then your client component would fetch from this API instead of the original?
+
+```javascript
+'use client';
+
+import { useEffect, useState, useRef } from 'react';
+import ThrottledButton from '../_components/ThrottledButton';
+
+export default function ClientSide() {
+  const [color, setColor] = useState({ name: null, value: null });
+  const [isLoading, setIsLoading] = useState(false);
+  const abortController = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      console.log('aborting...');
+      abortController.current?.abort();
+    };
+  }, []);
+
+  async function getColor() {
+    setIsLoading(true);
+    abortController.current = new AbortController();
+    const config = { signal: abortController.current.signal };
+
+    try {
+      console.log('fetching...');
+      const url = '/api/get-color';
+      const res = await fetch(url, { ...config });
+      const data = await res.json();
+      setColor({ name: data.name, value: data.value });
+    } catch (err) {
+      console.log(`Something went wrong: ${err}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    // ...
+  );
+}
+```
+
+Not sure if this i swhat they mean.
+
+
 ## Static vs dynamic rendering 
 
 In addition to client and server components, both can be either statically or dynamically rendered.
