@@ -50,7 +50,6 @@ It's important to underline the fact that Next.js is a framework (as opposed to 
 - [Notes](#notes)
 - [Q&As](#qas)
   * [If I build a react app using Next.js, do I have to deploy on Vercel, or can I deploy on my own server?](#if-i-build-a-react-app-using-nextjs-do-i-have-to-deploy-on-vercel-or-can-i-deploy-on-my-own-server)
-  * [Requires more reading:](#requires-more-reading)
 
 <!-- tocstop -->
 
