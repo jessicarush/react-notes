@@ -42,6 +42,7 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 - [Fetching user-specific data](#fetching-user-specific-data)
 - [Data fetching summary](#data-fetching-summary)
 - [Client-side fetching with SWR](#client-side-fetching-with-swr)
+- [Fetching Data on the client with route handlers](#fetching-data-on-the-client-with-route-handlers)
 - [Static vs dynamic rendering](#static-vs-dynamic-rendering)
   * [Static rendering](#static-rendering)
   * [Static/dynamic data fetching](#staticdynamic-data-fetching)
@@ -57,6 +58,8 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [headers](#headers)
   * [cookies](#cookies)
   * [redirects](#redirects)
+- [revalidatePath](#revalidatepath)
+- [revalidateTag](#revalidatetag)
 - [Images](#images)
   * [sizes](#sizes)
   * [fill](#fill)
@@ -75,8 +78,6 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [conditional statements](#conditional-statements)
   * [response](#response)
 - [Scripts](#scripts)
-- [revalidatePath](#revalidatepath)
-- [revalidateTag](#revalidatetag)
 - [Lazy loading](#lazy-loading)
   * [Loading External Libraries](#loading-external-libraries)
   * [Lazy loading with loader](#lazy-loading-with-loader)
@@ -1539,7 +1540,7 @@ export default function ClientSide() {
 }
 ```
 
-Not sure if this i swhat they mean.
+Not sure if this is what they mean.
 
 
 ## Static vs dynamic rendering 
@@ -1562,11 +1563,11 @@ By default, Next.js will cache the result of `fetch()` requests that do not spec
 
 The caching options for all `fetch` requests in a layout or page can also be set using the [segment config object](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config).
 
-**Note** I'm still a bit confused by this.For example, when fetching a color from my random color API in a server-component:
+**Note** I'm still a bit confused by this. For example, when fetching a color from my random color API in a server-component:
 
 **With default 'force-cache'**
 
-- The same color will be served to two different users. Navigation between pages will serve the same color. A hard refresh will still serve the same color. *This seems to makes sense.*
+- The same color will be served to two different users. Navigation between pages will serve the same color. A hard refresh will still serve the same color. *This makes sense.*
 
 **With 'no-cache'**
 
@@ -1575,9 +1576,9 @@ A hard refresh will fetch a new color.
 
 ### Dynamic Rendering
 
-During static rendering, if a *dynamic function* or a dynamic `fetch()` request *(no caching)* is discovered, Next.js will switch to dynamically rendering the whole route at request time. Any cached data requests can still be re-used during dynamic rendering.
+During static rendering, if a [dynamic function](https://nextjs.org/docs/app/building-your-application/rendering/static-and-dynamic-rendering#dynamic-functions) or a dynamic `fetch()` request *(no caching)* is discovered, Next.js will switch to dynamically rendering the whole route at request time. Any cached data requests can still be re-used during dynamic rendering.
 
-[Dynamic functions](https://nextjs.org/docs/app/building-your-application/rendering/static-and-dynamic-rendering#dynamic-functions) rely on information that can only be known at request time such as a user's cookies, current requests headers, or the URL's search params. In Next.js, these dynamic functions are:
+Dynamic functions rely on information that can only be known at request time such as a user's cookies, current requests headers, or the URL's search params. In Next.js, these dynamic functions are:
 
  - Using `cookies()` or `headers()` in a Server Component will opt the whole route into dynamic rendering at request time.
 - Using `useSearchParams()` in Client Components will skip static rendering and instead render all Client Components up to the nearest parent Suspense boundary on the client.
@@ -1783,9 +1784,9 @@ In the app directory, create an `api` directory. Then, for every api route creat
 ```javascript
 // app/api/rogers/route.js
 
-export async function GET(req) {
+export async function GET(request) {
   // Get search params from the request object
-  const { searchParams } = new URL(req.url);
+  const { searchParams } = new URL(request.url);
   const myparam = searchParams.get('myparam');
   // Get response data
   const quote = randomSelect(mrRogersQuotes);
@@ -1797,7 +1798,7 @@ export async function GET(req) {
 For POST requests get access to the body like so:
 
 ```javascript
-export async function POST(req) {
+export async function POST(request) {
   const body = await req.json();
   console.log(body);
 }
@@ -1820,6 +1821,13 @@ export async function GET() {
   return NextResponse.json({ data });
 }
 ```
+
+Route Handlers are cached by default when using the `GET` method with the Response object. You can opt out of caching by:
+
+- Using the `Request` object with the `GET` method.
+- Using any of the other HTTP methods.
+- Using Dynamic Functions like cookies and headers.
+- The Segment Config Options manually specifies dynamic mode.
 
 The [NextResponse](https://nextjs.org/docs/app/api-reference/functions/next-response) extends the standard Web Response with some additional convenience methods.
 
@@ -1920,6 +1928,48 @@ import { redirect } from 'next/navigation';
 export async function GET(request) {
   redirect('https://nextjs.org/');
 }
+```
+
+
+## revalidatePath
+
+`revalidatePath` allows you to revalidate data associated with a specific path. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire.
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
+ 
+export async function GET(request) {
+  const path = request.nextUrl.searchParams.get('path') || '/';
+  revalidatePath(path);
+  return NextResponse.json({ revalidated: true, now: Date.now() });
+}
+```
+
+`revalidatePath` only invalidates the cache when the path is next visited.
+
+
+## revalidateTag
+
+`revalidateTag` allows you to revalidate data associated with a specific cache tag. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire.
+
+app/api/revalidate/route.js
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
+ 
+export async function GET(request) {
+  const tag = request.nextUrl.searchParams.get('tag');
+  revalidateTag(tag);
+  return NextResponse.json({ revalidated: true, now: Date.now() });
+}
+```
+
+You can add tags to fetch as follows:
+
+```javascript
+fetch(url, { next: { tags: ['something'] } });
 ```
 
 
@@ -2127,7 +2177,7 @@ export async function generateMetadata({ params }) {
 - The `metadata` object and `generateMetadata` function exports are only supported in **Server Components**.
 - You cannot export both the metadata object and generateMetadata function from the same route segment.
 
-Some [fields](https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadata-fields);
+Some [fields](https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadata-fields):
 
 ```javascript
 export const metadata = {
@@ -2416,7 +2466,7 @@ export default function DashboardLayout({ children }) {
 }
 ```
 
-You van use the [strategy property](https://nextjs.org/docs/app/building-your-application/optimizing/scripts#strategy) to control when the script loads as well as offloadig them to web workers. 
+You van use the [strategy property](https://nextjs.org/docs/app/building-your-application/optimizing/scripts#strategy) to control when the script loads as well as offloading them to web workers. 
 
 - `beforeInteractive`: Load the script before any Next.js code and before any page hydration occurs.
 - `afterInteractive`: (default) Load the script early but after some hydration on the page occurs.
@@ -2460,48 +2510,6 @@ export default function Page() {
 ```
 
 See also the [<Script> component API reference](https://nextjs.org/docs/app/api-reference/components/script).
-
-
-## revalidatePath
-
-`revalidatePath` allows you to revalidate data associated with a specific path. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire.
-
-```javascript
-import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
- 
-export async function GET(request) {
-  const path = request.nextUrl.searchParams.get('path') || '/';
-  revalidatePath(path);
-  return NextResponse.json({ revalidated: true, now: Date.now() });
-}
-```
-
-`revalidatePath` only invalidates the cache when the path is next visited.
-
-
-## revalidateTag
-
-`revalidateTag` allows you to revalidate data associated with a specific cache tag. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire.
-
-app/api/revalidate/route.js
-
-```javascript
-import { NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
- 
-export async function GET(request) {
-  const tag = request.nextUrl.searchParams.get('tag');
-  revalidateTag(tag);
-  return NextResponse.json({ revalidated: true, now: Date.now() });
-}
-```
-
-You can add tags to fetch as follows:
-
-```javascript
-fetch(url, { next: { tags: ['something'] } });
-```
 
 
 ## Lazy loading
@@ -2620,7 +2628,7 @@ export default function Home() {
 
 ## Eslint 
 
-Eslint is automatically setup when using `npx create-next-app@latest`. See the [docs on eslint] for details on disabling rules, adding additional directories and more.
+Eslint is automatically setup when using `npx create-next-app@latest`. See the [docs on eslint](https://nextjs.org/docs/app/building-your-application/configuring/eslint) for details on disabling rules, adding additional directories and more.
 
 
 ## Environment variables
