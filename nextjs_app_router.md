@@ -1939,7 +1939,7 @@ export async function GET(request) {
 import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
  
-export async function GET(request) {
+export async function POST(request) {
   const path = request.nextUrl.searchParams.get('path') || '/';
   revalidatePath(path);
   return NextResponse.json({ revalidated: true, now: Date.now() });
@@ -1959,7 +1959,7 @@ app/api/revalidate/route.js
 import { NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
  
-export async function GET(request) {
+export async function POST(request) {
   const tag = request.nextUrl.searchParams.get('tag');
   revalidateTag(tag);
   return NextResponse.json({ revalidated: true, now: Date.now() });
