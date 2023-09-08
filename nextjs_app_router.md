@@ -1584,6 +1584,23 @@ Dynamic functions rely on information that can only be known at request time suc
 - Using `useSearchParams()` in Client Components will skip static rendering and instead render all Client Components up to the nearest parent Suspense boundary on the client.
 
 
+## useSearchParams 
+
+`useSearchParams` is a Client Component hook that lets you read the current URL's query string. It returns a read-only version of the [URLSearchParams](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) interface.
+
+```javascript
+'use client'
+ 
+import { useSearchParams } from 'next/navigation'
+ 
+export default function SearchBar() {
+  const searchParams = useSearchParams()
+  const search = searchParams.get('myparam')
+  // ...
+}
+```
+
+
 ## Server functions
 
 > Functions that run on the server, but can be called on the client.
