@@ -38,9 +38,12 @@ app
  │  │  └─page.js
  │  ├─layout.js    <-- This layout has props: children, team, projects
  │  └─page.js
+ ├─error.js
  ├─favicon.ico
+ ├─global-error.js
  ├─globals.css
  ├─layout.js
+ ├─not-found.ico
  ├─page.js
  └─page.module.css
 ```
@@ -88,9 +91,12 @@ app
  │  │  └─page.js
  │  ├─layout.js
  │  └─page.js
+ ├─error.js
  ├─favicon.ico
+ ├─global-error.js
  ├─globals.css
  ├─layout.js
+ ├─not-found.ico
  ├─page.js
  └─page.module.css
 ```
@@ -110,9 +116,12 @@ app
  │  ├─default.js       <-- Needed for some reason when hard navigating
  │  ├─layout.js
  │  └─page.js
+ ├─error.js
  ├─favicon.ico
+ ├─global-error.js
  ├─globals.css
  ├─layout.js
+ ├─not-found.ico
  ├─page.js
  └─page.module.css
 ```
@@ -132,24 +141,48 @@ The [example in the docs](https://nextjs.org/docs/app/building-your-application/
 
 For example, if you navigate to the parallel route directly (or refresh while on the parallel route) Next.js cannot know which page should be showing in the background (`{children}` in the root layout). So in this case, you would want to define a root `default.js` for this situation specifically.
 
+```
+app
+ ├─@auth
+ │  ├─login
+ │  │  └─page.js
+ │  └─default.js    <-- So nothing is displayed in the toot layout unless we go to /login
+ ├─default.js       <-- For if/when we navigate to /login first
+ ├─error.js
+ ├─favicon.ico
+ ├─global-error.js
+ ├─globals.css
+ ├─layout.js
+ ├─not-found.ico
+ ├─page.js
+ └─page.module.css
+```
+
 The next issue is when you want to dismiss the modal, they say:
 
 > If a modal was initiated through client navigation, e.g. by using `<Link href="/login">`, you can dismiss the modal by calling `router.back()` or by using a `Link` component.
 
-However they don't provide any hints as to what to do if a modal was navigated to directly. In tis situation, `router.back()` would be empty. One would think you could do something like this:
+However they don't provide any hints as to what to do if a modal was navigated to directly. In this situation, `router.back()` would be empty or worse, be the URL of a previously visited website. 
+
+I have tried using conditionals to determine whether to call `router.back()` or `router.push('/')` in the event they navigated directly to `/login`. For example:
 
 ```javascript
-// ❌ Don't get excited, it doesn't work
 const closeModal = useCallback(() => {
-  if (typeof window !== "undefined" && window.history.length > 1) {
+  if (condition) {
     router.back();
   } else {
-    router.push('/')
+    router.push('/');
   }
-  }, [router]);
+}, [router]);
 ```
 
-But it doesn't work. First, the `history.length` is already at 2 on first navigate (is that just in dev? idk). Next, even if you bump the condition to `> 2`, the router goes to `/` but the modal remains open.
+The first problem I encountered is I can't find an appropriate condition. For example checking `window.history.length` does not work because the history could contain URLs from other previously visited sites. Checking `document.referer` doesn't work because it returns an empty string with Next.js routing. 
+
+The second problem is, even if I can trigger the condition, `router.push('/')` will successfully navigate to `/` but the `/login` modal stays open with no way to close it. Similarly if I create a `Link` component that goes back to `/`, the same thing will happen.
+
+A note from [this github issue](https://github.com/vercel/next.js/issues/51714):
+
+> Also: soft navigating does not unmount the page in the parallel route slot. So modals won't disappear that easy. Its not a bug. But using refresh is bugged and routing stops working.
 
 You could fix this by using *Intercepting routes* instead, but I'm not sure why they put this as a parallel routes example.
 
@@ -190,9 +223,12 @@ app
  ├─photos
  │  └─[id]
  │     └─page.js    <-- This page will get rendered if I navigate directly to 
- ├─favicon.ico          /photos/[id] or refresh the while the modal is open.
+ ├─error.js             /photos/[id] or refresh the while the modal is open.
+ ├─favicon.ico
+ ├─global-error.js
  ├─globals.css
  ├─layout.js
+ ├─not-found.ico
  ├─page.js          <-- This page has links to our dynamic routes /photos/[id]
  └─page.module.css
 ```
