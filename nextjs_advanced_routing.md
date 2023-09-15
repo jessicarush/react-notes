@@ -176,15 +176,52 @@ const closeModal = useCallback(() => {
 }, [router]);
 ```
 
-The first problem I encountered is I can't find an appropriate condition. For example checking `window.history.length` does not work because the history could contain URLs from other previously visited sites. Checking `document.referer` doesn't work because it returns an empty string with Next.js routing. 
+The first problem I encountered is finding an appropriate condition. For example checking `window.history.length` does not work because the history could contain URLs from other previously visited sites. Checking `document.referer` doesn't work because it returns an empty string with Next.js routing. 
 
 The second problem is, even if I can trigger the condition, `router.push('/')` will successfully navigate to `/` but the `/login` modal stays open with no way to close it. Similarly if I create a `Link` component that goes back to `/`, the same thing will happen.
 
-A note from [this github issue](https://github.com/vercel/next.js/issues/51714):
+A note from [this github issue #51714](https://github.com/vercel/next.js/issues/51714):
 
 > Also: soft navigating does not unmount the page in the parallel route slot. So modals won't disappear that easy. Its not a bug. But using refresh is bugged and routing stops working.
 
-You could fix this by using *Intercepting routes* instead, but I'm not sure why they put this as a parallel routes example.
+There's also [this github issue #49662](https://github.com/vercel/next.js/issues/49662) which makes it seem like it is a bug.
+
+Cautiously optimistic that the following seems to working for now:
+
+```javascript
+import { headers } from 'next/headers';
+import Modal from "@/app/_components/Modal";
+
+export default function Login() {
+
+  // If there is a next-url header, soft navigation has been performed
+  // Otherwise, hard navigation has been performed.
+  // We need to know this to handle if someone navigates directly to `/login`,
+  // Dismissing the modal will be done with router.push instead of router.back.
+  const headersList = headers();
+  const isHardNavigation = !headersList.has('next-url');
+
+  return (
+    <Modal isHardNavigation={isHardNavigation}>
+      {/* ... */}
+    </Modal>
+  )
+}
+```
+
+Then in the modal:
+
+```javascript
+const closeModal = useCallback(() => {
+    if (isHardNavigation) {
+      router.push('/');
+    } else {
+      router.back();
+    }
+  }, [isHardNavigation, router]);
+```
+
+If this method ends up not working down thr road, you could also fix this by using *Intercepting routes* instead, but I'm not sure why they put this as a parallel routes example.
 
 
 ## Intercepting routes 
@@ -218,7 +255,7 @@ app
  ├─@modal
  │  ├─(.)photos
  │  │  └─[id]
- │  │     └─page.js <-- This page will get rendered into the main page.js 
+ │  │     └─page.js <-- This page will get rendered into the main layout.js 
  │  └─default.js    <-- This will prevent 404 not found when we're on other routes
  ├─photos
  │  └─[id]
