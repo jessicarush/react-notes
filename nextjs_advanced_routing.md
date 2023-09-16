@@ -199,10 +199,10 @@ export default function Login() {
   // We need to know this to handle if someone navigates directly to `/login`,
   // Dismissing the modal will be done with router.push instead of router.back.
   const headersList = headers();
-  const isHardNavigation = !headersList.has('next-url');
+  const isSoftNavigation = headersList.has('next-url');
 
   return (
-    <Modal isHardNavigation={isHardNavigation}>
+    <Modal isSoftNavigation={isSoftNavigation}>
       {/* ... */}
     </Modal>
   )
@@ -213,12 +213,12 @@ Then in the modal:
 
 ```javascript
 const closeModal = useCallback(() => {
-    if (isHardNavigation) {
-      router.push('/');
-    } else {
-      router.back();
-    }
-  }, [isHardNavigation, router]);
+  if (isSoftNavigation) {
+    router.back();
+  } else {
+    router.push('/');
+  }
+}, [isSoftNavigation, router]);
 ```
 
 If this method ends up not working down thr road, you could also fix this by using *Intercepting routes* instead, but I'm not sure why they put this as a parallel routes example.
