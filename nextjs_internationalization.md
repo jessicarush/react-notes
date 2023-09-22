@@ -75,11 +75,8 @@ function getLocale(request) {
   // Accept-Language: en-US,en;q=0.8,fr;q=0.6,de;q=0.4
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
 
-  // Get our array of supported locales
-  const locales = i18n.locales;
-
   // Use intl-localematcher to choose the best locale
-  return matchLocale(languages, locales, i18n.defaultLocale);
+  return matchLocale(languages, i18n.locales, i18n.defaultLocale);
 }
 
 export function middleware(request) {
@@ -121,7 +118,7 @@ See [http headers: Accept-Language](https://developer.mozilla.org/en-US/docs/Web
 
 ## 4. dictionaries
 
-In out root folder (beside `app`) we can create a dictionaries directory with a json file for every language we're supporting. The files would have objects with identical keys:
+In our root folder (beside `app`) we can create a dictionaries directory with a json file for every language we're supporting. The files would have objects with identical keys:
 
 /dictionaries/en.json
 
@@ -243,7 +240,7 @@ You could also pass the dictionary, or part of the dictionary as a prop to compo
 
 If my page/component is a client component then I can't call `getDictionary` directly because its `server-only`. Instead, use a parent that is a server component, get the dictionary there and then pass it down through props. 
 
-For example, my root layout has a `<Navbar>` so I'll pass the `params.lang` to it since it won;t have access to `params` itself:
+For example, my root layout has a `<Navbar>` so I'll pass the `params.lang` to it since it won't have access to `params` itself:
 
 ```javascript
 // ...
