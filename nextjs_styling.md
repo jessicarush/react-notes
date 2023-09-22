@@ -105,7 +105,7 @@ Install:
 npm install styled-components
 ```
 
-Then create style registry `app/_lib/registry.js`:
+Then create a client component "style registry" `app/_lib/registry.js`:
 
 ```javascript
 'use client';
@@ -135,10 +135,10 @@ export default function StyledComponentsRegistry({ children }) {
 }
 ```
 
-Then make a client component that wraps your app with the style registry:
+Then wrap your app with the style registry:
 
 ```javascript
-import StyledComponentsRegistry from './lib/registery.js';
+import StyledComponentsRegistry from './lib/registry.js';
 import './globals.css';
 
 // Root Layout
@@ -156,6 +156,8 @@ export default function RootLayout({ children }) {
 ```
 
 The registry for [styled-jsx](https://nextjs.org/docs/app/building-your-application/styling/css-in-js#styled-jsx) is a little different.
+
+For me, the main advantage to using styled components is that its easy to implement transitions with [react-transition-group](https://reactcommunity.org/react-transition-group/).
 
 
 ## Tailwind 
@@ -179,7 +181,7 @@ Add these to your global.css:
 @tailwind utilities;
 ```
 
-Note: all this is done automatically if you choose `yes` to tailwind in `npx create-next-app@latest`.
+Note: all the above is done automatically if you choose `yes` to tailwind in `npx create-next-app@latest`.
 
 Now you can use tailwind:
 
