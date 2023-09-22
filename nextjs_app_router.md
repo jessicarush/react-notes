@@ -47,6 +47,7 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [Static rendering](#static-rendering)
   * [Static/dynamic data fetching](#staticdynamic-data-fetching)
   * [Dynamic Rendering](#dynamic-rendering)
+- [useSearchParams](#usesearchparams)
 - [Server functions](#server-functions)
 - [Server actions (experimental)](#server-actions-experimental)
   * [Validation](#validation)
@@ -65,13 +66,6 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [fill](#fill)
   * [priority](#priority)
   * [warning](#warning)
-- [Meta data](#meta-data)
-  * [Config-based metadata](#config-based-metadata)
-  * [file-based metadata](#file-based-metadata)
-  * [favicon.ico, apple-icon.jpg, icon.jpg](#faviconico-apple-iconjpg-iconjpg)
-  * [opengraph-image and twitter-image](#opengraph-image-and-twitter-image)
-  * [robots.txt](#robotstxt)
-  * [sitemap.xml](#sitemapxml)
 - [Route segment config](#route-segment-config)
 - [Middleware](#middleware)
   * [matcher](#matcher)
@@ -944,7 +938,7 @@ So, to test this properly you will need to first add the `output: 'export'` to y
 
 ```
 npm run build && npx serve@latest out
-``````
+```
 
 2. If you are NOT doing a static export but planning to build and deploy with Node.js, then you get to control what happens when a dynamic segment is visited that was not generated with `generateStaticParams`. This is done with the [dynamicParams](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamicparams) segment config option:
 
@@ -2154,172 +2148,6 @@ module.exports = {
 ```
 
 Overall the whole thing feels a bit sus... like a money trap. 
-
-
-## Meta data
-
-There are [two ways to define Metadata](https://nextjs.org/docs/app/api-reference/functions/generate-metadata):
-
-- **Config-based Metadata**: Export a static metadata object or a dynamic generateMetadata function in a layout.js or page.js file.
-- **File-based Metadata**: Add static or dynamically generated special files to route segments (e.g. `favicon.ico`, `apple-icon.jpg`, and `icon.jpg`, `opengraph-image.jpg` and `twitter-image.jpg`, `robots.txt`, `sitemap.xml`).
-
-There are two default meta tags that are always added even if a route doesn't define metadata:
-
-```javascript
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-```
-
-### Config-based metadata
-
-```javascript
-// Static metadata object
-export const metadata = {
-  title: '...',
-};
- 
-// or Dynamic metadata
-export async function generateMetadata({ params }) {
-  // This is useful for dynamic routes
-  // For example you could await a fetch call here:
-  // const postid = params.postid;
-  // const res = await fetch('...');
-  // const data = await res.json();
-  return {
-    title: '...',
-  };
-}
-```
-
-- The `metadata` object and `generateMetadata` function exports are only supported in **Server Components**.
-- You cannot export both the metadata object and generateMetadata function from the same route segment.
-
-Some [fields](https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadata-fields):
-
-```javascript
-export const metadata = {
-  title: 'Next.js',
-  description: 'The React Framework for the Web',
-  generator: 'Next.js',
-  applicationName: 'Next.js',
-  referrer: 'origin-when-cross-origin',
-  keywords: ['Next.js', 'React', 'JavaScript'],
-  authors: [{ name: 'Jessica' }, { name: 'Scott', url: 'https://nextjs.org' }],
-  creator: 'Scott Volk',
-  publisher: 'Jessica Rush',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
-  colorScheme: 'dark'
-};
-```
-
-There's way more, e.g. for robots, icons, etc. See also the [HTML standard](https://html.spec.whatwg.org/multipage/semantics.html#the-meta-element).
-
-### file-based metadata 
-
-These special files are available for metadata:
-
-- `favicon.ico`, `apple-icon.jpg`, and `icon.jpg`
-- `opengraph-image.jpg` and `twitter-image.jpg`
-- `robots.txt`
-- `sitemap.xml`
-
-See the [Metadata Files API Reference](https://nextjs.org/docs/app/api-reference/file-conventions/metadata)
-
-### favicon.ico, apple-icon.jpg, icon.jpg
-
-File convention | Supported file types | Valid locations
---------------- | -------------------- | ---------------
-favicon | .ico | `app/`
-icon | .ico, .jpg, .jpeg, .png, .svg | `app/**/*`
-apple-icon | .jpg, .jpeg, .png | `app/**/*`
-
-You can set multiple icons by adding a number suffix to the file name. For example, `icon1.png`, `icon2.png`, etc. Numbered files will sort lexically.
-
-### opengraph-image and twitter-image
-
-These are useful for setting the images that appear on social networks and messaging apps when a user shares a link to your site. These files can be placed in any segment.
-
-File convention | Supported file types
---------------- | --------------------
-opengraph-image | .jpg, .jpeg, .png, .gif
-twitter-image | .jpg, .jpeg, .png, .gif
-opengraph-image.alt | .txt
-twitter-image.alt | .txt
-
-### robots.txt 
-
-Add a static robots.txt file to your `app/` directory. For example:
-
-```
-User-Agent: *
-Allow: /
-Disallow: /private/
-
-Sitemap: https://acme.com/sitemap.xml
-```
-
-You can also [generate this file](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots#generate-a-robots-file) with a `robots.js` but I don't really see any added benefit.
-
-### sitemap.xml
-
-You can add a static xml file to your `app/` directory, however in this case it's easier automatically generate the file with a `app/sitemap.js`:
-
-```javascript
-export default function sitemap() {
-  return [
-    {
-      url: 'https://acme.com',
-      lastModified: new Date(),
-    },
-    {
-      url: 'https://acme.com/about',
-      lastModified: new Date(),
-    },
-    {
-      url: 'https://acme.com/blog',
-      lastModified: new Date(),
-    },
-  ]
-}
-```
-
-If you had dynamic routes, you could do:
-
-```javascript
-export default async function sitemap() {
-  // List regular routes
-  const pages = ['', 'about', 'login', 'signup'];
-
-  // Also fetch any dynamic routes
-  const res = await fetch(url);
-  const posts = await res.json()
-
-  // Create arrays:
-  const dynamicRoutes = posts.map((post) => {
-    return {
-      url: `http://localhost:3000/post/${post.id}`,
-      lastModified: new Date()
-    }
-  });
-  const routes = pages.map((route) => {
-    return {
-      url: `http://localhost:3000/${route}`,
-      lastModified: new Date()
-    }
-  });
-
-  return [...routes, ...dynamicRoutes];
-}
-```
 
 
 ## Route segment config
