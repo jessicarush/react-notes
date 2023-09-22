@@ -136,7 +136,7 @@ Features that require a Node.js server, or dynamic logic that cannot be computed
   If you recall the `<Image>` component does a bunch of on-demand optimizations for you on teh server. You can however using an external service by [defining a custom image loader](https://nextjs.org/docs/app/building-your-application/deploying/static-exports#image-optimization). 
 - **Draft Mode**
 
-Attempting to use any of these features with `npm run dev` will result in an error (once you've enabled statuc export).
+Attempting to use any of these features with `npm run dev` will result in an error (once you've enabled static export).
 
 To enable a static export, change the output mode inside `next.config.js`:
 
@@ -267,8 +267,7 @@ Note that for static exports, you no longer need to run the `export` command as 
 
 ## Manual graceful shutdowns 
 
-
-When self-hosting, you might want to run code when the server shuts down on `SIGTERM` or `SIGINT` signals. As of this writing, the [App Router docs only show how to do this in Page Router](https://nextjs.org/docs/app/building-your-application/deploying#manual-graceful-shutdowns). I've added an issue to the 2.1k exisitng issues so maybe the instructions will get upadted. 
+When self-hosting, you might want to run code when the server shuts down on `SIGTERM` or `SIGINT` signals. As of this writing, the [App Router docs only show how to do this in Page Router](https://nextjs.org/docs/app/building-your-application/deploying#manual-graceful-shutdowns). I've added an issue to the 2.1k existing issues so maybe the instructions will get updated. 
 
 
 ## To investigate
