@@ -36,8 +36,11 @@ function Example(props) {
   const [name, setName] = useState('');
 
   useEffect(() => {
-    console.log('mounted');
-  });
+    console.log('mount');
+    return () => {
+      console.log('cleanup');
+    }
+  }, []);
 
   return (
     <div className="Example">
