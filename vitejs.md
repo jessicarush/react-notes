@@ -40,12 +40,12 @@ npm run dev
 
 This will launch a development server running at `http://localhost:5173/`.
 
-Both `npm create vite@latest` and `npm init vite` can be used to initialize a new project however, the former is the recommended method according to the Vite docs. The `create` command is part of teh new npm init feature that allows you to create a new project with a specific package without needing to install it globally. 
+Both `npm create vite@latest` and `npm init vite` can be used to initialize a new project however, the former is the recommended method according to the Vite docs. The `create` command is part of the new npm init feature that allows you to create a new project with a specific package without needing to install it globally. 
 
 You can also use the single line command:
 
 ```bash
-npm create vite@latest my-project --template react
+npm create vite@latest my-project -- --template react
 ```
 
 For steps to migrate a CRA project to Vite see: [How to migrate from CRA to Vite](https://github.com/nordcloud/pat-frontend-template/blob/master/docs/CRA_MIGRATION_GUIDE.md)
