@@ -1277,7 +1277,7 @@ const Button = styled.button`
 
 `theme() `is a tiny little function that returns another function which you can use as a value in styled-components. It looks up the correct value using the `theme` prop you provided to `<ThemeProvider>`. You're encouraged to create your own helper functions that wrap `theme()` to make it easier to declare your themes. Just make sure that you're doing as much work as possible ahead of time (or only once).
 
-In addition to the `theme()` function, there's also a `theme.variants() `function to help you declare variantions of the same component based on a prop.
+In addition to the `theme()` function, there's also a `theme.variants() `function to help you declare variations of the same component based on a prop.
 
 ```javascript
 import theme from "styled-theming";

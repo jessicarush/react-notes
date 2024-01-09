@@ -395,7 +395,7 @@ import { ThemeContext } from './contexts/ThemeContext';
 import { LanguageContext } from './contexts/LanguageContext';
 
 function Navbar() {
-  const { isDarkMode } = useContext(ThemeContext);
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const { language, setLanguage } = useContext(LanguageContext);
 
   return (
