@@ -2042,7 +2042,7 @@ If your image src was a remote file (a URL) you will also want to set up some [c
 
 The `sizes` attribute is usually used with `srcset` to give the browser information about how wide the image will be at different breakpoints (media conditions).
 
-It sounds like Next creates a `srcset` and various optimzed images for you:
+It sounds like Next creates a `srcset` and various optimized images for you:
 
 > First, the value of sizes is used by the browser to determine which size of the image to download, from next/image's *automatically-generated source set*. 
 
@@ -2163,6 +2163,14 @@ export const runtime = 'nodejs';
 export const preferredRegion = 'all';
  
 export default function MyComponent() {}
+```
+
+Note you can also do *comma-separated variable declarations* to visually group these:
+
+```javascript
+export const dynamic = 'auto',
+  dynamicParams = false,
+  revalidate = 300;
 ```
 
 
