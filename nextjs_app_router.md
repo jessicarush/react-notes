@@ -2362,7 +2362,7 @@ export default function Page() {
 }
 ```
 
-See also the [<Script> component API reference](https://nextjs.org/docs/app/api-reference/components/script).
+See also the [Script component API reference](https://nextjs.org/docs/app/api-reference/components/script).
 
 
 ## Lazy loading
@@ -2551,8 +2551,9 @@ There's additional topics in the Next documentation but from the sounds of it, t
 - [Analytics](https://nextjs.org/docs/app/building-your-application/optimizing/analytics) 
 - [OpenTelemetry](https://nextjs.org/docs/app/building-your-application/optimizing/open-telemetry)
 
-There are also some topics which would need further investigation because there's just not enough in the docs to know how/when/when to use:
+There are also some topics which would need further investigation:
 
+- [Content Security Policy](https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy)
 - [Instrumentation](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation)
 
 And others that are specific use cases:
