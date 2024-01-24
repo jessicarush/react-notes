@@ -138,6 +138,8 @@ Features that require a Node.js server, or dynamic logic that cannot be computed
 
 Attempting to use any of these features with `npm run dev` will result in an error (once you've enabled static export).
 
+#### Deploying a static export
+
 To enable a static export, change the output mode inside `next.config.js`:
 
 ```javascript
@@ -265,10 +267,30 @@ See [Deploy a Next.js App to App Platform](https://docs.digitalocean.com/tutoria
 Note that for static exports, you no longer need to run the `export` command as shown in the above tutorial. You only need to `npm run build`. The `output: 'export'` config option should be set in `next.config.js`.
 
 
-## Manual graceful shutdowns 
+## Streaming and Suspense
 
-When self-hosting, you might want to run code when the server shuts down on `SIGTERM` or `SIGINT` signals. As of this writing, the [App Router docs only show how to do this in Page Router](https://nextjs.org/docs/app/building-your-application/deploying#manual-graceful-shutdowns). I've added an issue to the 2.1k existing issues so maybe the instructions will get updated. 
+The Next.js App Router supports streaming responses when self-hosting. If you are using Nginx or a similar proxy, you will need to configure it to disable buffering to enable streaming.
 
+For example, you can disable buffering in Nginx by setting X-Accel-Buffering to no:
+next.config.js
+
+```
+module.exports = {
+  async headers() {
+    return [
+      {
+        source: '/:path*{/}?',
+        headers: [
+          {
+            key: 'X-Accel-Buffering',
+            value: 'no',
+          },
+        ],
+      },
+    ]
+  },
+}
+```
 
 ## To investigate
 
