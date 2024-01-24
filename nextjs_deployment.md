@@ -15,9 +15,10 @@ See <https://nextjs.org/docs/pages/building-your-application/deploying>
   * [Static export](#static-export)
     + [Supported features](#supported-features)
     + [Unsupported features](#unsupported-features)
+    + [Deploying a static export](#deploying-a-static-export)
 - [Other services](#other-services)
   * [Digitalocean app platform](#digitalocean-app-platform)
-- [Manual graceful shutdowns](#manual-graceful-shutdowns)
+- [Streaming and Suspense](#streaming-and-suspense)
 - [To investigate](#to-investigate)
 
 <!-- tocstop -->

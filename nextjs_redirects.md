@@ -4,6 +4,16 @@
 
 <!-- toc -->
 
+- [Introduction](#introduction)
+- [Redirect](#redirect)
+- [permanentRedirect](#permanentredirect)
+- [useRouter](#userouter)
+- [redirects in next.config.js](#redirects-in-nextconfigjs)
+- [NextResponse.redirect in middleware](#nextresponseredirect-in-middleware)
+- [Managing redirects at scale](#managing-redirects-at-scale)
+
+<!-- tocstop -->
+
 ## Introduction 
 
 There are a few ways you can handle [redirects](https://nextjs.org/docs/app/building-your-application/routing/redirecting) in Next.js.
