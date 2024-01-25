@@ -10,6 +10,7 @@
 - [CSS-in-JS](#css-in-js)
 - [Tailwind](#tailwind)
   * [with css variables](#with-css-variables)
+- [clsx](#clsx)
 - [Fonts](#fonts)
 
 <!-- tocstop -->
@@ -242,6 +243,45 @@ export default function Home() {
 
 See [tailwind docs on theme](https://tailwindcss.com/docs/theme).
 
+## clsx
+
+[clsx](https://github.com/lukeed/clsx) is a tiny (239B) utility for constructing className strings conditionally. For example:
+
+```tsx
+import clsx from 'clsx';
+import styles from './page.module.css';
+
+export default function Home() {
+  const status: string = 'error';
+  return (
+    <main>
+      <div
+        className={`${styles.message} ${status === 'success' ? styles.success : ''}${
+          status === 'error' ? styles.error : ''
+        }`}>
+        <p>string interpolation</p>
+      </div>
+      <div
+        className={clsx(
+          styles.message,
+          status === 'success' && styles.success,
+          status === 'error' && styles.error
+        )}>
+        <p>clsx: using comma separated conditions</p>
+      </div>
+      <div
+        className={clsx(styles.message, {
+          [styles.success]: status === 'success',
+          [styles.error]: status === 'error'
+        })}>
+        <p>clsx: using an object and computed property names</p>
+      </div>
+    </main>
+  );
+}
+```
+
+While string interpolation works fine for straightforward cases, clsx shines in scenarios where you have multiple conditional class names or need to combine classes from different sources. It can be more readable, flexible (you can mix strings, objects, and arrays), and less errror prone (it omits false values, whereas string interpolation expression like `status === 'success' && styles.success` will add the word 'false' to the className if it doesn't reolve to true).
 
 ## Fonts
 
