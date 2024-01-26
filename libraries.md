@@ -31,6 +31,7 @@ A list of react packages/libraries that I've used.
 - [remark](#remark)
 - [date-fns](#date-fns)
 - [fuse.js](#fusejs)
+- [heroicons](#heroicons)
 
 <!-- tocstop -->
 
@@ -600,3 +601,59 @@ See *courses/nextjs/next_blog*.
 ## fuse.js 
 
 [fuse.js](https://www.fusejs.io/) is a nice simple library (no dependencies!) for doing fuzzy search. I have a very simple example in `React/examples/next_lazy_loading`.
+
+## heroicons 
+
+[heroicons](https://heroicons.com/) are a set of MIT License hand-crafted SVG icons, by the makers of Tailwind CSS.
+
+The quickest way to use these icons is to simply copy the source for the icon you need from heroicons.com and inline it directly into your HTML:
+
+```html
+<svg
+  class="h-6 w-6 text-gray-500"
+  fill="none"
+  viewBox="0 0 24 24"
+  stroke="currentColor"
+  stroke-width="2"
+>
+  <path
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+  />
+</svg>
+```
+
+Icon styles are preconfigured to be stylable by setting the color CSS property, either manually or using utility classes like text-gray-500 in a framework like Tailwind CSS.
+
+Otherwise you can install for use with React:
+
+```bash
+npm install @heroicons/react
+```
+
+Now each icon can be imported individually as a React component:
+
+```tsx
+import { CodeBracketIcon } from '@heroicons/react/24/outline';
+// import {CodeBracketIcon} from '@heroicons/react/24/solid';
+// import {CodeBracketIcon} from '@heroicons/react/20/mini';
+// import {CodeBracketIcon} from '@heroicons/react/16/micro';
+import styles from './ExampleIcon.module.css';
+
+function ExampleIcon() {
+  return (
+    <CodeBracketIcon className={styles.icon} />
+  );
+}
+```
+
+- 24x24 outline icons can be imported from` @heroicons/react/24/outline`
+- 24x24 solid icons can be imported from `@heroicons/react/24/solid`
+- 20x20 solid icons can be imported from `@heroicons/react/20/solid`
+- 16x16 solid icons can be imported from `@heroicons/react/16/solid`
+
+Icons use an upper camel case naming convention and are always suffixed with the word Icon.
+
+- [See all icons on heroicons.com](https://heroicons.com)
+- [See all the icon import names](https://unpkg.com/browse/@heroicons/react@2.1.1/24/outline/)
