@@ -22,6 +22,7 @@
 - [Breaking code into chunks](#breaking-code-into-chunks)
 - [Conditionally render content](#conditionally-render-content)
 - [React Fragments](#react-fragments)
+- [Map can be used for component names too](#map-can-be-used-for-component-names-too)
 
 <!-- tocstop -->
 
@@ -642,3 +643,39 @@ function Columns() {
 ```
 
 Keep in mind though, if you have to pass a `key=uuid()`, you'll need to use the normal `<Fragment>` syntax.
+
+
+## Map can be used for component names too 
+
+I don't know why my brain found this noteworthy, but it did. When mapping, the name of a component can come from the mapped object, for example:
+
+```jsx
+import {
+  UserGroupIcon,
+  HomeIcon,
+  DocumentDuplicateIcon,
+} from '@heroicons/react/24/outline';
+
+// Map of links to display in the side navigation.
+const links = [
+  { name: 'Home', href: '/dashboard', icon: HomeIcon },
+  { name: 'Invoices', href: '/dashboard/invoices', icon: DocumentDuplicateIcon },
+  { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+];
+
+export default function NavLinks() {
+  return (
+    <>
+      {links.map((link) => {
+        const LinkIcon = link.icon;
+        return (
+          <a key={link.name} href={link.href} className="">
+            <LinkIcon className="" />
+            <p className="">{link.name}</p>
+          </a>
+        );
+      })}
+    </>
+  );
+}
+```
