@@ -29,7 +29,7 @@ import React, { useState, useEffect } from 'react';
 import './Example.css';
 
 
-function Example(props) {
+export default function Example(props) {
   // props
   // const {} = props;
   // state
@@ -48,6 +48,3 @@ function Example(props) {
     </div>
   );
 }
-
-
-export default Example;
