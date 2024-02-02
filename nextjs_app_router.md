@@ -4,7 +4,6 @@ Next used to use something called *Pages router* but now they are moving to a di
 
 The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of the differences between the two routers.
 
-
 ## Table of Contents
 
 <!-- toc -->
@@ -31,46 +30,18 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [Fragment links](#fragment-links)
   * [useRouter](#userouter)
 - [Route groups](#route-groups)
-- [Dynamic routes](#dynamic-routes)
-  * [Pre-render static routes](#pre-render-static-routes)
-  * [Link to dynamic routes](#link-to-dynamic-routes)
-  * [catch-all routes](#catch-all-routes)
-- [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch)
-- [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate)
-- [Revalidation](#revalidation)
-- [Data fetching examples](#data-fetching-examples)
-- [Fetching user-specific data](#fetching-user-specific-data)
-- [Data fetching summary](#data-fetching-summary)
-- [Client-side fetching with SWR](#client-side-fetching-with-swr)
-- [Fetching Data on the client with route handlers](#fetching-data-on-the-client-with-route-handlers)
 - [Static vs dynamic rendering](#static-vs-dynamic-rendering)
-  * [Static rendering](#static-rendering)
-  * [Static/dynamic data fetching](#staticdynamic-data-fetching)
-  * [Dynamic Rendering](#dynamic-rendering)
+- [Dynamic functions](#dynamic-functions)
 - [useSearchParams](#usesearchparams)
 - [Server functions](#server-functions)
-- [Server actions (experimental)](#server-actions-experimental)
-  * [Validation](#validation)
-  * [Headers](#headers)
-  * [Server Mutations](#server-mutations)
-- [Route handlers (API routes)](#route-handlers-api-routes)
-  * [request body](#request-body)
-  * [url params](#url-params)
-  * [headers](#headers)
-  * [cookies](#cookies)
-  * [redirects](#redirects)
-- [revalidatePath](#revalidatepath)
-- [revalidateTag](#revalidatetag)
 - [Images](#images)
   * [sizes](#sizes)
   * [fill](#fill)
   * [priority](#priority)
   * [warning](#warning)
+- [revalidatePath](#revalidatepath)
+- [revalidateTag](#revalidatetag)
 - [Route segment config](#route-segment-config)
-- [Middleware](#middleware)
-  * [matcher](#matcher)
-  * [conditional statements](#conditional-statements)
-  * [response](#response)
 - [Scripts](#scripts)
 - [Lazy loading](#lazy-loading)
   * [Loading External Libraries](#loading-external-libraries)
@@ -78,7 +49,7 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 - [Eslint](#eslint)
 - [Environment variables](#environment-variables)
 - [Absolute import path alias](#absolute-import-path-alias)
-- [Other features](#other-features)
+- [See also](#see-also)
 
 <!-- tocstop -->
 
@@ -177,9 +148,9 @@ Other files and folders that can be used:
 
 ```
 app
- ├─_components
  ├─_hooks
  ├─_lib
+ ├─_ui
  ├─api
  │  └─apiname
  │    └─route.js
@@ -204,9 +175,9 @@ app
 public
 ```
 
-- **_components**: Components which are shared throughout the app can go here. Components which are only used on one page could be stored in that pages folder.
 - **_hooks**: Put custom hooks in here.
 - **_lib**: For library type functions and resources. Some people also call this `utils`.
+- **_ui**: Components which are used or shared throughout the app can go here. Components which are only used on one page could be stored in that pages folder.
 - **api**: Its a good idea to create API routes in an API folder. Then inside that folder another folder will determine the route name. Finally, the route is defined in a *special file* called `route.js`. This file name is specifically used for server-side API endpoints for a route.
 - **pagename**: A page directory can contain its own `layout.js`. `loading.js` and `error.js` files get displayed automatically under certain conditions (they replace `page.js` in the layout).
 - **favicon.ico**: (special file) Also apple-icon.jpg, icon.jpg.
@@ -232,7 +203,7 @@ See [Next.js Project Structure](https://nextjs.org/docs/getting-started/project-
 
 ## Special file hierarchy 
 
-`page.js`, `layout.js`, `route.js`, `error.js`, `loading.js`, `not-found.js` are all examples of *special files* in Nextjs. The React components defined in the special files of a route segment are rendered in a specific hierarchy:
+`page.js`, `layout.js`, `route.js`, `error.js`, `loading.js`, `not-found.js` are all examples of [special files](https://nextjs.org/docs/getting-started/project-structure#app-routing-conventions) in Next.js. The React components defined in the special files of a route segment are rendered in a specific hierarchy:
 
 For example: 
 
@@ -459,12 +430,12 @@ export async function getColorWithFetch() {
 }
 ```
 
-See also: [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch) and [Caching/revalidating with `dynamic` and `revalidate`](#cachingrevalidating-with-dynamic-and-revalidate) below.
+This just scratches the surface. See [Fetching, caching, and revalidating](nextjs_fetch_cache_revalidate.md) for more information.
 
 
 ## Server components cannot contain hooks
 
-This is because Server Components have no React state (since they're not interactive) and they rely on client-side APIs. As a result, it would be difficult to implement a loading state, so they have designed it so that we do this simply by adding a file to our page route folder:
+This is because Server Components have no React state (since they're not interactive) and they rely on client-side APIs. As a result, it would be difficult to implement a loading state, so they have designed it so that we do this simply by adding a file to our page route folder...
 
 
 ## loading.js
@@ -521,7 +492,9 @@ export default function Posts() {
 }
 ```
 
-Remember: As notes above, `Suspense` does not detect when data is fetched inside an Effect or event handler.
+Remember: As noted above, `Suspense` does not detect when data is fetched inside an Effect or event handler.
+
+For another example of this, see the streaming section in [nextjs_databases.md](nextjs_databases.md).
 
 ## error.js 
 
@@ -840,737 +813,34 @@ export default function NotFoundCatchAll() {
 }
 ```
 
-
-## Dynamic routes 
-
-Create dynamic routes by doing the directory structure like: `app/post/[postid]/page.js`.
-
-Then we create a component in `page.js`:
-
-```javascript
-function Example(props) {
-  console.log(props); // { params: { postid: '100' }, searchParams: {} }
-  const postid = props.params.postid; // returns the postid of /app/post/100
-  return (
-    <main>
-      <p>Post { postid }.</p>
-    </main>
-  );
-}
-
-export default Example;
-```
-
-Note that the dynamic segments are passed as the `params` prop to `layout`, `page`, `route`, and `generateMetadata` functions.
-
-This would be equivalent to `getStaticPaths` with `fallback: true`. In other words, these will be dynamic pages so you will need to do your own handling for when the route doesn't exist. 
-
-**Q: how to return a 404 when necessary here?**
-
-If the dynamic route doesn't exist, call `notFound()` from `next/navigation`. Calling this function will raise a `NEXT_NOT_FOUND` error which will then be caught by the closest `not-found.js`.
-
-```javascript
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import photos from '@/app/photos';
-import styles from './page.module.css';
-
-export default function PhotoPage({ params }) {
-  const photo = photos.find((p) => p.id === params.id);
-  const width = 600;
-
-  // If photo not found, return 404.
-  // You want to call notFound() here and not just render a 404
-  // so that the 404 status code gets sent correctly. notFound()
-  // throws a NEXT_NOT_FOUND error which will then be caught by
-  // the closest not-found special file.
-  if (!photo) {
-    notFound();
-  }
-
-  return (
-    <main>
-      <Image
-        alt=""
-        src={photo.imageSrc}
-        height={width * 1.25}
-        width={width}
-        className={styles.photo}
-      />
-    </main>
-  );
-}
-```
-
-### Pre-render static routes
-
-To pre-render static pages (like `getStaticPaths` with `fallback: false`), you would create and export a special function called `generateStaticParams`. 
-
-> The `generateStaticParams` function can be used in combination with dynamic route segments to statically generate routes at build time instead of on-demand at request time.
-
-```javascript
-// The object keys should be the same as the filename [postid].js
-export async function generateStaticParams() {
-  return [
-    { postid: '100' },
-    { postid: '101' }
-  ]
-}
-
-export default function Example(props) {
-  const postid = props.params.postid;
-  return (
-    <main>
-      <p>Post { postid }.</p>
-    </main>
-  );
-}
-```
-
-At this point you want to consider how you are deploying your app/site:
-
-1. If you are planning to build and deploy a [static export](https://nextjs.org/docs/app/building-your-application/deploying/static-exports) (see [nextjs_deployment.md](nextjs_deployment.md)), then this is all you need to do. In this case, any routes not returned in by `generateStaticParams` will not be generated and therefor result in a 404. Note that in `npm run dev` mode, you will still get on-demand generated routes, even if they are not included in `generateStaticParams`:
-
-> During `next dev`, `generateStaticParams` will be called when you navigate to a route.
-> During `next build`, `generateStaticParams` runs before the corresponding Layouts or Pages are generated.
-
-So, to test this properly you will need to first add the `output: 'export'` to your `next.config.js`, then build and run the export:
-
-```
-npm run build && npx serve@latest out
-```
-
-2. If you are NOT doing a static export but planning to build and deploy with Node.js, then you get to control what happens when a dynamic segment is visited that was not generated with `generateStaticParams`. This is done with the [dynamicParams](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamicparams) segment config option:
-
-
-```javascript
-// Control what happens when a dynamic segment is visited that was not
-// generated with generateStaticParams.
-export const dynamicParams = false;
-```
-
-- `true` (default): Dynamic segments not included in `generateStaticParams` are generated on demand.
-- `false`: Dynamic segments not included in `generateStaticParams` will return a `404`.
-
-With the `dynamicParams` option set, you should be able to test this with `npm run dev` or `npm run build && npm start`.
-
-### Link to dynamic routes
-
-```javascript
-<ul>
-  {allPostsData.map((post) => (
-    <li key={post.id}>
-      <Link href={`/posts/${post.id}`}>{post.title}</Link>
-    </li>
-  ))}
-</ul>
-```
-
-### catch-all routes
-
-Note the `[postid]` directory name will only handle and exact match for that url structure. For example: `app/post/100` or `app/post/fart` will be handled but `app/post/100/another` would result in a 404. If I rename my folder `[...postid]`, this will catch all urls such as:
-
-```
-/app/post/100
-/app/post/100/another
-/app/post/100/a/b/c
-```
-
-In this case `props.params/postid` would return an array like `[ '100', 'a', 'b', 'c' ]`.
-
-
-## Caching/revalidating with `fetch()`
-
-Nextjs has extended the standard `fetch()` API. One of the main options is about caching and whether the page is static or dynamic. By default, a fetch call will have its result cache set to `force-cache` which means it will fetch the data once during build time and return a static page with the result data. 
-
-If you want the page to fetch new data on every request (thereby creating a dynamic page), you can add your own cache object to the `fetch()` call:
-
-```javascript
-export async function getColorWithFetch() {
-  const options = {
-    cache: 'no-store'
-  };
-  const res = await fetch(url, options);
-  const data = await res.json();
-  // ...
-}
-```
-
-This is like `getServerSideProps` in `Page Router` versions of Nextjs.
-
-You can also revalidate cached data at a timed interval (`Incremental Static Regeneration`). If many requests come in for the same page, a cached static version of the page will be used until the time interval has passed, then fresh data will be fetch and a new static page is served and cached until the next interval has passed. 
-
-```javascript
-export async function getColorWithFetch() {
-  const options = {
-    // cache: 'no-store',
-    next: { revalidate: 60 } // seconds
-  };
-  const res = await fetch(url, options);
-  const data = await res.json();
-  //...
-}
-```
-
-The downside of this (ISR) is any `loading.js` is ignored because with this strategy we are still serving static pages. If you happen to be the one initiating the request causing the new fetch, you will just see the loading spinner in the tab.
-
-> :warning: NOTE: Caching at the fetch level via `revalidate` or `cache: 'force-cache'` stores the data across requests in a **shared cache**. You should avoid using it for user specific data (i.e. requests that derive data from cookies() or headers()).
-
-
-## Caching/revalidating with `dynamic` and `revalidate`
-
-If you prefer using `axios`, you can still get these features. To force a refresh of data on every request:
-
-```javascript
-import { getColorWithAxios, getColorWithFetch } from "@/lib/colors";
-
-// Change the dynamic behavior of a layout or page to fully static or fully dynamic.
-export const dynamic = 'force-dynamic';
-
-async function Color() {
-  console.log('Color render');
-  const color = await getColorWithAxios();
-  // const color = await getColorWithFetch();
-
-  return (
-    <main>
-      <p>Color. <span style={{ color: color.hex }}>{color.name}</span></p>
-    </main>
-  )
-}
-
-export default Color;
-```
-
-See the [dynamic option](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#dynamic).
-
-
-To force a revalidate:
-
-```javascript
-import { getColorWithAxios, getColorWithFetch } from "@/lib/colors";
-
-// Set the default revalidation time for a layout or page.
-// This option does not override the revalidate set by individual fetch requests.
-export const revalidate = 20;
-
-async function Color() {
-  console.log('Color render');
-  const color = await getColorWithAxios();
-  // const color = await getColorWithFetch();
-
-  return (
-    <main>
-      <p>Color. <span style={{ color: color.hex }}>{color.name}</span></p>
-    </main>
-  )
-}
-
-export default Color;
-```
-
-See the [revalidate option](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config#revalidate).
-
-Keep in mind this can be hard to test because with axios in dev, it runs on every page refresh. If you do a `npm run build`, the output will tell you whether that page is dynamic or static.
-
-Note that all signs seem to point to using `fetch()` over `axios`. `axios` is still awesome as a js package but in Next.js, `fetch()` is preferred as they've extended it.
-
-
-## Revalidation
-
-There are two types of revalidation in Next.js:
-
-- Background: Revalidates the data at a specific time interval.
-- On-demand: Revalidates the data based on an event such as an update.
-
-**Background revalidation**
-
-To revalidate cached data at a specific interval, you can use the `next.revalidate` option in `fetch()` to set the cache lifetime of a resource (in seconds).
-
-```javascript
-fetch('https://...', { next: { revalidate: 60 } })
-```
-
-If you want to revalidate data that does not use fetch (i.e. using an external package or query builder), you can use the route segment config.
-
-```javascript
-export const revalidate = 60 // revalidate this page every 60 seconds
-```
-
-**On-demand revalidation**
-
-The [examples in the Next.js docs](https://nextjs.org/docs/app/building-your-application/data-fetching/revalidating#on-demand-revalidation) don't really explain how this would be used practically but here's what they say.
-
-You can use `revalidateTag` or `revalidatePath` to force a refresh of fetched data on-demand. They say this can be done inside a *Route Handler* or a *Server Action*.
-
-Using `revalidateTag` in a *Route Handler*, first you would add a tag to the options that are passed to `fetch()`:
-
-```javascript
-async function getColor() {
-  // ...
-  const options = {
-    cache: 'force-cache',
-    next: { tags: ['color'] }
-  };
-  const res = await fetch(url, options);
-  // ...
-}
-```
-
-Then, create a route handler to revalidate a given tag.
-
-```javascript
-import { NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
-
-// e.g a webhook to `your-website.com/api/revalidate?tag=color`
-export async function GET(request) {
-  const tag = request.nextUrl.searchParams.get('tag');
-
-  if (!tag) {
-    return NextResponse.json({ message: 'Missing tag param' }, { status: 400 });
-  }
-
-  revalidateTag(tag);
-
-  return NextResponse.json({ tag: tag, revalidated: true, now: Date.now() });
-}
-```
-
-So I will need to navigate to `my-website.com/api/revalidate?tag=color`. This tells Next.js that the **next request** to a page that does a fetch with that tag should be refreshed. 
-
-Instead of returning json, you could also redirect to the page thereby triggering the refresh right away;
-
-```javascript
-import { NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
-import { redirect } from 'next/navigation';
-
-// e.g a webhook to `your-website.com/api/revalidate?tag=color`
-export async function GET(request) {
-  const tag = request.nextUrl.searchParams.get('tag');
-
-  if (!tag) {
-    return NextResponse.json({ message: 'Missing tag param' }, { status: 400 });
-  }
-
-  revalidateTag(tag);
-  redirect('/server-side');
-}
-```
-
-If you want to protect who can revalidate you could use a token:
-
-```javascript
-import { NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
- 
-// e.g a webhook to `your-website.com/api/revalidate?tag=color&secret=<token>`
-export async function POST(request) {
-  const secret = request.nextUrl.searchParams.get('secret')
-  const tag = request.nextUrl.searchParams.get('tag')
- 
-  if (secret !== process.env.MY_SECRET_TOKEN) {
-    return NextResponse.json({ message: 'Invalid secret' }, { status: 401 })
-  }
- 
-  if (!tag) {
-    return NextResponse.json({ message: 'Missing tag param' }, { status: 400 })
-  }
- 
-  revalidateTag(tag)
- 
-  return NextResponse.json({ revalidated: true, now: Date.now() })
-}
-```
-
-`revalidatePath` works the same way except you don't need to add options to the fetch call:
-
-```javascript
-import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
-
-// e.g a webhook to `your-website.com/api/revalidate?path=/server-side`
-export async function GET(request) {
-  const path = request.nextUrl.searchParams.get('path');
-
-  console.log(path);
-  if (!path) {
-    return NextResponse.json(
-      { message: 'Missing path param' },
-      { status: 400 }
-    );
-  }
-
-  revalidatePath(path);
-
-  return NextResponse.json({ path: path, revalidated: true, now: Date.now() });
-}
-```
-
-Still not sure of the practical application of this. 
-
-
-## Data fetching examples 
-
-Parallel data fetching:
-
-```javascript
-import Albums from './albums';
- 
-async function getArtist(username) {
-  const res = await fetch(`https://api.example.com/artist/${username}`);
-  return res.json();
-}
- 
-async function getArtistAlbums(username) {
-  const res = await fetch(`https://api.example.com/artist/${username}/albums`);
-  return res.json();
-}
- 
-export default async function Page({ params: { username } }) {
-  // Initiate both requests in parallel
-  const artistData = getArtist(username);
-  const albumsData = getArtistAlbums(username);
- 
-  // Wait for the promises to resolve
-  const [artist, albums] = await Promise.all([artistData, albumsData]);
- 
-  return (
-    <>
-      <h1>{artist.name}</h1>
-      <Albums list={albums}></Albums>
-    </>
-  );
-}
-```
-
-Add a suspense boundary to break up the rendering work and show part of the result as soon as possible:
-
-```javascript
-import { getArtist, getArtistAlbums } from './api';
- 
-export default async function Page({ params: { username } }) {
-  // Initiate both requests in parallel
-  const artistData = getArtist(username);
-  const albumData = getArtistAlbums(username);
- 
-  // Wait for the artist's promise to resolve first
-  const artist = await artistData;
- 
-  return (
-    <>
-      <h1>{artist.name}</h1>
-      {/* Send the artist information first,
-      and wrap albums in a suspense boundary */}
-      <Suspense fallback={<div>Loading...</div>}>
-        <Albums promise={albumData} />
-      </Suspense>
-    </>
-  );
-}
- 
-// Albums Component
-async function Albums({ promise }) {
-  // Wait for the albums promise to resolve
-  const albums = await promise;
- 
-  return (
-    <ul>
-      {albums.map((album) => (
-        <li key={album.id}>{album.name}</li>
-      ))}
-    </ul>
-  );
-}
-```
-
-Sequential data fetching:
-
-```javascript
-// ...
- 
-async function Playlists({ artistID }) {
-  // Wait for the playlists
-  const playlists = await getArtistPlaylists(artistID);
- 
-  return (
-    <ul>
-      {playlists.map((playlist) => (
-        <li key={playlist.id}>{playlist.name}</li>
-      ))}
-    </ul>
-  );
-}
- 
-export default async function Page({ params: { username } }) {
-  // Wait for the artist
-  const artist = await getArtist(username);
- 
-  return (
-    <>
-      <h1>{artist.name}</h1>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Playlists artistID={artist.id} />
-      </Suspense>
-    </>
-  );
-}
-```
-
-## Fetching user-specific data 
-
-Keeping in mind that you shouldn't cache at the fetch level using `revalidate` or `cache: 'force-cache'` (because shared cache), this doesn't mean you can't fetch user-specific data in a server component.
-
-In fact, you could fetch user-specific data in both server and client components.
-
-In a server component, the user ID needed to fetch user-specific data can be obtained from the incoming request. Common ways to obtain the user ID in a server component:
-
-- Authentication: If your application has an authentication system in place, the user ID can be obtained from the authenticated user's session or token. When a user logs in or authenticates, their user ID is typically stored in the session or token, which can be accessed in the server component.
-
-- Request Headers: You can access request headers in the server component. For example, the user ID could be included in an "Authorization" header, which you can extract and use to fetch user-specific data.
-
-When it comes to data fetching in a client component, the approach for using authentication and request headers can be similar to that in a server component, but there are some differences to consider.
-
-In a client component, the user's authentication and authorization information is typically stored on the client-side, such as in local storage, session storage, or cookies. When making requests to fetch user-specific data, you can include the authentication information in the request headers to authenticate the user and authorize access to the data.
-
-Here are some considerations for using authentication and request headers in client components:
-
-- Authentication: In a client component, you would typically retrieve the authentication information, such as an authentication token, from the client-side storage where it was stored during the authentication process. This token can then be included in the request headers when making API calls to fetch user-specific data.
-
-- Request Headers: Similar to server components, you can include custom headers in the request to pass additional information, such as the user ID or any other necessary data, to the server. These headers can be used to authenticate the user and authorize access to the user-specific data.
-
-However, it's important to note that client-side authentication and request headers are generally less secure than server-side authentication and headers. Client-side code can be inspected and manipulated by users, so it's crucial to implement additional security measures, such as validating the authentication token on the server-side and implementing proper authorization checks, to ensure the integrity and security of the data.
-
-
-## Data fetching summary 
-
-> Whenever possible, we recommend fetching data in Server Components. It's still possible to fetch data client-side. We recommend using a third-party library such as SWR or React Query with Client Components. In the future, it'll also be possible to fetch data in Client Components using React's use() hook.
-
-Next.js recommends fetching data in Server Components whenever possible. This is because Server Components always fetch data on the server, which provides several benefits such as direct access to backend data resources, improved security, reduced client-server communication, and potentially improved performance due to reduced latency (<https://nextjs.org/docs/app/building-your-application/data-fetching>).
-
-However, Next.js also acknowledges that there are valid situations where client-side data fetching is necessary, such as when dealing with user-specific data or frequently updating data. For example, user dashboard pages that are private, user-specific, and frequently updated can benefit from client-side data fetching.
-
-As for the recommendation to use SWR or React Query for client-side data fetching, it's not that using a standard fetch in an async function triggered by an `onclick` is wrong. Rather, libraries like SWR and React Query provide additional features that can make client-side data fetching more efficient and easier to manage. For instance, SWR handles caching, revalidation, focus tracking, refetching on intervals, and more.
-
-- Whenever possible, fetch data on the server using Server Components.
-- Fetch data in parallel to minimize waterfalls and reduce loading times.
-- By fetching data in a layout, rendering for all route segments beneath it can only start once the data has finished loading.
-- For Layouts, Pages and components, fetch data where it's used. Next.js will automatically dedupe requests in a tree.
-- Whenever possible, it's best to fetch data in the segment that uses it. This also allows you to show a loading state for only the part of the page that is loading, and not the entire page.
-- Use `loading.js`, Streaming and Suspense to progressively render a page and show a result to the user while the rest of the content loads.
-- React extends fetch to provide automatic request deduping.
-- Next.js extends the fetch options object to allow each request to set its own caching and revalidating rules.
-- Static Data is data that doesn't change often. For example, a blog post.
-- Dynamic Data is data that changes often or can be specific to users. For example, a shopping cart list.
-- By default, Next.js automatically does static fetches. This means that the data will be fetched at build time, cached, and reused on each request.
-- Caching at the fetch level with revalidate or cache: 'force-cache' stores the data across requests in a **shared cache**. You should avoid using it for user-specific data (i.e. requests that derive data from [cookies()](https://nextjs.org/docs/app/api-reference/functions/cookies) or [headers()](https://nextjs.org/docs/app/api-reference/functions/headers))
-- If your data is personalized to the user or you want to always fetch the latest data, you can mark requests as dynamic and fetch data on each request without caching (`cache: 'no-store'` or `next: { revalidate: 0 }`).
-
-
-## Client-side fetching with SWR 
-
-Vercel created a React hook for data fetching called [SWR](https://swr.vercel.app/docs/getting-started). They recommend it if you’re fetching data on the client side.
-
-The name “SWR” is derived from stale-while-revalidate, a HTTP cache invalidation strategy. SWR is a strategy to first return the data from cache (stale), then send the fetch request (revalidate), and finally come with the up-to-date data.
-
-With SWR, components will get a stream of data updates constantly and automatically. For example, if you click to another app or tab, when you reactivate the tab with SWR, it will automatically get new data.
-
-```bash
-npm install swr
-```
-
-Example:
-
-```javascript
-import useSWR from 'swr';
-
-const url = 'https://log.zebro.id/api_demo_one';
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
-
-export default function Home() {
-  const { data, error, isLoading } = useSWR(url, fetcher);
-  const name = data ? data.name : '';
-  const value = data ? data.value : '';
-
-  let content;
-  if (error) content = 'Failed to load.';
-  if (isLoading) content = 'Loading...';
-  if (data)
-    content = (
-      <>
-        Your color is{' '}
-        <span style={{ color: value }}>
-          {name} {value}
-        </span>
-      </>
-    );
-
-  return (
-    <>
-      <p>{content}</p>
-    </>
-  );
-}
-```
-
-You can also fetch via a user event using `mutate`:
-
-```javascript
-import useSWR, { mutate } from 'swr'; // <-- import mutate
-
-const url = 'https://log.zebro.id/api_demo_one';
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
-
-export default function Home() {
-  const { data, error, isLoading } = useSWR(url, fetcher);
-  const name = data ? data.name : '';
-  const value = data ? data.value : ''
-
-  const fetchNewColor = async () => {  // <-- create a handler
-    mutate(url);
-  }
-
-  let content;
-
-  if (error) content = 'Failed to load.';
-  if (isLoading) content = 'Loading...';
-  if (data)
-    content = (
-      <>
-        Your color is{' '}
-        <span style={{ color: value }}>
-          {name} {value}
-        </span>
-      </>
-    );
-
-  return (
-    <>
-      <p>{content}</p>
-      <button onClick={fetchNewColor}>get another</button>
-    </>
-  );
-}
-```
-
-Side note, it's perfectly fine to return different content too:
-
-```javascript
-export default function Home() {
-  const { data, error, isLoading } = useSWR(url, fetcher);
-  // ...
- 
-  if (error) return <div>Failed to load.</div>
-  if (isLoading) return <div>Loading...</div>
- 
-  return <div>{data.name}</div>
-}
-```
-
-
-## Fetching Data on the client with route handlers
-
-> If you need to fetch data in a client component, you can call a Route Handler from the client. Route Handlers execute on the server and return the data to the client. This is useful when you don't want to expose sensitive information to the client, such as API tokens.
-
-They don;t give an example but I'm guessing they mean doing something like this:
-
-```javascript
-export async function GET(req) {
-  const url = 'https://log.zebro.id/api_demo_two';
-  const options = {
-    cache: 'no-store'
-  };
-  const params = new URLSearchParams({ value: 'rgb' });
-  const res = await fetch(`${url}?${params}`, options);
-  const data = await res.json()
-
-  // Response in a native Web API
-  return new Response(JSON.stringify( data ));
-}
-```
-
-Then your client component would fetch from this API instead of the original?
-
-```javascript
-'use client';
-
-import { useEffect, useState, useRef } from 'react';
-import ThrottledButton from '../_components/ThrottledButton';
-
-export default function ClientSide() {
-  const [color, setColor] = useState({ name: null, value: null });
-  const [isLoading, setIsLoading] = useState(false);
-  const abortController = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      console.log('aborting...');
-      abortController.current?.abort();
-    };
-  }, []);
-
-  async function getColor() {
-    setIsLoading(true);
-    abortController.current = new AbortController();
-    const config = { signal: abortController.current.signal };
-
-    try {
-      console.log('fetching...');
-      const url = '/api/get-color';
-      const res = await fetch(url, { ...config });
-      const data = await res.json();
-      setColor({ name: data.name, value: data.value });
-    } catch (err) {
-      console.log(`Something went wrong: ${err}`);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  return (
-    // ...
-  );
-}
-```
-
-Not sure if this is what they mean.
-
-
 ## Static vs dynamic rendering 
 
 In addition to client and server components, both can be either statically or dynamically rendered.
 
-- With Static Rendering, both Server and Client Components can be prerendered on the server at build time. The result of the work is cached and reused on subsequent requests. The cached result can also be revalidated.
-  - Client Components have their HTML and JSON prerendered and cached on the server. The cached result is then sent to the client for hydration.
-  - Server Components are rendered on the server by React, and their payload is used to generate HTML. The same rendered payload is also used to hydrate the components on the client, resulting in no JavaScript needed on the client.
+With *Static Rendering*, both Server and Client Components can be prerendered on the server at build time. The result of the work is cached and reused on subsequent requests. The cached result can also be revalidated.
 
-- With Dynamic Rendering, both Server and Client Components are rendered on the server at request time. The result of the work is not cached.
+- Client Components have their HTML and JSON prerendered and cached on the server. The cached result is then sent to the client for hydration.
+- Server Components are rendered on the server by React, and their payload is used to generate HTML. The same rendered payload is also used to hydrate the components on the client, resulting in no JavaScript needed on the client.
 
-### Static rendering 
+Static rendering is useful for UI with no data or data that is shared across users, such as a static blog post or a product page. It might not be a good fit for a dashboard that has personalized data that is regularly updated.
 
-By default, Next.js statically renders routes to improve performance.
+With *Dynamic Rendering*, both Server and Client Components are rendered on the server at request time. The result of the work is not cached. Benefits of dynamic rendering:
 
-### Static/dynamic data fetching 
+- Real-Time Data - Dynamic rendering allows your application to display real-time or frequently updated data. This is ideal for applications where data changes often.
+- User-Specific Content - It's easier to serve personalized content, such as dashboards or user profiles, and update the data based on user interaction.
+- Request Time Information - Dynamic rendering allows you to access information that can only be known at request time, such as cookies or the URL search parameters.
 
-By default, Next.js will cache the result of `fetch()` requests that do not specifically opt out of caching behavior. Dynamic data fetches are `fetch()` requests that specifically opt out of caching behavior by setting the `cache` option to `'no-store'` or `revalidate` to `0`.
+By default, Next.js statically renders routes to improve performance. To change to dynamic rendering you would do one if the following:
 
-The caching options for all `fetch` requests in a layout or page can also be set using the [segment config object](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config).
+- `fetch()` with options `cache: 'no-store'` or `revalidate: 0` (see [nextjs_fetch_cache_revalidate.md](nextjs_fetch_cache_revalidate.md))
+- Use the Segment Config Option `export const dynamic = "force-dynamic"` (see [nextjs_fetch_cache_revalidate.md](nextjs_fetch_cache_revalidate.md))
+- Use `unstable_noStore` to indicate a particular component should not be cached (see [nextjs_databases.md](nextjs_databases.md))
+- Use a Next.js dynamic function like `cookies()`, `headers()`, or `useSearchParams()`
 
-**Note** I'm still a bit confused by this. For example, when fetching a color from my random color API in a server-component:
 
-**With default 'force-cache'**
+## Dynamic functions
 
-- The same color will be served to two different users. Navigation between pages will serve the same color. A hard refresh will still serve the same color. *This makes sense.*
-
-**With 'no-cache'**
-
-- Different colors will be served to different users. Navigation between pages will usually serve the same color... but then eventually/sometimes it will fetch a new color. *This makes no sense. You would think it would always serve the same color (to the same user) or always fetch a new color. It seems like there's a timeout, after x minutes has passed it fetches again.*
-A hard refresh will fetch a new color.
-
-### Dynamic Rendering
-
-During static rendering, if a [dynamic function](https://nextjs.org/docs/app/building-your-application/rendering/static-and-dynamic-rendering#dynamic-functions) or a dynamic `fetch()` request *(no caching)* is discovered, Next.js will switch to dynamically rendering the whole route at request time. Any cached data requests can still be re-used during dynamic rendering.
+During static rendering, if a [dynamic function](https://nextjs.org/docs/app/building-your-application/rendering/static-and-dynamic-rendering#dynamic-functions) is discovered, Next.js will switch to dynamically rendering the whole route at request time. Any cached data requests can still be re-used during dynamic rendering.
 
 Dynamic functions rely on information that can only be known at request time such as a user's cookies, current requests headers, or the URL's search params. In Next.js, these dynamic functions are:
 
@@ -1622,366 +892,6 @@ export default function Page() {
 ```
 
 `headers()` is a *dynamic function* whose returned values cannot be known ahead of time. Using it in a layout or page will opt a route into dynamic rendering at request time.
-
-
-## Server actions (experimental)
-
-> Server Functions called as an action on forms or form elements.
-
-[Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions) are an alpha feature in Next.js, built on top of [React Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions#actions). They enable server-side data mutations, reduced client-side JavaScript, and progressively enhanced forms.
-
-app/actions.js
-
-```javascript
-'use server'
-
-export async function addItem(data) {
-  const cartId = cookies().get('cartId')?.value;
-  await saveToDb({ cartId, data });
-}
-```
-
-app/add-to-cart.js
-
-```javascript
-'use client'
- 
-import { addItem } from './actions.js';
- 
-// Server Action being called inside a Client Component
-export default function AddToCart({ productId }) {
-  return (
-    <form action={addItem}>
-      <button type="submit">Add to Cart</button>
-    </form>
-  );
-}
-```
-
-In addition to invoking with the `action` prop on a `<form>`, you can also invoke with the `formAction` prop to on elements such as `button`, `input type="submit"`, and `input type="image"`:
-
-```javascript
- 
-import { addItem, addImage } from './actions.js';
- 
-// Server Action being called inside a Client Component
-export default function AddToCart({ productId }) {
-  return (
-    <form action={addItem}>
-      <input type="image" formAction={addImage} />
-      <button type="submit">Add to Cart</button>
-    </form>
-  );
-}
-```
-
-You can also do [custom invocation](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions#custom-invocation-using-starttransition) with `startTransition`: Invoke Server Actions without using `action` or `formAction` by using `startTransition`.
-
-For now you can enable Server Actions in your Next.js project by enabling the experimental serverActions flag.
-
-next.config.js
-
-```
-module.exports = {
-  experimental: {
-    serverActions: true,
-  },
-}
-```
-
-By default, the maximum size of the request body sent to a Server Action is 1MB. This prevents large amounts of data being sent to the server, which consumes a lot of server resource to parse. However, you can configure this limit using the experimental serverActionsBodySizeLimit option.
-
-```
-module.exports = {
-  experimental: {
-    serverActions: true,
-    serverActionsBodySizeLimit: '2mb',
-  },
-}
-```
-
-Server Actions can be defined in two places:
-
-- Inside the component that uses it (Server Components only)
-- In a separate file (Client and Server Components), for reusability. You can define multiple Server Actions in a single file.
-
-
-### Validation 
-
-Data passed to a Server Action can be validated or sanitized before invoking the action. For example, you can create a wrapper function that receives the action as its argument, and returns a function that invokes the action if it's valid.
-
-app/actions.js
-
-```javascript
-'use server'
- 
-import { withValidate } from 'lib/form-validation';
- 
-export const action = withValidate((data) => {
-  // ...
-});
-```
-
-lib/form-validation.js
-
-```javascript
-export function withValidate(action) {
-  return async (formData) => {
-    'use server'
- 
-    const isValidData = verifyData(formData);
- 
-    if (!isValidData) {
-      throw new Error('Invalid input.')
-    }
- 
-    const data = process(formData);
-    return action(data);
-  }
-}
-```
-
-
-### Headers
-
-You can read incoming request headers such as cookies and headers within a Server Action.
-
-```javascript
-'use server'
-
-import { cookies } from 'next/headers';
- 
-export async function addItem(data) {
-  const cartId = cookies().get('cartId')?.value;
-  await saveToDb({ cartId, data });
-}
-```
-
-You can also modify cookies inside a server action:
-
-```javascript
-'use server'
-
-import { cookies } from 'next/headers';
-
-export async function create(data) {
-
-  const cart = await createCart():
-  cookies().set('cartId', cart.id)
-  // or
-  cookies().set({
-    name: 'cartId',
-    value: cart.id,
-    httpOnly: true,
-    path: '/'
-  })
-}
-```
-
-
-### Server Mutations
-
-> Server Actions that mutates your data and calls redirect, revalidatePath, or revalidateTag.
-
-Have not been able to find good examples of this.
-
-
-## Route handlers (API routes)
-
-Route Handlers allow you to create custom request handlers for a given route using the Web [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) and [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) APIs.
-
-In the app directory, create an `api` directory. Then, for every api route create a directory with the route name containing a file called `route.js`. Inside this file you will do a named export (not default) of an async function of a [http method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) like `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`.
-
-```javascript
-// app/api/rogers/route.js
-
-export async function GET(request) {
-  // Get search params from the request object
-  const { searchParams } = new URL(request.url);
-  const myparam = searchParams.get('myparam');
-  // Get response data
-  const quote = randomSelect(mrRogersQuotes);
-  // Response in a native Web API
-  return new Response(JSON.stringify({data: quote}))
-}
-```
-
-For POST requests get access to the body like so:
-
-```javascript
-export async function POST(request) {
-  const body = await req.json();
-  console.log(body);
-}
-```
-
-Next's example fetching from a database:
-
-```javascript
-import { NextResponse } from 'next/server';
- 
-export async function GET() {
-  const res = await fetch('https://data.mongodb-api.com/...', {
-    headers: {
-      'Content-Type': 'application/json',
-      'API-Key': process.env.DATA_API_KEY,
-    },
-  });
-  const data = await res.json();
- 
-  return NextResponse.json({ data });
-}
-```
-
-Route Handlers are cached by default when using the `GET` method with the Response object. You can opt out of caching by:
-
-- Using the `Request` object with the `GET` method.
-- Using any of the other HTTP methods.
-- Using Dynamic Functions like cookies and headers.
-- The Segment Config Options manually specifies dynamic mode.
-
-The [NextResponse](https://nextjs.org/docs/app/api-reference/functions/next-response) extends the standard Web Response with some additional convenience methods.
-
-### request body 
-
-You can read the `Request` body using the standard Web API methods:
-
-```javascript
-import { NextResponse } from 'next/server';
- 
-export async function POST(request) {
-  const res = await request.json();
-  return NextResponse.json({ res });
-}
-```
-
-### url params
-
-You can get search params like this:
-
-```javascript
-import { NextResponse } from 'next/server';
- 
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-  const res = await fetch(`https://data.mongodb-api.com/product/${id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'API-Key': process.env.DATA_API_KEY,
-    },
-  });
-  const product = await res.json();
- 
-  return NextResponse.json({ product });
-}
-```
-
-### headers 
-
-You can read headers with headers from `next/headers`. This `headers` instance is read-only. To set `headers`, you need to return a new `Response` with new `headers`.
-
-```javascript
-import { headers } from 'next/headers';
- 
-export async function GET(request) {
-  const headersList = headers();
-  const referer = headersList.get('referer');
- 
-  return new Response(JSON.stringify('Hello, Next.js!'), {
-    status: 200,
-    headers: { 
-      'referer': referer,
-      'Content-Type': 'application/json'
-      },
-  });
-}
-```
-
-CORS example:
-
-```javascript
-export async function GET(request) {
-  return new Response('Hello, Next.js!', {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
-}
-```
-
-### cookies
-
-You can read cookies with `cookies` from `next/headers`. This `cookies` instance is read-only. To set cookies, you need to return a new `Response` using the `Set-Cookie` header.
-
-```javascript
-import { cookies } from 'next/headers';
- 
-export async function GET(request) {
-  const cookieStore = cookies();
-  const token = cookieStore.get('token');
- 
-  return new Response('Hello, Next.js!', {
-    status: 200,
-    headers: { 'Set-Cookie': `token=${token}` },
-  });
-}
-```
-
-### redirects 
-
-```javascript
-import { redirect } from 'next/navigation';
- 
-export async function GET(request) {
-  redirect('https://nextjs.org/');
-}
-```
-
-
-## revalidatePath
-
-`revalidatePath` allows you to revalidate data associated with a specific path. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire.
-
-```javascript
-import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
- 
-export async function POST(request) {
-  const path = request.nextUrl.searchParams.get('path') || '/';
-  revalidatePath(path);
-  return NextResponse.json({ revalidated: true, now: Date.now() });
-}
-```
-
-`revalidatePath` only invalidates the cache when the path is next visited.
-
-
-## revalidateTag
-
-`revalidateTag` allows you to revalidate data associated with a specific cache tag. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire.
-
-app/api/revalidate/route.js
-
-```javascript
-import { NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
- 
-export async function POST(request) {
-  const tag = request.nextUrl.searchParams.get('tag');
-  revalidateTag(tag);
-  return NextResponse.json({ revalidated: true, now: Date.now() });
-}
-```
-
-You can add tags to fetch as follows:
-
-```javascript
-fetch(url, { next: { tags: ['something'] } });
-```
 
 
 ## Images 
@@ -2150,12 +1060,54 @@ module.exports = {
 Overall the whole thing feels a bit sus... like a money trap. 
 
 
+## revalidatePath
+
+`revalidatePath` allows you to revalidate data associated with a specific path. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire. Note this example uses [route handlers](nextjs_route_handlers.md).
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
+ 
+export async function POST(request) {
+  const path = request.nextUrl.searchParams.get('path') || '/';
+  revalidatePath(path);
+  return NextResponse.json({ revalidated: true, now: Date.now() });
+}
+```
+
+`revalidatePath` only invalidates the cache when the path is next visited.
+
+
+## revalidateTag
+
+`revalidateTag` allows you to revalidate data associated with a specific cache tag. This is useful for scenarios where you want to update your cached data without waiting for a revalidation period to expire. Note this example uses [route handlers](nextjs_route_handlers.md).
+
+app/api/revalidate/route.js
+
+```javascript
+import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
+ 
+export async function POST(request) {
+  const tag = request.nextUrl.searchParams.get('tag');
+  revalidateTag(tag);
+  return NextResponse.json({ revalidated: true, now: Date.now() });
+}
+```
+
+You can add tags to fetch as follows:
+
+```javascript
+fetch(url, { next: { tags: ['something'] } });
+```
+
+
 ## Route segment config
 
 The [Route Segment options](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config) allows you configure the behavior of a Page, Layout, or Route Handler by directly exporting the following variables:
 
 ```javascript
-export const dynamic = 'auto';
+export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const revalidate = false;
 export const fetchCache = 'auto';
@@ -2171,134 +1123,6 @@ Note you can also do *comma-separated variable declarations* to visually group t
 export const dynamic = 'auto',
   dynamicParams = false,
   revalidate = 300;
-```
-
-
-## Middleware
-
-Middleware allows you to run code before a request is completed. Then, based on the incoming request, you can modify the response by rewriting, redirecting, modifying the request or response headers, or responding directly.
-
-Middleware runs before cached content and routes are matched.
-
-Use the file middleware.js in the root of your project to define Middleware. In other words, it should be at the same level as your `app` directory.
-
-```javascript
-import { NextResponse } from 'next/server';
- 
-// This function can be marked `async` if using `await` inside
-export function middleware(request) {
-  return NextResponse.redirect(new URL('/home', request.url));
-}
- 
-// Matcher to determine which paths the middleware will run on
-export const config = {
-  matcher: '/about',
-};
-```
-
-By default middleware will be invoked for every route in your project. There are two ways to define which paths Middleware will run on:
-
-- Custom matcher config
-- Conditional statements 
-
-### matcher 
-
-You can match a single path or multiple paths with an array syntax:
-
-```javascript
-export const config = {
-  matcher: '/about/:path*',
-};
-```
-
-```javascript
-export const config = {
-  matcher: ['/about/:path*', '/dashboard/:path*'],
-};
-```
-
-The matcher config allows full regex so matching like *negative lookaheads* or character matching is supported. An example of a negative lookahead to match all except specific paths can be seen here:
-
-```javascript
-export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
-};
-```
-
-Configures matchers:
-
-- must start with `/`
-- can include named parameters: `/about/:path` matches `/about/a` and `/about/b` but not `/about/a/c`
-- can have modifiers on named parameters (starting with `:`): `/about/:path*` matches `/about/a/b/c` because `*` is zero or more. `?` is zero or one and `+` one or more
-- can use regular expression enclosed in parenthesis: `/about/(.*)` is the same as `/about/:path*`
-- values need to be constants so they can be statically analyzed at build-time. Dynamic values such as variables will be ignored.
-
-
-### conditional statements
-
-```javascript
-import { NextResponse } from 'next/server';
-
-export function middleware(request) {
-  if (request.nextUrl.pathname.startsWith('/about')) {
-    return NextResponse.rewrite(new URL('/about-2', request.url));
-  }
- 
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.rewrite(new URL('/dashboard/user', request.url));
-  }
-}
-```
-
-> URL rewriting is the process of internally changing the URL behind the scenes. This doesn't send an HTTP redirect to the client. It is used to serve a different page than the one at the requested URL, without the client knowing about it. For instance, in the above, all requests to /about get served /about-2 but the client would still see the URL as /about.
-
-### response 
-
-To produce a response from middleware, you can:
-
-- rewrite to a route (page or API route) that produces a response
-- return a `Response` or `NextResponse` directly.
-
-
-The `NextResponse` API allows you to:
-
-- redirect the incoming request to a different URL
-- rewrite the response by displaying a given URL
-- [set request headers](https://nextjs.org/docs/app/building-your-application/routing/middleware#setting-headers) for API Routes, getServerSideProps, and rewrite destinations
-- [set response cookies](https://nextjs.org/docs/app/building-your-application/routing/middleware#using-cookies)
-- [set response headers](https://nextjs.org/docs/app/building-your-application/routing/middleware#setting-headers)
-
-
-An example of returning a response directly:
-
-```javascript
-import { NextResponse } from 'next/server';
-import { isAuthenticated } from '@lib/auth';
- 
-// Limit the middleware to paths starting with `/api/`
-export const config = {
-  matcher: '/api/:function*',
-};
- 
-export function middleware(request) {
-  // Call our authentication function to check the request
-  if (!isAuthenticated(request)) {
-    // Respond with JSON indicating an error message
-    return new NextResponse(
-      JSON.stringify({ success: false, message: 'authentication failed' }),
-      { status: 401, headers: { 'content-type': 'application/json' } },
-    );
-  }
-}
 ```
 
 
@@ -2543,8 +1367,20 @@ import { Button } from '../../../_components/button';
 import { Button } from '@/app/_components/button';
 ```
 
+## See also
 
-## Other features
+- [nextjs_dynamic_routes.md](nextjs_dynamic_routes.md)
+- [nextjs_fetch_cache_revalidate.md](nextjs_fetch_cache_revalidate.md)
+- [nextjs_route_handlers.md](nextjs_route_handlers.md)
+- [nextjs_middleware.md](nextjs_middleware.md)
+- [nextjs_server_actions.md](nextjs_server_actions.md)
+- [nextjs_advanced_routing.md](nextjs_advanced_routing.md)
+- [nextjs_redirects.md](nextjs_redirects.md)
+- [nextjs_styling.md](nextjs_styling.md)
+- [nextjs_databases.md](nextjs_databases.md)
+- [nextjs_internationalization.md](nextjs_internationalization.md)
+- [nextjs_deployment.md](nextjs_deployment.md)
+- [nextjs_seo.md](nextjs_seo.md)
 
 There's additional topics in the Next documentation but from the sounds of it, these features require deploying to Vercel. These include:
 
@@ -2560,5 +1396,3 @@ And others that are specific use cases:
 
 - [MDX](https://nextjs.org/docs/app/building-your-application/configuring/mdx)
 - [Draft Mode](https://nextjs.org/docs/app/building-your-application/configuring/draft-mode)
-
-
