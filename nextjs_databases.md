@@ -1,7 +1,25 @@
 # Working with Databases 
 
+## Table of Contents
+
+<!-- toc -->
+
+- [Introduction](#introduction)
+- [dotenv](#dotenv)
+- [Seeding (with @vercel/postgres)](#seeding-with-vercelpostgres)
+- [Querying (fetching) data](#querying-fetching-data)
+- [Request waterfalls](#request-waterfalls)
+- [Parallel data fetching](#parallel-data-fetching)
+- [Streaming a whole page with loading.tsx/jsx](#streaming-a-whole-page-with-loadingtsxjsx)
+- [Streaming a specific component](#streaming-a-specific-component)
+- [Search](#search)
+
+<!-- tocstop -->
+
+## Introduction 
+
 For relational databases like Postgres, you can interact with them using `SQL`, or an ORM
-like [Prisma](https://www.prisma.io/). 
+like [Prisma](https://www.prisma.io/) or [Drizzle](https://orm.drizzle.team/). 
 
 Vercel has a [@vercel/postgres SDK](https://vercel.com/docs/storage/vercel-postgres/sdk) that makes writing `SQL` queries a little easier. I'm not sure if it will work with non-vercel databases. An example of the `@vercel/postgres` SDK is in the seeding section below.
 
@@ -11,25 +29,11 @@ It looks like [node-postgres](https://github.com/brianc/node-postgres?tab=readme
 - [How to set up Next.js with Node Postgres](https://ethanmick.com/how-to-set-up-next-js-with-node-postgres/)
 - [Writing Database Functions using Next.js, TypeScript, and PostgreSQL](https://www.linkedin.com/pulse/writing-database-functions-using-nextjs-typescript-postgresql-milne)
 
-There's also a [node-sqlite3](https://github.com/TryGhost/node-sqlite3#README) driver. In addition, you can apparently do [raw SQL queries with Prisma](https://www.prisma.io/docs/orm/prisma-client/queries/raw-database-access/raw-queries).
+There's also a [node-sqlite3](https://github.com/TryGhost/node-sqlite3#README) driver. In addition, you can apparently do [raw SQL queries with Prisma](https://www.prisma.io/docs/orm/prisma-client/queries/raw-database-access/raw-queries) and [raw SQL queries with Drizzle](https://orm.drizzle.team/docs/sql#sqlraw).
 
 When doing database queries, you will want to do this through an API (route handler) to avoid exposing your database secrets to the client.
 
 If you are using React Server Components (fetching data on the server), you can skip the API layer, and query your database directly without risking exposing your database secrets to the client.
-
-## Table of Contents
-
-<!-- toc -->
-
-- [dotenv](#dotenv)
-- [Seeding (with @vercel/postgres)](#seeding-with-vercelpostgres)
-- [Querying (fetching) data](#querying-fetching-data)
-- [Request waterfalls](#request-waterfalls)
-- [Parallel data fetching](#parallel-data-fetching)
-- [Streaming a whole page with loading.tsx/jsx](#streaming-a-whole-page-with-loadingtsxjsx)
-- [Streaming a specific component](#streaming-a-specific-component)
-
-<!-- tocstop -->
 
 ## dotenv
 
@@ -367,3 +371,70 @@ Deciding where to place your Suspense boundaries will depend on a few things:
 
 In general, it's good practice to move your data fetches down to the components that need it, and then wrap those components in Suspense.
 
+## Search
+
+We can implement a database search like this:
+
+- Capture the user's input.
+- Update the URL with the search params.
+- Keep the URL in sync with the input field.
+- Update the ui data to reflect the search query
+
+```tsx
+'use client';
+
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+
+export default function Search({ placeholder }: { placeholder: string }) {
+  // A client component hook that lets you read the current URL's query string.
+  const searchParams = useSearchParams();
+  // A client component hook that lets you read the current URL's pathname.
+  const pathname = usePathname();
+  // A client component hook that allows you to programmatically change routes.
+  const router = useRouter();
+
+  function handleSearch(term: string) {
+    // URLSearchParams is a Web API that provides utility methods for manipulating the
+    // URL query parameters. Instead of creating a complex string literal, you can use
+    // it to get the params string like ?page=1&query=a.
+    const params = new URLSearchParams(searchParams);
+    // Set the params string based on the user’s input. If the input is empty, you want to delete it:
+    if (term) {
+      params.set('query', term);
+    } else {
+      params.delete('query');
+    }
+    // router.replace let's you perform a client-side navigation to the provided route
+    // without adding a new entry into the browser’s history stack. The URL is updated
+    // without reloading the page, thanks to Next.js's client-side navigation
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+
+  return (
+    <div className="">
+      {/* To ensure the input field is in sync with the URL and will be populated when sharing,
+      you can pass a defaultValue to the input by reading from searchParams.
+      If you're using state to manage the value of an input, you'd use the value attribute instead
+      to make it a controlled component. This means React would manage the input's state.
+      However, since we're not using state, you can use defaultValue. This means the native input
+      will manage its own state. This is okay since we're saving the search query to the URL
+      instead of state. */}
+      <input
+        className=""
+        placeholder={placeholder}
+        onChange={(e => handleSearch(e.target.value))}
+        defaultValue={searchParams.get('query')?.toString()}
+      />
+    </div>
+  );
+}
+```
+The above client component sets the search params in teh URL. We can then access these search params in another client component using the `useSearchParams` hook, or in the `page.js` by accessing the `searchParams` prop which can then be passed to the server component that fetches and displays our search results.
+
+```tsx
+// page
+```
+
+```tsx
+// table component
+```
