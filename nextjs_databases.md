@@ -26,7 +26,8 @@ If you are using React Server Components (fetching data on the server), you can 
 - [Querying (fetching) data](#querying-fetching-data)
 - [Request waterfalls](#request-waterfalls)
 - [Parallel data fetching](#parallel-data-fetching)
-- [Streaming (Suspense)](#streaming-suspense)
+- [Streaming a whole page with loading.tsx/jsx](#streaming-a-whole-page-with-loadingtsxjsx)
+- [Streaming a specific component](#streaming-a-specific-component)
 
 <!-- tocstop -->
 
@@ -251,7 +252,21 @@ A common way to avoid waterfalls is to initiate all data requests at the same ti
 
 This is where we turn to *streaming* (Suspense). By streaming, you can prevent slow data requests from blocking your whole page.
 
-## Streaming (Suspense)
+## Streaming a whole page with loading.tsx/jsx
+
+We can start streaming by simply adding a `loading.tsx` to out route folder:
+
+```tsx
+export default function Loading() {
+  return <DashboardSkeleton />;
+}
+```
+
+You can use route groups to ensure this `loading.tsx` is only applied to the segments you need it to.
+
+However, a full page loading skeleton may not be appropriate. You can also set up streaming for individual components...
+
+## Streaming a specific component
 
 Using the example above, what we need to do is move each potentially time-consuming fetch into the component itself that uses it, then where that component is placed in our page; wrap it in `<Suspense>` and pass it a fallback skeleton component:
 
@@ -287,7 +302,7 @@ export default async function Page() {
 }
 ```
 
-If you have a group of components that you want to load at the same time instaed of popping in one by one, wrap them in their own component and make a skelton for that group.
+If you have a group of components that you want to load at the same time instead of popping in one by one, wrap them in their own component and make a skelton for that group.
 
 For example:
 
@@ -350,4 +365,5 @@ Deciding where to place your Suspense boundaries will depend on a few things:
 - What content you want to prioritize.
 - If the components rely on data fetching.
 
+In general, it's good practice to move your data fetches down to the components that need it, and then wrap those components in Suspense.
 
