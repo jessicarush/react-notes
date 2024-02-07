@@ -492,7 +492,9 @@ export default function Posts() {
 }
 ```
 
-Remember: As noted above, `Suspense` does not detect when data is fetched inside an Effect or event handler.
+As noted above, `Suspense` does not detect when data is fetched inside an Effect or event handler.
+
+It's also worth noting that wrapping a component in Suspense doesn't make the component itself *dynamic* (see [Static vs dynamic rendering](#static-vs-dynamic-rendering)), but rather `Suspense` is used as a boundary between the static and dynamic parts of your route.
 
 For another example of this, see the streaming section in [nextjs_databases.md](nextjs_databases.md).
 
@@ -846,6 +848,7 @@ Dynamic functions rely on information that can only be known at request time suc
 
  - Using `cookies()` or `headers()` in a Server Component will opt the whole route into dynamic rendering at request time.
 - Using `useSearchParams()` in Client Components will skip static rendering and instead render all Client Components up to the nearest parent Suspense boundary on the client.
+- Using `unstable_noStore()` (soon to be `noStore()`) in a component makes the entire route become dynamic.
 
 
 ## useSearchParams 
