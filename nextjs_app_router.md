@@ -248,6 +248,7 @@ Define a layout by *default exporting* a React component from a `layout.js` file
 - Layouts in a route are nested by default. Each parent layout wraps child layouts below it using the React children prop.
 - You can use *Route Groups* to opt specific route segments in and out of shared layouts.
 - Passing data between a parent layout and its children is not possible. However, you can fetch the same data in a route more than once, and React will automatically dedupe the requests without affecting performance.
+- pages automatically receive `params` and `searchParams` in their props. `params` contain [dynamic route](nextjs_dynamic_routes.md) parameters and `searchParams` contain any search params from the URL. See [page.js](https://nextjs.org/docs/app/api-reference/file-conventions/page)
 
 
 ### layout.js 
@@ -838,6 +839,7 @@ By default, Next.js statically renders routes to improve performance. To change 
 - Use the Segment Config Option `export const dynamic = "force-dynamic"` (see [nextjs_fetch_cache_revalidate.md](nextjs_fetch_cache_revalidate.md))
 - Use `unstable_noStore` to indicate a particular component should not be cached (see [nextjs_databases.md](nextjs_databases.md))
 - Use a Next.js dynamic function like `cookies()`, `headers()`, or `useSearchParams()`
+- `searchParams` which are passed automatically in the props of a `page.js` is a Dynamic API whose values cannot be known ahead of time. Using it will opt the page into dynamic rendering at request time.
 
 
 ## Dynamic functions
@@ -846,7 +848,7 @@ During static rendering, if a [dynamic function](https://nextjs.org/docs/app/bui
 
 Dynamic functions rely on information that can only be known at request time such as a user's cookies, current requests headers, or the URL's search params. In Next.js, these dynamic functions are:
 
- - Using `cookies()` or `headers()` in a Server Component will opt the whole route into dynamic rendering at request time.
+- Using `cookies()` or `headers()` in a Server Component will opt the whole route into dynamic rendering at request time.
 - Using `useSearchParams()` in Client Components will skip static rendering and instead render all Client Components up to the nearest parent Suspense boundary on the client.
 - Using `unstable_noStore()` (soon to be `noStore()`) in a component makes the entire route become dynamic.
 
@@ -866,6 +868,24 @@ export default function SearchBar() {
   // ...
 }
 ```
+
+Note that there are actually two different ways to extract search params: using the `useSearchParams` hook in client components and the `searchParams` prop in pages:
+
+```jsx
+export default function Page(props) {
+  console.log(props);
+  // { params: {}, searchParams: {} }
+  return (
+    <main>
+      <p>Page.</p>
+    </main>
+  )
+}
+```
+
+As a general rule, if you want to read the `params` from the client, use the `useSearchParams` hook as this avoids having to go back to the server.
+
+However, if you want to access these in a server component that fetches its own data, you can pass the `searchParams` prop from the page to that component.
 
 
 ## Server functions
