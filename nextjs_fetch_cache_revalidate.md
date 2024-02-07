@@ -4,7 +4,7 @@
 
 <!-- toc -->
 
-  * [Static/dynamic data fetching](#staticdynamic-data-fetching)
+- [Static/dynamic data fetching](#staticdynamic-data-fetching)
 - [Caching/revalidating with `fetch()`](#cachingrevalidating-with-fetch)
 - [Caching/revalidating with segment config options](#cachingrevalidating-with-segment-config-options)
 - [Revalidation](#revalidation)
@@ -16,7 +16,7 @@
 
 <!-- tocstop -->
 
-### Static/dynamic data fetching 
+## Static/dynamic data fetching 
 
 By default, Next.js will cache the result of `fetch()` requests that do not specifically opt out of caching behavior. Dynamic data fetches are `fetch()` requests that specifically opt out of caching behavior by setting the `cache` option to `'no-store'` or `revalidate` to `0`.
 
@@ -584,8 +584,8 @@ As for the recommendation to use SWR or React Query for client-side data fetchin
 - Fetch data in parallel to minimize waterfalls and reduce loading times.
 - By fetching data in a layout, rendering for all route segments beneath it can only start once the data has finished loading.
 - For Layouts, Pages and components, fetch data where it's used. Next.js will automatically dedupe requests in a tree.
-- Whenever possible, it's best to fetch data in the segment that uses it. This also allows you to show a loading state for only the part of the page that is loading, and not the entire page.
-- Use `loading.js`, Streaming and Suspense to progressively render a page and show a result to the user while the rest of the content loads.
+- In general, it's good practice to move your data fetches down to the components that need it, and then wrap those components in `<Suspense>`. 
+- Use `loading.js`, Streaming and `<Suspense>` to progressively render a page and show a result to the user while the rest of the content loads.
 - React extends fetch to provide automatic request deduping.
 - Next.js extends the fetch options object to allow each request to set its own caching and revalidating rules.
 - Static Data is data that doesn't change often. For example, a blog post.
