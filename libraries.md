@@ -32,6 +32,7 @@ A list of react packages/libraries that I've used.
 - [date-fns](#date-fns)
 - [fuse.js](#fusejs)
 - [heroicons](#heroicons)
+- [use-debounce](#use-debounce)
 
 <!-- tocstop -->
 
@@ -657,3 +658,28 @@ Icons use an upper camel case naming convention and are always suffixed with the
 
 - [See all icons on heroicons.com](https://heroicons.com)
 - [See all the icon import names](https://unpkg.com/browse/@heroicons/react@2.1.1/24/outline/)
+
+## use-debounce 
+
+```bash
+npm install use-debounce
+```
+
+```jsx
+'use client';
+
+import { useDebouncedCallback } from 'use-debounce';
+
+export default function Search() {
+
+  const handleSearch = useDebouncedCallback((term => {
+    // ...
+  }), 300)
+
+  return (
+    <div className="">
+      <input onChange={(e => handleSearch(e.target.value))} />
+    </div>
+  );
+}
+```
