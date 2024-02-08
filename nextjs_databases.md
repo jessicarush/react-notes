@@ -13,6 +13,7 @@
 - [Streaming a whole page with loading.tsx/jsx](#streaming-a-whole-page-with-loadingtsxjsx)
 - [Streaming a specific component](#streaming-a-specific-component)
 - [Search](#search)
+- [Pagination](#pagination)
 
 <!-- tocstop -->
 
@@ -398,7 +399,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
     // URL query parameters. Instead of creating a complex string literal, you can use
     // it to get the params string like ?page=1&query=a.
     const params = new URLSearchParams(searchParams);
-    // Set the params string based on the user’s input. If the input is empty, you want to delete it:
+    // Set the params string based on the user’s input. If the input is empty, delete it:
     if (term) {
       params.set('query', term);
     } else {
@@ -422,19 +423,360 @@ export default function Search({ placeholder }: { placeholder: string }) {
       <input
         className=""
         placeholder={placeholder}
-        onChange={(e => handleSearch(e.target.value))}
+        onChange={(e) => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()}
       />
     </div>
   );
 }
 ```
-The above client component sets the search params in teh URL. We can then access these search params in another client component using the `useSearchParams` hook, or in the `page.js` by accessing the `searchParams` prop which can then be passed to the server component that fetches and displays our search results.
+
+The above client component sets the search params in the URL. We can then access these search params in another client component using the `useSearchParams` hook, or in the `page.js` by accessing the `searchParams` prop which can then be passed to the server component that fetches and displays our search results.
 
 ```tsx
-// page
+import Table from '@/app/ui/invoices/table';
+import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
+import Search from '@/app/ui/search';
+import { Suspense } from 'react';
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
+}) {
+  const query = searchParams?.query || '';
+  const currentPage = Number(searchParams?.page) || 1;
+
+  return (
+    <div className="">
+      <Search placeholder="Search invoices..." />
+      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+        <Table query={query} currentPage={currentPage} />
+      </Suspense>
+    </div>
+  );
+}
 ```
 
+Then in the component:
+
 ```tsx
-// table component
+import { fetchFilteredInvoices } from '@/app/lib/data';
+
+export default async function InvoicesTable({
+  query,
+  currentPage,
+}: {
+  query: string;
+  currentPage: number;
+}) {
+  const invoices = await fetchFilteredInvoices(query, currentPage);
+
+  return (
+    <div className="mt-6 flow-root">
+      {invoices?.map((invoice) => (
+        // ...
+      ))}
+    </div>
+  );
+}
+```
+
+In this case the fetch uses the term:
+
+```ts
+const ITEMS_PER_PAGE = 6;
+
+export async function fetchFilteredInvoices(
+  query: string,
+  currentPage: number,
+) {
+  noStore();
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const invoices = await sql<InvoicesTable>`
+      SELECT
+        invoices.id,
+        invoices.amount,
+        invoices.date,
+        invoices.status,
+        customers.name,
+        customers.email,
+        customers.image_url
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      WHERE
+        customers.name ILIKE ${`%${query}%`} OR
+        customers.email ILIKE ${`%${query}%`} OR
+        invoices.amount::text ILIKE ${`%${query}%`} OR
+        invoices.date::text ILIKE ${`%${query}%`} OR
+        invoices.status ILIKE ${`%${query}%`}
+      ORDER BY invoices.date DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return invoices.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch invoices.');
+  }
+}
+```
+
+Side note: it's best to debounce the `handleSearch` function since it's currently replacing the URL on every keystroke of the input, this triggers a new db query every time. We can use the [use-debounce](xhttps://github.com/xnimorz/use-debounce) library: `import { useDebouncedCallback } from 'use-debounce'`.
+
+```tsx
+  // npm install use-debounce
+  const handleSearch = useDebouncedCallback((term => {
+    // URLSearchParams is a Web API that provides utility methods for manipulating the
+    // URL query parameters. Instead of creating a complex string literal, you can use
+    // it to get the params string like ?page=1&query=a.
+    const params = new URLSearchParams(searchParams);
+    // Set the params string based on the user’s input. If the input is empty, you want to delete it:
+    if (term) {
+      params.set('query', term);
+    } else {
+      params.delete('query');
+    }
+    // router.replace let's you perform a client-side navigation to the provided route
+    // without adding a new entry into the browser’s history stack. The URL is updated
+    // without reloading the page, thanks to Next.js's client-side navigation
+    router.replace(`${pathname}?${params.toString()}`);
+  }), 300)
+```
+
+## Pagination
+
+This builds on the Search example above. The query `fetchFilteredInvoices` query is already set up the use the `currentPage` value in the SQL query: `LIMIT num OFFSET num` will only return the rows for a given page. To create pagination here, we're really just add a dynamic link that will change depending on the current page and total number of results.
+
+First, since we will now be setting the `page` URL param in this new page component, we should reset it to `1` whenever we change the input (do a new search):
+
+```tsx
+  const handleSearch = useDebouncedCallback((term) => {
+    // URLSearchParams is a Web API that provides utility methods for manipulating the
+    // URL query parameters. Instead of creating a complex string literal, you can use
+    // it to get the params string like ?page=1&query=a.
+    const params = new URLSearchParams(searchParams);
+    // Reset the page param (this is later set by the pagination component)
+    params.set('page', '1');
+    // ...
+```
+
+Next we need to get the total number of pages on the server and pass to the pagination client component. You don't want to fetch data on the client as this would expose your database secrets.
+
+```tsx
+import Table from '@/app/ui/invoices/table';
+import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
+import Search from '@/app/ui/search';
+import { fetchInvoicesPages } from '@/app/lib/data';
+import { Suspense } from 'react';
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
+}) {
+  const query = searchParams?.query || '';
+  const currentPage = Number(searchParams?.page) || 1;
+
+  const totalPages = await fetchInvoicesPages(query);
+
+  return (
+    <div className="">
+      <Search placeholder="Search invoices..." />
+      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+        <Table query={query} currentPage={currentPage} />
+      </Suspense>
+
+      <Pagination totalPages={totalPages} /> 
+    </div>
+  );
+}
+```
+
+The `totalPages` query function look slike:
+
+```ts 
+export async function fetchInvoicesPages(query: string) {
+  noStore();
+  try {
+    const count = await sql`SELECT COUNT(*)
+    FROM invoices
+    JOIN customers ON invoices.customer_id = customers.id
+    WHERE
+      customers.name ILIKE ${`%${query}%`} OR
+      customers.email ILIKE ${`%${query}%`} OR
+      invoices.amount::text ILIKE ${`%${query}%`} OR
+      invoices.date::text ILIKE ${`%${query}%`} OR
+      invoices.status ILIKE ${`%${query}%`}
+  `;
+
+    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of invoices.');
+  }
+}
+```
+
+Then in our `Pagination` component:
+
+```tsx
+'use client';
+
+import { usePathname, useSearchParams } from 'next/navigation';
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import clsx from 'clsx';
+import Link from 'next/link';
+import { generatePagination } from '@/app/lib/utils';
+
+export default function Pagination({ totalPages }: { totalPages: number }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get('page')) || 1;
+
+  const createPageURL = (pageNumber: number | string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', pageNumber.toString());
+    return `${pathname}?${params.toString()}`;
+  };
+
+  const allPages = generatePagination(currentPage, totalPages);
+
+  return (
+    <>
+      <div className="">
+        <PaginationArrow
+          direction="left"
+          href={createPageURL(currentPage - 1)}
+          isDisabled={currentPage <= 1}
+        />
+
+        <div className="">
+          {allPages.map((page, index) => {
+            let position: 'first' | 'last' | 'single' | 'middle' | undefined;
+            if (index === 0) position = 'first';
+            if (index === allPages.length - 1) position = 'last';
+            if (allPages.length === 1) position = 'single';
+            if (page === '...') position = 'middle';
+
+            return (
+              <PaginationNumber
+                key={page}
+                href={createPageURL(page)}
+                page={page}
+                position={position}
+                isActive={currentPage === page}
+              />
+            );
+          })}
+        </div>
+
+        <PaginationArrow
+          direction="right"
+          href={createPageURL(currentPage + 1)}
+          isDisabled={currentPage >= totalPages}
+        />
+      </div>
+    </>
+  );
+}
+
+function PaginationNumber({
+  page,
+  href,
+  isActive,
+  position,
+}: {
+  page: number | string;
+  href: string;
+  position?: 'first' | 'last' | 'middle' | 'single';
+  isActive: boolean;
+}) {
+  const className = clsx(
+    // ...
+  );
+
+  return isActive || position === 'middle' ? (
+    <div className={className}>{page}</div>
+  ) : (
+    <Link href={href} className={className}>
+      {page}
+    </Link>
+  );
+}
+
+function PaginationArrow({
+  href,
+  direction,
+  isDisabled,
+}: {
+  href: string;
+  direction: 'left' | 'right';
+  isDisabled?: boolean;
+}) {
+  const className = clsx(
+    // ...
+  );
+
+  const icon =
+    direction === 'left' ? (
+      <ArrowLeftIcon className="w-4" />
+    ) : (
+      <ArrowRightIcon className="w-4" />
+    );
+
+  return isDisabled ? (
+    <div className={className}>{icon}</div>
+  ) : (
+    <Link className={className} href={href}>
+      {icon}
+    </Link>
+  );
+}
+```
+
+Finally, `generatePagination` which is just a utility function the outputs an array for the pagination depending on what the current page is and teh total number of pages.
+
+```ts
+export const generatePagination = (currentPage: number, totalPages: number) => {
+  // If the total number of pages is 7 or less,
+  // display all pages without any ellipsis.
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  // If the current page is among the first 3 pages,
+  // show the first 3, an ellipsis, and the last 2 pages.
+  if (currentPage <= 3) {
+    return [1, 2, 3, '...', totalPages - 1, totalPages];
+  }
+
+  // If the current page is among the last 3 pages,
+  // show the first 2, an ellipsis, and the last 3 pages.
+  if (currentPage >= totalPages - 2) {
+    return [1, 2, '...', totalPages - 2, totalPages - 1, totalPages];
+  }
+
+  // If the current page is somewhere in the middle,
+  // show the first page, an ellipsis, the current page and its neighbors,
+  // another ellipsis, and the last page.
+  return [
+    1,
+    '...',
+    currentPage - 1,
+    currentPage,
+    currentPage + 1,
+    '...',
+    totalPages,
+  ];
+};
 ```
