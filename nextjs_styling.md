@@ -281,7 +281,7 @@ export default function Home() {
 }
 ```
 
-While string interpolation works fine for straightforward cases, clsx shines in scenarios where you have multiple conditional class names or need to combine classes from different sources. It can be more readable, flexible (you can mix strings, objects, and arrays), and less errror prone (it omits false values, whereas string interpolation expression like `status === 'success' && styles.success` will add the word 'false' to the className if it doesn't reolve to true).
+While string interpolation works fine for straightforward cases, clsx shines in scenarios where you have multiple conditional class names or need to combine classes from different sources. It can be more readable, flexible (you can mix strings, objects, and arrays), and less error prone (it omits false values, whereas string interpolation expression like `status === 'success' && styles.success` will add the word 'false' to the className if it doesn't reolve to true).
 
 ## Fonts
 
