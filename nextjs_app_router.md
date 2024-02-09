@@ -55,7 +55,7 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
 
 ## Getting started
 
-See the [create-next-app API reference](https://nextjs.org/docs/app/api-reference/create-next-app).
+See the [create-next-app API reference](https://nextjs.org/docs/app/api-reference/create-next-app). 
 
 There are many [official Next.js examples](https://github.com/vercel/next.js/tree/canary/examples) but they all seem to be using Pages Router.
 
@@ -177,7 +177,7 @@ public
 
 - **_hooks**: Put custom hooks in here.
 - **_lib**: For library type functions and resources. Some people also call this `utils`.
-- **_ui**: Components which are used or shared throughout the app can go here. Components which are only used on one page could be stored in that pages folder.
+- **_ui**: Components which are used or shared throughout the app can go here. Components which are only used on one route/page could be stored in that pages folder. The Next.js dashboard tutorial puts all components in the ui folder and only puts special files like `page` and `layout` in the route segment folders.
 - **api**: Its a good idea to create API routes in an API folder. Then inside that folder another folder will determine the route name. Finally, the route is defined in a *special file* called `route.js`. This file name is specifically used for server-side API endpoints for a route.
 - **pagename**: A page directory can contain its own `layout.js`. `loading.js` and `error.js` files get displayed automatically under certain conditions (they replace `page.js` in the layout).
 - **favicon.ico**: (special file) Also apple-icon.jpg, icon.jpg.
