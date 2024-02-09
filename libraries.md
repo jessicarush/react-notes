@@ -33,6 +33,7 @@ A list of react packages/libraries that I've used.
 - [fuse.js](#fusejs)
 - [heroicons](#heroicons)
 - [use-debounce](#use-debounce)
+- [zod](#zod)
 
 <!-- tocstop -->
 
@@ -683,3 +684,14 @@ export default function Search() {
   );
 }
 ```
+
+## zod 
+
+[Zod](https://zod.dev/) is a TypeScript-first schema declaration and validation library. The use the the term "schema" to broadly refer to any data type, from a simple string to a complex nested object.
+
+```bash
+npm install zod
+```
+
+See the [Validate and prepare the data to be inserted into your database](#validate-and-prepare-the-data-to-be-inserted-into-your-database) section in [nextjs_server_actions.md](nextjs_server_actions.md) for example usage.
+
