@@ -184,7 +184,7 @@ public
 - **global-error.js**: (special file) Displayed when catching errors in the root layout.js.
 - **globals.css**: (special file) Global css file.
 - **layout.js**: (special file) Root layout. A layout wraps a page or child segment.
-- **not-found.js**: (special file) Create UI to show when the notFound function is thrown within a route segment or when a URL is not matched by any route (404).
+- **not-found.js**: (special file) Create UI to show when the `notFound()` function is thrown within a route segment or when a URL is not matched by any route (404).
 - **page.js**: (special file) index.html
 - **page.module.css**: Css module for index.html
 - **sitemap.js**: (special file) A file that can be used to generate an XML sitemap for web crawlers.

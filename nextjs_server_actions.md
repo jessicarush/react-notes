@@ -13,6 +13,7 @@
   * [Validate and prepare the data to be inserted into your database.](#validate-and-prepare-the-data-to-be-inserted-into-your-database)
   * [Insert the data and handle any errors.](#insert-the-data-and-handle-any-errors)
   * [Revalidate the cache and redirect the user back to invoices page.](#revalidate-the-cache-and-redirect-the-user-back-to-invoices-page)
+- [Single button forms](#single-button-forms)
 - [Validation](#validation)
 - [Headers](#headers)
 - [Server Mutations](#server-mutations)
@@ -60,7 +61,7 @@ export default function AddToCart({ productId }) {
 }
 ```
 
-In addition to invoking with the `action` prop on a `<form>`, you can also invoke with the `formAction` prop on elements such as `button`, `input type="submit"`, and `input type="image"`:
+In addition to invoking with the `action` prop on a `<form>`, you can also invoke with the `formAction` prop on elements such as `button`, `input type="submit"`, and `input type="image"`. This is useful in cases where you want to call multiple server actions within a form. For example, you can create a specific `<button>` element for saving a post draft in addition to publishing it.
 
 ```javascript
 'use client'
@@ -113,11 +114,11 @@ Server Actions can be defined in two places:
 1. Inside the Server Action, extract the data from the formData object.
 1. Validate and prepare the data to be inserted into your database.
 1. Insert the data and handle any errors.
-1. Revalidate the cache and redirect the user back to invoices page.
-
-
+1. Revalidate the cache and redirect the user back to a page.
 
 ### Create a form to capture the user's input.
+
+
 
 ### Create a Server Action and invoke it from the form.
 
@@ -144,6 +145,31 @@ export default function Form({ customers }: FormProps) {
 ```
 
 > In HTML, you'd normally pass a URL to the action attribute. This URL would be the destination where your form data should be submitted (usually an API endpoint). However, in React, the action attribute is considered a special prop - meaning React builds on top of it to allow actions to be invoked. Behind the scenes, Server Actions create a POST API endpoint. This is why you don't need to create API endpoints manually when using Server Actions. [source](https://nextjs.org/learn/dashboard-app/mutating-data)
+
+If you need to pass an argument along with to the server action, they say to use `bind`. This will ensure that any values passed to the server action are encoded. 
+
+```tsx
+// ...
+import { updateInvoice } from '@/app/lib/actions';
+ 
+export default function EditInvoiceForm({ invoice }: { invoice: InvoiceForm }) {
+  const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
+ 
+  return (
+    <form action={updateInvoiceWithId}>
+      // ...
+    </form>
+  );
+}
+```
+
+The action:
+
+```ts
+export async function updateInvoice(id: string, formData: FormData) {
+  // ...
+}
+```
 
 ### Inside the Server Action, extract the data from the formData object.
 
@@ -191,7 +217,7 @@ export async function createInvoice(formData: FormData) {
 
 The `amount` field is specifically set to coerce (change) from a string to a number while also validating its type.
 
-You can then pass your rawFormData to CreateInvoice to validate the types:
+You can then pass your `rawFormData` to `CreateInvoice` to validate the types:
 
 ```ts
 export async function createInvoice(formData: FormData) {
@@ -203,6 +229,8 @@ export async function createInvoice(formData: FormData) {
   const { customerId, amount, status } = CreateInvoice.parse(rawFormData);
 }
 ```
+
+If the validation fails it will raise a `ZodError` with details on what field failed. We should also be doing validation on our forms. See the [Validation](#validation) section below.
 
 It's usually good practice to store monetary values in cents in your database to eliminate JavaScript floating-point errors and ensure greater accuracy. We might then also add a field like the date. We could also write the rawFormData object directly as the args to `CreateInvoice.parse()` since that variable won't be used anywhere else:
 
@@ -219,14 +247,140 @@ export async function createInvoice(formData: FormData) {
 }
 ```
 
-
-
-
 ### Insert the data and handle any errors.
+
+```ts
+'use server';
+
+import { z } from 'zod';
+import { sql } from '@vercel/postgres';
+
+// ...
+
+export async function createInvoice(formData: FormData) {
+  // ...
+  const date = new Date().toISOString().split('T')[0];
+
+  try {
+    await sql`
+    INSERT INTO invoices (customer_id, amount, status, date)
+    VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+  `;
+  } catch (error) {
+    return { message: 'Database Error: Failed to Create Invoice.', };
+  }
+}
+```
+
+An `error.tsx` file can be used to define a UI boundary for a route segment (`app/dashboard/invoices/error.tsx`). It serves as a catch-all for unexpected errors and allows you to display a fallback UI.
+
+Another way you can handle errors gracefully is by using the `notFound` function. While `error.tsx` is useful for catching all errors, `notFound` can be used when you try to fetch a resource that doesn't exist.
+
+For example, in a page that edits an invoice:
+
+```tsx
+import { fetchInvoiceById, fetchCustomers } from '@/app/lib/data';
+import { notFound } from 'next/navigation';
+// ...
+
+export default async function Page({ params }: PageProps ) {
+  const id = params.id;
+  const [invoice, customers] = await Promise.all([
+    fetchInvoiceById(id),
+    fetchCustomers(),
+  ]);
+
+  if (!invoice) {
+    notFound();
+  }
+
+  return (
+    // ...
+  );
+}
+```
+
+Then we create a `not-found.tsx` for that specific route segment (`app/dashboard/invoices/[id]/edit/not-found.tsx`):
+
+```tsx
+import Link from 'next/link';
+
+export default function NotFound() {
+  return (
+    <main className="">
+      <h2 className="">404 Not Found</h2>
+      <p>Could not find the requested invoice.</p>
+      <Link href="/dashboard/invoices">Go Back</Link>
+    </main>
+  );
+}
+```
+
+`notFound` will take precedence over error.tsx, so you can reach out for it when you want to handle more specific errors!
+
+TODO: Add example using something other than `@vercel/postrgres`?
+
 ### Revalidate the cache and redirect the user back to invoices page.
 
+> Next.js has a Client-side Router Cache that stores the route segments in the user's browser for a time. Along with prefetching, this cache ensures that users can quickly navigate between routes while reducing the number of requests made to the server. Since you're updating the data displayed in the invoices route, you want to clear this cache and trigger a new request to the server. You can do this with the revalidatePath function from Next.js [source](https://nextjs.org/learn/dashboard-app/mutating-data#6-revalidate-and-redirect)
+
+
+```ts
+'use server';
+
+import { z } from 'zod';
+import { sql } from '@vercel/postgres';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+
+// ...
+
+export async function createInvoice(formData: FormData) {
+  // ...
+  try {
+    await sql`
+    INSERT INTO invoices (customer_id, amount, status, date)
+    VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+  `;
+  } catch (error) {
+    return { message: 'Database Error: Failed to Create Invoice.', };
+  }
+  revalidatePath('/dashboard/invoices');
+  redirect('/dashboard/invoices');
+}
+```
+
+## Single button forms
+
+While this may be obvious, it's good to note that if you have a single button that needs to do something like delete an item, to get access to server actions, wrap that one button in a form:
+
+```tsx
+import { deleteInvoice } from '@/app/lib/actions';
+ 
+// ...
+ 
+export function DeleteInvoice({ id }: { id: string }) {
+  const deleteInvoiceWithId = deleteInvoice.bind(null, id);
+ 
+  return (
+    <form action={deleteInvoiceWithId}>
+      <button className="">
+        <span className="sr-only">Delete</span>
+        <TrashIcon className="" />
+      </button>
+    </form>
+  );
+}
+```
 
 ## Validation 
+
+
+
+
+
+
+
 
 Data passed to a Server Action can be validated or sanitized before invoking the action. For example, you can create a wrapper function that receives the action as its argument, and returns a function that invokes the action if it's valid.
 
@@ -255,7 +409,7 @@ export function withValidate(action) {
       throw new Error('Invalid input.')
     }
  
-    const data = process(formData);
+    const data = process(formData)
     return action(data);
   }
 }
