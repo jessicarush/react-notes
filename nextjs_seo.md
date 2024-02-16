@@ -183,11 +183,16 @@ export const metadata = {
     initialScale: 1,
     maximumScale: 1,
   },
-  colorScheme: 'dark'
+  colorScheme: 'dark',
+  robots: {
+    index: true,
+    follow: true,
+    noarchive: true,
+  },
 };
 ```
 
-There's way more, e.g. for robots, icons, etc. See also the [HTML standard](https://html.spec.whatwg.org/multipage/semantics.html#the-meta-element).
+There's way more, e.g. robots,  icons, etc. See also the [HTML standard](https://html.spec.whatwg.org/multipage/semantics.html#the-meta-element).
 
 ### file-based metadata 
 
