@@ -15,8 +15,9 @@
   * [Revalidate the cache and redirect the user back to invoices page.](#revalidate-the-cache-and-redirect-the-user-back-to-invoices-page)
 - [Single button forms](#single-button-forms)
 - [Validation](#validation)
+- [Client-side validation](#client-side-validation)
+- [Server-side validation](#server-side-validation)
 - [Headers](#headers)
-- [Server Mutations](#server-mutations)
 
 <!-- tocstop -->
 
@@ -77,35 +78,22 @@ export default function AddToCart({ productId }) {
   );
 }
 ```
-
-For now you can enable Server Actions in your Next.js project by enabling the experimental serverActions flag.
-
-next.config.js
-
-```
-module.exports = {
-  experimental: {
-    serverActions: true,
-  },
-}
-```
-
-By default, the maximum size of the request body sent to a Server Action is 1MB. This prevents large amounts of data being sent to the server, which consumes a lot of server resource to parse. However, you can configure this limit using the experimental serverActionsBodySizeLimit option.
-
-```
-module.exports = {
-  experimental: {
-    serverActions: true,
-    serverActionsBodySizeLimit: '2mb',
-  },
-}
-```
-
 Server Actions can be defined in two places:
 
 - Inside the component that uses it (**Server Components only**)
 - In a separate 'server-only' file. You can define multiple Server Actions in a single file and both client and server components can import and use them.
 
+Server Actions became a stable feature in Next.js 14, and are enabled by default. By default, the maximum size of the request body sent to a Server Action is 1MB. This prevents large amounts of data being sent to the server, which consumes a lot of server resource to parse. However, you can configure this limit in `next.config.js`.
+
+```js
+module.exports = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
+}
+```
 
 ## Implementation process  
 
@@ -375,46 +363,181 @@ export function DeleteInvoice({ id }: { id: string }) {
 
 ## Validation 
 
+Validating form input can be done on the client or the server.
 
+## Client-side validation 
 
+There are a couple of ways you can validate forms on the client. The simplest would be to rely on the form validation provided by the browser, using html attributes:
 
+attribute | description
+--------- | -----------
+`required` | Specifies form field that must be filled in before the form can be submitted
+`minlength`, `maxlength` | Specifies the minimum and maximum length for text inputs (strings)
+`min`, `max` | Specifies the minimum and maximum values of number inputs
+`type` | Specifies whether the data needs to be a specific type (`button`, `checkbox`, `color`, `data`, `datetime-local`, `email`, `file`, `hidden`, `image`, `month`, `number`, `password`, `radio`, `range`, `reset`, `search`, `submit`, `tel`, `text`, `time`, `url`, `week`)
+`pattern` | Specifies a regular expression that defines a pattern the entered data needs to follow
 
+When an element is valid, the following things are true:
 
+- The element matches the `:valid` CSS pseudo-class, which lets you apply a specific style to valid elements.
+- If the user tries to send the data, the browser will submit the form, provided there is nothing else stopping it from doing so.
 
+When an element is invalid, the following things are true:
 
-Data passed to a Server Action can be validated or sanitized before invoking the action. For example, you can create a wrapper function that receives the action as its argument, and returns a function that invokes the action if it's valid.
+- The element matches the `:invalid` CSS pseudo-class, and sometimes other UI pseudo-classes (e.g., `:out-of-range`) depending on the error, which lets you apply a specific style to invalid elements.
+- If the user tries to send the data, the browser will block the form and display an error message.
 
-app/actions.js
+The next way to implement client-side validation would be to write you own JavaScript. See [Validating forms using JavaScript](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation#validating_forms_using_javascript).
 
-```javascript
-'use server'
+## Server-side validation
+
+By validating forms on the server, you can:
+
+- Reduce the risk of malicious users bypassing client-side validation.
+- Have one source of truth for what is considered valid data.
+
+In your form component, import the `useFormState` hook from react-dom. Since `useFormState` is a hook, you will need to turn your form into a client component:
+
+```tsx
+'use client';
+// ...
+import { useFormState } from 'react-dom';
  
-import { withValidate } from 'lib/form-validation';
+export default function Form({ customers }: { customers: CustomerField[] }) {
+  const [state, dispatch] = useFormState(createInvoice, initialState);
  
-export const action = withValidate((data) => {
-  // ...
-});
-```
-
-lib/form-validation.js
-
-```javascript
-export function withValidate(action) {
-  return async (formData) => {
-    'use server'
- 
-    const isValidData = verifyData(formData);
- 
-    if (!isValidData) {
-      throw new Error('Invalid input.')
-    }
- 
-    const data = process(formData)
-    return action(data);
-  }
+  return <form action={dispatch}>...</form>;
 }
 ```
 
+The `useFormState` hook takes two arguments: `(action, initialState)`, and returns two values: `[state, dispatch]` - similar to [useReducer](https://react.dev/reference/react/useReducer).
+
+Pass your action (`createInvoice`) as the first arg of `useFormState`, and pass the `dispatch` to the form action attribute `<form action={}>`.
+
+The `initialState` can be anything you define. In this case, create an object with two empty keys: `message` and `errors`.
+
+```tsx
+export default function Form({ customers }: { customers: CustomerField[] }) {
+  const initialState = { message: null, errors: {} };
+  const [state, dispatch] = useFormState(createInvoice, initialState);
+
+  // ...
+}
+```
+
+In your `action.ts` file, you can use [Zod](https://zod.dev/) to validate the form data. Update your FormSchema as follows:
+
+```ts
+const FormSchema = z.object({
+  id: z.string(),
+  customerId: z.string({
+    invalid_type_error: 'Please select a customer.',
+  }),
+  amount: z.coerce.number().gt(0, { message: 'Please enter an amount greater than $0.' }),
+  status: z.enum(['pending', 'paid'], {
+    invalid_type_error: 'Please select an invoice status.',
+  }),
+  date: z.string(),
+});
+```
+
+- `customerId` - Zod let's add a message if the user doesn't select a customer.
+- `amount` - Since we are coercing the amount type from string to number, it'll default to zero if the string is empty. You can tell Zod we always want the amount greater than 0 with the `.gt()` function.
+- `status` - Zod already throws an error if the status field is empty as it expects "pending" or "paid". We'll just add a message if the user doesn't select a status.
+
+Next, update your action to accept two parameters:
+
+```ts
+// This is temporary until @types/react-dom is updated
+export type State = {
+  errors?: {
+    customerId?: string[];
+    amount?: string[];
+    status?: string[];
+  };
+  message?: string | null;
+};
+
+export async function createInvoice(PrevState: State, formData: FormData) {
+  // ...
+}
+```
+
+`prevState` contains the state passed from the `useFormState` hook. We won't be using it in this example, but it's a required prop.
+
+Next, change the Zod `parse()` function to `safeParse()`. This will return an object containing either a `success` or `error` field. This will help handle validation more gracefully without having put this logic inside the try/catch block. If the parse is successful, we can then get our individual fields from `.data`:
+
+```ts
+export async function createInvoice(formData: FormData) {
+  // Validate form fields with Zod
+  const validatedFields = CreateInvoice.safeParse({
+    customerId: formData.get('customerId'),
+    amount: formData.get('amount'),
+    status: formData.get('status'),
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Invoice.',
+    };
+  }
+
+  // Prepare data for insertion into the database
+  const { customerId, amount, status } = validatedFields.data;
+  const amountInCents = amount * 100;
+  const date = new Date().toISOString().split('T')[0];
+
+  // ...
+}
+```
+
+To display the errors in your form component:
+
+```tsx
+<select
+  id="customer"
+  name="customerId"
+  aria-describedby="customer-error"
+>
+...
+</select>
+
+<div id="customer-error" aria-live="polite" aria-atomic="true">
+  {state.errors?.customerId &&
+    state.errors.customerId.map((error: string) => (
+      <p className="" key={error}>
+        {error}
+      </p>
+    ))}
+</div>
+```
+
+`aria-describedby="customer-error"`: This establishes a relationship between the select element and the error message container. Screen readers will read this description when the user interacts with the select box to notify them of errors.
+
+`aria-live="polite"`: The screen reader should politely notify the user when the error inside the div is updated. When the content changes (e.g. when a user corrects an error), the screen reader will announce these changes, but only when the user is idle so as not to interrupt them.
+
+`aria-atomic="true"`: present the entire changed region as a whole, including the author-defined label if one exists.
+
+To print the messages `console.log` the `state` inside your component to check the structure of the object. For example, when there are no errors:
+
+```console
+{ message: null, errors: {} }
+```
+
+When the form is submitted with empty fields:
+
+```console
+{
+  errors: {
+    customerId: [ 'Please select a customer.' ],
+    amount: [ 'Please enter an amount greater than $0.' ],
+    status: [ 'Please select an invoice status.' ]
+  },
+  message: 'Missing Fields. Failed to Create Invoice.'
+}
+```
 
 ## Headers
 
@@ -427,7 +550,6 @@ import { cookies } from 'next/headers';
  
 export async function addItem(data) {
   const cartId = cookies().get('cartId')?.value;
-  await saveToDb({ cartId, data });
 }
 ```
 
@@ -451,10 +573,5 @@ export async function create(data) {
   })
 }
 ```
-
-
-## Server Mutations
-
-> Server Actions that mutates your data and calls redirect, revalidatePath, or revalidateTag.
 
 Have not been able to find good examples of this.
