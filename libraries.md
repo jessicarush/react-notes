@@ -32,6 +32,7 @@ A list of react packages/libraries that I've used.
 - [date-fns](#date-fns)
 - [fuse.js](#fusejs)
 - [heroicons](#heroicons)
+- [react-icons](#react-icons)
 - [use-debounce](#use-debounce)
 - [zod](#zod)
 
@@ -659,6 +660,10 @@ Icons use an upper camel case naming convention and are always suffixed with the
 
 - [See all icons on heroicons.com](https://heroicons.com)
 - [See all the icon import names](https://unpkg.com/browse/@heroicons/react@2.1.1/24/outline/)
+
+## react-icons 
+
+Haven;t looked into this yet but [react-icons](https://react-icons.github.io/react-icons/) apparently lets you use any icon set. It utilizes ES6 imports that allows you to include only the icons that your project is using. 
 
 ## use-debounce 
 
