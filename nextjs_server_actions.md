@@ -387,7 +387,7 @@ When an element is invalid, the following things are true:
 - The element matches the `:invalid` CSS pseudo-class, and sometimes other UI pseudo-classes (e.g., `:out-of-range`) depending on the error, which lets you apply a specific style to invalid elements.
 - If the user tries to send the data, the browser will block the form and display an error message.
 
-The next way to implement client-side validation would be to write you own JavaScript. See [Validating forms using JavaScript](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation#validating_forms_using_javascript).
+Another way to implement client-side validation would be to write your own JavaScript. See [Validating forms using JavaScript](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation#validating_forms_using_javascript).
 
 ## Server-side validation
 
@@ -573,5 +573,3 @@ export async function create(data) {
   })
 }
 ```
-
-Have not been able to find good examples of this.
