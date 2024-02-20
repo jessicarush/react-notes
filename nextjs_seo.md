@@ -194,6 +194,27 @@ export const metadata = {
 
 There's way more, e.g. robots,  icons, etc. See also the [HTML standard](https://html.spec.whatwg.org/multipage/semantics.html#the-meta-element).
 
+Note that for page titles you can use the `title.template` field to define a template for your page titles, for example in my root layout:
+
+```tsx
+import { Metadata } from 'next';
+ 
+export const metadata: Metadata = {
+  title: {
+    template: '%s | company name',
+    default: 'company name',
+  },
+};
+```
+
+The `%s` in the template will be replaced with the specific page title:
+
+```tsx
+export const metadata: Metadata = {
+  title: 'About us',
+};
+```
+
 ### file-based metadata 
 
 These special files are available for metadata:
