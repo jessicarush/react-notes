@@ -106,7 +106,43 @@ module.exports = {
 
 ### Create a form to capture the user's input.
 
+```tsx
+export default function Form({ customers }: FormProps) {
+  return (
+    <form>
+      {/* Customer Name */}
+      <label htmlFor="customer">Choose customer</label>
+      <select id="customer" name="customerId" defaultValue="">
+        <option value="" disabled>Select a customer</option>
+        {customers.map((customer) => (
+          <option key={customer.id} value={customer.id}>{customer.name}</option>
+        ))}
+      </select>
 
+      {/* Invoice Amount */}
+      <label htmlFor="amount">Choose an amount</label>
+      <input
+        id="amount"
+        name="amount"
+        type="number"
+        step="0.01"
+        placeholder="Enter USD amount"
+      />
+
+      {/* Invoice Status */}
+      <fieldset>
+        <legend>Set the invoice status</legend>
+        <input id="pending" name="status" type="radio" value="pending"/>
+        <label htmlFor="pending">Pending</label>
+        <input id="paid" name="status" type="radio" value="paid" />
+        <label htmlFor="paid">Paid</label>
+      </fieldset>
+
+      <Button type="submit">Create Invoice</Button>
+    </form>
+  );
+}
+```
 
 ### Create a Server Action and invoke it from the form.
 
@@ -259,6 +295,8 @@ export async function createInvoice(formData: FormData) {
   }
 }
 ```
+
+Note that this is safeguarded against SQL injection. When you use a tagged template literal for SQL queries (`sql` in this case), the library prepares the query by treating the variables (`${customerId}`, `${amountInCents}`, `${status}`, `${date}`) as parameters rather than part of the SQL command itself. This separation ensures that the inputs are not executed as SQL code, regardless of their content, effectively mitigating the risk of SQL injection.
 
 An `error.tsx` file can be used to define a UI boundary for a route segment (`app/dashboard/invoices/error.tsx`). It serves as a catch-all for unexpected errors and allows you to display a fallback UI.
 
