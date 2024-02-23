@@ -20,17 +20,23 @@
 ## Introduction 
 
 For relational databases like Postgres, you can interact with them using `SQL`, or an ORM
-like [Prisma](https://www.prisma.io/) or [Drizzle](https://orm.drizzle.team/). 
+like [Prisma](https://www.prisma.io/) or [Drizzle](https://orm.drizzle.team/) or a query-builder like [Kysley](https://kysely.dev/docs/getting-started). 
 
-Vercel has a [@vercel/postgres SDK](https://vercel.com/docs/storage/vercel-postgres/sdk) that makes writing `SQL` queries a little easier. I'm not sure if it will work with non-vercel databases. An example of the `@vercel/postgres` SDK is in the seeding section below.
+Vercel has a [@vercel/postgres SDK](https://vercel.com/docs/storage/vercel-postgres/sdk) that makes writing `SQL` queries a little easier. It uses the same API as [node-postgres](https://node-postgres.com/) so it should be straightforward to switch between the two. An example of the `@vercel/postgres` SDK is in the seeding section below.
 
-It looks like [node-postgres](https://github.com/brianc/node-postgres?tab=readme-ov-file) is the main non-vendor-locked `SQL` query tool for postgres, but the documentation is a little confusing. There's a few posts on how to set it up:
+It looks like the [node-postgres](https://github.com/brianc/node-postgres?tab=readme-ov-file) documentation is a little confusing. There's a few posts on how to set it up:
 
 - [How to use PostgreSQL database in Next.js apps](https://www.simplenextjs.com/posts/next-postgresql)
 - [How to set up Next.js with Node Postgres](https://ethanmick.com/how-to-set-up-next-js-with-node-postgres/)
 - [Writing Database Functions using Next.js, TypeScript, and PostgreSQL](https://www.linkedin.com/pulse/writing-database-functions-using-nextjs-typescript-postgresql-milne)
 
-There's also a [node-sqlite3](https://github.com/TryGhost/node-sqlite3#README) driver. In addition, you can apparently do [raw SQL queries with Prisma](https://www.prisma.io/docs/orm/prisma-client/queries/raw-database-access/raw-queries) and [raw SQL queries with Drizzle](https://orm.drizzle.team/docs/sql#sqlraw).
+There's also a [better-sqlite3](https://www.npmjs.com/package/better-sqlite3) driver. 
+
+In addition, you can do: 
+
+- [raw SQL queries with Prisma](https://www.prisma.io/docs/orm/prisma-client/queries/raw-database-access/raw-queries) 
+- [raw SQL queries with Drizzle](https://orm.drizzle.team/docs/sql#sqlraw)
+- [raw SQL queries with Kysley](https://kysely-org.github.io/kysely-apidoc/interfaces/Sql.html#raw).
 
 When doing database queries, you will want to do this through an API (route handler) to avoid exposing your database secrets to the client.
 
@@ -208,7 +214,7 @@ export default async function Page() {
 }
 ```
 
-By default, Next.js prerenders routes *Static Rendering*. With static rendering, data fetching and rendering happens on the server at build time (when you deploy) or during revalidation. So currently, if the data changes, it won't be reflected in this page.
+By default, Next.js pre-renders routes *Static Rendering*. With static rendering, data fetching and rendering happens on the server at build time (when you deploy) or during revalidation. So currently, if the data changes, it won't be reflected in this page.
 
 To make it dynamically rendered:
 
