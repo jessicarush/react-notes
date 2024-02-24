@@ -1,8 +1,19 @@
 # Databases
 
-## Table of Contents 
+## Table of Contents
 
 <!-- toc -->
+
+- [Setting up a local PostgreSQL database](#setting-up-a-local-postgresql-database)
+- [Check your new database using psql](#check-your-new-database-using-psql)
+- [Set up a Next.js app with node-postgres](#set-up-a-nextjs-app-with-node-postgres)
+- [Set up `.env`](#set-up-env)
+- [Add you database variables to your `.env`](#add-you-database-variables-to-your-env)
+- [Quick test a node-postgres connection](#quick-test-a-node-postgres-connection)
+- [Test](#test)
+- [Setting up a Next.js app with a sqlite3 database](#setting-up-a-nextjs-app-with-a-sqlite3-database)
+
+<!-- tocstop -->
 
 ## Setting up a local PostgreSQL database
 
@@ -62,8 +73,161 @@ psql -d database_name -U user_name -f path/to/your_file.sql
 
 When done type `\q` to quit from the `psql` interactive shell.
 
-## Test
+## Set up a Next.js app with node-postgres
+
+Once you have a barebones Next.js app running, install `node-postgres`:
+
+```bash
+npm install pg
+npm i --save-dev @types/pg
+```
+
+## Set up `.env`
+
+Firstly, know that Next.js will automatically look up environment variables in the following places, in order, stopping once the variable is found:
+
+- `process.env`
+- `.env.$(NODE_ENV).local`
+- `.env.local` (Not checked when `NODE_ENV` is `test`.)
+- `.env.$(NODE_ENV)`
+- `.env`
+
+So if you or a package needs to access an environment variable from your `.env`, it will happen automatically once you create the file. In fact, you will notice as soon as you create a `.env` in your root directory, the next time you `npm run dev` you should see:
+
+```bash
+ ▲ Next.js 14.1.0
+   - Local:        http://localhost:3000
+   - Environments: .env
+```
+
+As a side note, if you want to access environment vars in your code, keep in mind that these are by default, only available in server components. If you need to access a var client-side, then you must prefix it with `NEXT_PUBLIC_`. For example, my `.env` file:
+
+```bash
+TEST_ENV="my server-only environment variable"
+NEXT_PUBLIC_TEST_ENV="my public environment variable"
+```
+
+And to access them:
+
+```js
+// Can be used server-side
+const serverEnv = process.env.TEST_ENV;
+console.log('TEST_ENV:', serverEnv);
+
+// Can be used client-side
+const clientEnv = process.env.NEXT_PUBLIC_TEST_ENV;
+console.log('NEXT_PUBLIC_TEST_ENV:', clientEnv);
+```
+
+## Add you database variables to your `.env`
+
+Finally, in your `.env` file add the following variables. These will be used by the `node-postgres` client and pool instances to connect to you database. Remember to use quotes when you have spaces.
+
+```bash
+PGHOST=localhost
+PGUSER=postgres
+PGDATABASE=postgres_test_1
+PGPASSWORD="my password"
+PGPORT=5432
+```
+
+## Quick test a node-postgres connection 
+
+```tsx
+'use server';
+
+import { Client } from 'pg';
+
+export default async function One() {
+  const client = new Client();
+  await client.connect();
+
+  try {
+    const res = await client.query('SELECT $1::text as message', ['Hello world!']);
+    console.log(res.rows[0].message); // Hello world!
+  } catch (err) {
+    console.error(err);
+  } finally {
+    await client.end();
+  }
+
+  return (
+    <main>
+      <p>One.</p>
+    </main>
+  );
+}
+```
+
+-----
+
+WIP
+
+-----
+
+
+A Client instance will use environment variables for all missing values.
+
+```js
+type Config = {
+  user?: string, // default process.env.PGUSER || process.env.USER
+  password?: string or function, // default process.env.PGPASSWORD
+  host?: string, // default process.env.PGHOST
+  database?: string, // default process.env.PGDATABASE || user
+  port?: number, // default process.env.PGPORT
+  connectionString?: string, // e.g. postgres://user:password@host:5432/database
+  ssl?: any, // passed directly to node.TLSSocket, supports all tls.connect options
+  types?: any, // custom type parsers
+  statement_timeout?: number, // number of milliseconds before a statement in query will time out, default is no timeout
+  query_timeout?: number, // number of milliseconds before a query call will timeout, default is no timeout
+  application_name?: string, // The name of the application that created this Client instance
+  connectionTimeoutMillis?: number, // number of milliseconds to wait for connection, default is no timeout
+  idle_in_transaction_session_timeout?: number // number of milliseconds before terminating any session with an open idle transaction, default is no timeout
+}
+```
+
+example to create a client with specific connection information:
+
+```js
+import { Client } from 'pg'
+ 
+const client = new Client({
+  host: 'my.database-server.com',
+  port: 5334,
+  database: 'database-name',
+  user: 'database-user',
+  password: 'secretpassword!!',
+})
+```
+
+also URL strings
+
+```js
+import { Pool } from 'pg';
+
+const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  ssl: true
+});
+```
 
 postgresql://username:password@host:port/database
+
+## Seeding
+
+Lastly there is one situation where we will need to use access the `.env` variables outside of Next.js: when we seed the database. For this w dotenv 
+
+```bash
+npm install dotenv --
+```
+
+```json
+{
+  "scripts": {
+    // ...
+    "seed": "node -r dotenv/config ./scripts/seed.js"
+  },
+}
+```
 
 ## Setting up a Next.js app with a sqlite3 database
