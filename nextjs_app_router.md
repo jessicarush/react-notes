@@ -666,7 +666,7 @@ export default function Navlinks(props) {
   return (
     <ul className={styles.navlinks}>
       {links.map((link) => {
-        const isActive = pathname.startsWith(link.href);
+        const isActive = pathname?.startsWith(link.href) ?? false;
 
         return (
           <li key={link.name}>
