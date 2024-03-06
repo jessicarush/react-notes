@@ -24,10 +24,9 @@ like [Prisma](https://www.prisma.io/) or [Drizzle](https://orm.drizzle.team/) or
 
 Vercel has a [@vercel/postgres SDK](https://vercel.com/docs/storage/vercel-postgres/sdk) that makes writing `SQL` queries a little easier. It uses the same API as [node-postgres](https://node-postgres.com/) so it should be straightforward to switch between the two. An example of the `@vercel/postgres` SDK is in the seeding section below.
 
-It looks like the [node-postgres](https://github.com/brianc/node-postgres?tab=readme-ov-file) documentation is a little confusing. There's a few posts on how to set it up:
+It looks like the [node-postgres](https://github.com/brianc/node-postgres?tab=readme-ov-file) documentation is a little confusing. There's posts on how to set it up:
 
 - [How to use PostgreSQL database in Next.js apps](https://www.simplenextjs.com/posts/next-postgresql)
-- [How to set up Next.js with Node Postgres](https://ethanmick.com/how-to-set-up-next-js-with-node-postgres/)
 - [Writing Database Functions using Next.js, TypeScript, and PostgreSQL](https://www.linkedin.com/pulse/writing-database-functions-using-nextjs-typescript-postgresql-milne)
 
 There's also a [better-sqlite3](https://www.npmjs.com/package/better-sqlite3) driver. 
@@ -607,7 +606,7 @@ export default async function Page({
 }
 ```
 
-The `totalPages` query function look slike:
+The `totalPages` query function looks like:
 
 ```ts 
 export async function fetchInvoicesPages(query: string) {
