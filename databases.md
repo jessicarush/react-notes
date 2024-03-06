@@ -250,12 +250,108 @@ A `Pool` instance works the same as a `Client` in that it takes a config object 
 ```ts
 import { Pool } from 'pg';
  
-const pool = new Pool()
-const res = await pool.query('SELECT NOW()')
-await pool.end()
+const pool = new Pool();
+const res = await pool.query('SELECT NOW()');
+await pool.end();
 ```
 
-The config object is defined exactly the same as shown above in `Client`.
+The above will automatically grab (connect) a client from the pool and then release it when the query is done. If you need to to do a series of sequential queries that rely on one another then you would create your own client connection and then release it yourself when your done:
+
+```ts
+import { Pool } from 'pg';
+ 
+const pool = new Pool();
+ 
+const client = await pool.connect();
+await client.query('SELECT NOW()')
+client.release()
+```
+
+In the context of PostgreSQL and most relational databases,a sequence of one or more SQL operations that need to be executed as a single, atomic unit of work, are called a transaction. With transactions, all steps should be completed successfully for the transaction to be considered successful. If any step fails, the entire operation should be undone to prevent data inconsistency. This is what you do:
+
+- Acquire a single client from the pool.
+- Start the transaction on that client.
+- Perform all operations related to the transaction using that same client.
+- Commit or roll back the transaction on that client.
+- Release the client back to the pool.
+
+The code would look like this:
+
+```js
+import { Pool } from 'pg';
+
+const pool = new Pool();
+
+async function transactionExample() {
+  const client = await pool.connect();
+  try {
+    // Start the transaction
+    await client.query('BEGIN');
+    // Perform a series of queries within the transaction
+    await client.query('SELECT NOW()');
+    // Add more queries here as needed, for example:
+    // await client.query('INSERT INTO ...');
+    // await client.query('UPDATE ...');
+
+    // Commit the transaction if all queries succeed
+    await client.query('COMMIT'); 
+  } catch (error) {
+    // Roll back the transaction on error
+    await client.query('ROLLBACK');
+    // Rethrow the error for further handling
+    throw error; 
+  } finally {
+    // Release the client back to the pool
+    client.release();
+  }
+}
+```
+
+The config object is defined exactly the same as shown above in `Client` with a few additional options:
+
+```ts
+type Config = {
+  // all valid client config options are also valid here
+  // in addition here are the pool specific configuration parameters:
+ 
+  // number of milliseconds to wait before timing out when connecting a new client
+  // by default this is 0 which means no timeout
+  connectionTimeoutMillis?: number
+ 
+  // number of milliseconds a client must sit idle in the pool and not be checked out
+  // before it is disconnected from the backend and discarded
+  // default is 10000 (10 seconds) - set to 0 to disable auto-disconnection of idle clients
+  idleTimeoutMillis?: number
+ 
+  // maximum number of clients the pool should contain
+  // by default this is set to 10.
+  max?: number
+ 
+  // Default behavior is the pool will keep clients open & connected to the backend
+  // until idleTimeoutMillis expire for each client and node will maintain a ref
+  // to the socket on the client, keeping the event loop alive until all clients are closed
+  // after being idle or the pool is manually shutdown with `pool.end()`.
+  //
+  // Setting `allowExitOnIdle: true` in the config will allow the node event loop to exit
+  // as soon as all clients in the pool are idle, even if their socket is still open
+  // to the postgres server. This can be handy in scripts & tests
+  // where you don't want to wait for your clients to go idle before your process exits.
+  allowExitOnIdle?: boolean
+}
+```
+
+One last piece of the puzzle I haven't quite sorted out:
+
+> Calling `pool.end` will drain the pool of all active clients, disconnect them, and shut down any internal timers in the pool. It is common to call this at the end of a script using the pool or when your process is attempting to shut down cleanly.
+
+```js
+import { Pool } from 'pg';
+ 
+const pool = new Pool();
+await pool.end();
+```
+
+See the server cleanup section below.
 
 ### Querying
 
@@ -421,7 +517,7 @@ To run the script we will need to use access the `.env` variables outside of Nex
 npm install dotenv --save-dev
 ```
 
-Then add a script to yout `package.json`:
+Then add a script to your `package.json`:
 
 ```json
 {
@@ -435,6 +531,8 @@ Then add a script to yout `package.json`:
 Then run `npm run seed`.
 
 You should be able to see your new tables in pgAdmin 4. You can also view the data by right-clicking on the table and choosing `View/Edit Data`.
+
+### Fetch data using pool
 
 
 ### Server actions using pool
@@ -453,16 +551,34 @@ WIP
 
 
 
+### Graceful Shutdowns 
 
+Graceful Shutdown: You've already noted the importance of gracefully shutting down the pool. Implementing a graceful shutdown is crucial for long-running applications to release resources properly. This can be done by listening to process termination signals (like SIGINT and SIGTERM) and then calling pool.end().
 
 
 ### Server Cleanup 
+
+What I need is [Manual Graceful Shutdowns](https://nextjs.org/docs/pages/building-your-application/deploying#manual-graceful-shutdowns) in App Router, but it doesn't seem to exist.
+
+I found these github issues:
+
+- [Docs: App Router docs for gracefully handling shutdowns still requires pages/_document.js #51404](https://github.com/vercel/next.js/issues/51404): No solution, no activity. Someone mentions using a `server.js` instead of `pages/_document.js`. This `server.js` appears to be yet another Pages Router section that is missing in the App Router docs: [Configuring > Custom Server](https://nextjs.org/docs/pages/building-your-application/configuring/custom-server).
+- [Manual Graceful shutdowns do not work #56810](https://github.com/vercel/next.js/issues/56810): Has been marked as resolved even though the solution thread seems to be pages router based again.
+- [Add NEXT_MANUAL_SIG_HANDLE handling to start-server.ts](https://github.com/vercel/next.js/pull/59117): The "solution" to the above issue #56810. It is a pages router fix not an app router solution.
+
+Regarding a custom `server.js`:
+
+- This article talks about creating a custom server (and server.js) with express: [Next.js Custom Server with Node.js](https://louispetrik.medium.com/next-js-custom-server-e1011c4142c9)
+- This video talks about deploying: [How to Deploy a Next.js app to a Custom Server - NOT Vercel!](https://www.youtube.com/watch?v=HIb4Ucs_foQ)
+
+
+Chat GPT:
 
 Particularly when not using connection pooling, but even with it, ensure that your application correctly handles shutdowns and cleans up resources. This includes ending pool connections when your application exits.
 
 Handling Pool Shutdown in Next.js
 
-    For Development: Generally, you don't need to manually shut down the pool, especially in a serverless production environment. However, in a development environment or if you're running a Next.js custom server (next start or a Node.js server script that uses next), you might want to properly close the pool when the server process is terminated. This can be achieved with process event listeners like SIGINT, but it's more relevant when you have a long-running server process, not typical in standard Next.js usage.
+For Development: Generally, you don't need to manually shut down the pool, especially in a serverless production environment. However, in a development environment or if you're running a Next.js custom server (next start or a Node.js server script that uses next), you might want to properly close the pool when the server process is terminated. This can be achieved with process event listeners like SIGINT, but it's more relevant when you have a long-running server process, not typical in standard Next.js usage.
 
 How to ensure ending pool connections when your application exits?
 
@@ -478,37 +594,34 @@ process.on('SIGINT', async () => {
 
 If you plan to deploy your Next.js application on a Digital Ocean droplet (or any similar virtual server environment) and run it with npm run start, you are effectively running a Node.js server that serves your Next.js application in a more traditional server environment. This scenario is different from serverless deployments and brings your application closer to traditional web applications in terms of lifecycle management.
 
-
 If you plan to deploy your Next.js application on a Digital Ocean droplet (or any similar virtual server environment) and run it with npm run start, you are effectively running a Node.js server that serves your Next.js application in a more traditional server environment. This scenario is different from serverless deployments and brings your application closer to traditional web applications in terms of lifecycle management.
 Why Listening for SIGINT Makes Sense Here
 
 In this context, listening for SIGINT makes more sense because:
 
-    Long-running Process: Your Next.js server is a long-running process that can benefit from graceful shutdown procedures. This includes cleaning up resources like database connections or other tasks you need to ensure are handled properly before the server process exits.
+Long-running Process: Your Next.js server is a long-running process that can benefit from graceful shutdown procedures. This includes cleaning up resources like database connections or other tasks you need to ensure are handled properly before the server process exits.
 
-    Manual Interruptions and Deployments: During deployments, updates, or maintenance, you might manually stop the server using Ctrl+C or through scripts that send SIGINT or similar signals. Handling these signals allows you to ensure that your application shuts down gracefully, closing out resources like your PostgreSQL connection pool.
+Manual Interruptions and Deployments: During deployments, updates, or maintenance, you might manually stop the server using Ctrl+C or through scripts that send SIGINT or similar signals. Handling these signals allows you to ensure that your application shuts down gracefully, closing out resources like your PostgreSQL connection pool.
 
 How and Where to Implement SIGINT Handling
 
 Given your deployment strategy, you can implement SIGINT handling in the main entry point of your application or in a specific module responsible for your server's setup and resource management. Here’s a basic approach:
 
-    Identify the Main Server File: This is typically the file where you start your Next.js application with a custom server setup. For a basic Next.js setup without custom server logic, you might not have this file, but since you're considering handling SIGINT, you might be looking at adding some custom server logic.
+Identify the Main Server File: This is typically the file where you start your Next.js application with a custom server setup. For a basic Next.js setup without custom server logic, you might not have this file, but since you're considering handling SIGINT, you might be looking at adding some custom server logic.
 
-    Implement SIGINT Handling: You can add the SIGINT listener in the same file where you set up your database connection pool if you're managing it manually or in your server's main file. 
+Implement SIGINT Handling: You can add the SIGINT listener in the same file where you set up your database connection pool if you're managing it manually or in your server's main file. 
 
-    When deploying updates or making changes, gracefully stopping your server will ensure that database connections and other resources are properly closed, which can help prevent issues related to resource leaks or locked connections.
+When deploying updates or making changes, gracefully stopping your server will ensure that database connections and other resources are properly closed, which can help prevent issues related to resource leaks or locked connections.
 
-    Ensure that any other resources (like file streams, external API connections, etc.) are also gracefully handled in your shutdown procedure.
+Ensure that any other resources (like file streams, external API connections, etc.) are also gracefully handled in your shutdown procedure.
 
-    How PM2 Manages Graceful Shutdown
+How PM2 Manages Graceful Shutdown
 
 PM2 sends a SIGINT signal to your application when stopping it, which is the standard signal for interrupting a process. Your application can listen for this signal to initiate a graceful shutdown, including closing database connections, saving state, or cleaning up resources before the process exits.
 
 PM2 Configuration: When using PM2, you can specify how your application should be started, including setting up instances, watch mode, and more in an ecosystem configuration file (ecosystem.config.js or similar). PM2 automatically handles the rest, including restarting your application if it crashes and gracefully stopping it when required.
 
 Using PM2 to Stop/Reload Your Application: To stop or reload your application gracefully, you would use PM2 commands. For example, to reload your application (which allows current connections to finish before restarting), you can use:
-
-arduino
 
 pm2 reload ecosystem.config.js
 
