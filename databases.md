@@ -15,7 +15,9 @@
   * [Pool](#pool)
   * [Querying](#querying)
   * [Seeding using client](#seeding-using-client)
+  * [Fetch data using pool](#fetch-data-using-pool)
   * [Server actions using pool](#server-actions-using-pool)
+  * [Graceful Shutdowns](#graceful-shutdowns)
   * [Server Cleanup](#server-cleanup)
 - [Setting up a Next.js app with a sqlite3 database](#setting-up-a-nextjs-app-with-a-sqlite3-database)
 
@@ -263,7 +265,7 @@ import { Pool } from 'pg';
 const pool = new Pool();
  
 const client = await pool.connect();
-await client.query('SELECT NOW()')
+const res = await client.query('SELECT NOW()')
 client.release()
 ```
 
