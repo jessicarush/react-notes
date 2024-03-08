@@ -257,7 +257,7 @@ const updateName = e => setName(e.target.value);
 
 Or inline arrow function:
 
-```javascript
+```jsx
 input
   type="text"
   value={ name }
