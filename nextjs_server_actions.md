@@ -17,7 +17,9 @@
 - [Validation](#validation)
 - [Client-side validation](#client-side-validation)
 - [Server-side validation](#server-side-validation)
+- [Resetting form fields](#resetting-form-fields)
 - [Headers](#headers)
+- [Resources](#redources)
 
 <!-- tocstop -->
 
@@ -577,6 +579,39 @@ When the form is submitted with empty fields:
 }
 ```
 
+## Resetting form fields
+
+
+TODO...
+
+```tsx
+'use client';
+
+import { useRef } from 'react';
+import { useFormState } from 'react-dom';
+import { addItem } from '@/app/_lib/actions';
+
+function ItemAdd() {
+  const ref = useRef<HTMLFormElement>(null);
+  const initialState = { message: null, errors: {} };
+  const [state, dispatch] = useFormState(addItem, initialState);
+
+  return (
+    <form ref={ref} action={async (formData) => {
+      await dispatch(formData)
+      ref.current?.reset()
+    }}>
+      // ...
+    </form>
+  );
+}
+
+export default ItemAdd;
+```
+
+see also robins progressive enhancement solution: https://www.robinwieruch.de/next-forms/
+
+
 ## Headers
 
 You can read incoming request headers such as cookies and headers within a Server Action.
@@ -611,3 +646,7 @@ export async function create(data) {
   })
 }
 ```
+
+## Resources 
+
+- [Exploring Next.js Forms with Server Actions - Robin Wieruch](https://www.robinwieruch.de/next-forms/)
