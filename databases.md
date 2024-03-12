@@ -17,7 +17,6 @@
   * [Seeding using client](#seeding-using-client)
   * [Fetch data using pool](#fetch-data-using-pool)
   * [Server actions using pool](#server-actions-using-pool)
-  * [Graceful Shutdowns](#graceful-shutdowns)
   * [Server Cleanup](#server-cleanup)
 - [Setting up a Next.js app with a sqlite3 database](#setting-up-a-nextjs-app-with-a-sqlite3-database)
 
@@ -253,6 +252,7 @@ A `Pool` instance works the same as a `Client` in that it takes a config object 
 import { Pool } from 'pg';
  
 const pool = new Pool();
+
 const res = await pool.query('SELECT NOW()');
 await pool.end();
 ```
@@ -353,7 +353,7 @@ const pool = new Pool();
 await pool.end();
 ```
 
-See the server cleanup section below.
+See the [server cleanup section](#server-cleanup) below.
 
 ### Querying
 
@@ -536,35 +536,226 @@ You should be able to see your new tables in pgAdmin 4. You can also view the da
 
 ### Fetch data using pool
 
+`app/_lib/database.ts`:
+
+```ts
+import { Pool } from 'pg';
+
+const pool: Pool = new Pool({
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  host: process.env.PGHOST,
+  database: process.env.PGDATABASE,
+  port: parseInt(process.env.PGPORT || '5432', 10)
+});
+
+export default pool;
+```
+
+`app/_lib/definitions.ts`:
+
+```ts
+export type Item = {
+  id: number;
+  name: string;
+  quantity: number;
+  date: string;
+}
+```
+
+`app/_lib/fetch-data.ts`:
+
+```ts
+import { unstable_noStore as noStore } from 'next/cache';
+// This would be needed if we had a fetchItem function
+// import { notFound } from 'next/navigation';
+// import { QueryResult } from 'pg';
+import pool from '@/app/_lib/database';
+import type { Item } from '@/app/_lib/definitions';
+
+export async function fetchItems(): Promise<Item[]> {
+  noStore();
+
+  try {
+    // const result: QueryResult<Item> = await pool.query(`SELECT * FROM items;`);
+    const result = await pool.query(`SELECT * FROM items;`);
+    return result.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch items.');
+  }
+}
+```
+
+In my component:
+
+```tsx
+import ItemList from '@/app/_ui/ItemList';
+import { fetchItems } from '@/app/_lib/fetch-data';
+
+export default async function Home() {
+  const items = await fetchItems();
+
+  return (
+    <main>
+      <ItemList items={items} />
+    </main>
+  );
+}
+```
 
 ### Server actions using pool
 
+Since we're dealing with forms here, we have a whole nunch of code related to validation and response messaging. See [nextjs_server_actions.md]() for more explantaion on that stuff.
 
------
+`@/app/_lib/actions.ts`:
 
-WIP
+```ts
+'use server';
 
------
+import { revalidatePath } from 'next/cache';
+// Use this if you want to redirect after revalidatePath
+// import { redirect } from 'next/navigation';
+import type { FormState } from '@/app/_lib/definitions';
+import { ItemFormSchema } from '@/app/_lib/form-validation-schemas';
+import pool from '@/app/_lib/database';
 
 
+const AddItem = ItemFormSchema.omit({ id: true, date: true });
 
+export async function addItem(prevState: FormState, formData: FormData): Promise<FormState> {
+  // Extract the data from the formData object.
+  const rawFormData = {
+    name: formData.get('name'),
+    quantity: formData.get('quantity')
+  };
 
+  // Validate form fields with Zod
+  const validatedFields = AddItem.safeParse(rawFormData);
 
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      status: 'ERROR' as const,
+      message: 'Missing Fields. Failed to add item.',
+      errors: validatedFields.error.flatten().fieldErrors,
+      timestamp: Date.now(),
+    };
+  }
 
+  // Prepare data for insertion into the database
+  const { name, quantity } = validatedFields.data;
+  const date = new Date().toISOString().split('T')[0];
+  const values = [name, quantity, date];
 
+  // Insert the data and handle any errors.
+  try {
+    await pool.query(`
+      INSERT INTO items (name, quantity, date)
+      VALUES ($1, $2, $3);
+    `, values);
+  } catch (error) {
+    return {
+      status: 'ERROR' as const,
+      message: 'Database Error: Failed to add item.',
+      errors: {},
+      timestamp: Date.now(),
+    };
+  }
 
-### Graceful Shutdowns 
+  // Revalidate the cache
+  revalidatePath('/');
+  return {
+    status: 'SUCCESS' as const,
+    message: 'Item added.',
+    errors: {},
+    timestamp: Date.now(),
+  };
+}
+```
 
-Graceful Shutdown: You've already noted the importance of gracefully shutting down the pool. Implementing a graceful shutdown is crucial for long-running applications to release resources properly. This can be done by listening to process termination signals (like SIGINT and SIGTERM) and then calling pool.end().
+`app/_lib/database.ts` is shown above. For completenees here is `FormState` and `ItemFormSchema`, which are needed for `useFormState` messaging and form validation:
 
+```ts 
+export type FormState = {
+  status: 'UNSET' | 'SUCCESS' | 'ERROR';
+  message: string;
+  errors: {
+    name?: string[];
+    quantity?: string[];
+  };
+  timestamp: number;
+};
+```
+
+```ts
+import { z } from 'zod';
+
+// Form validation using Zod.
+// Messages are sent back to the form via the state from useFormState.
+const ItemFormSchema = z.object({
+  id: z.number(),
+  name: z
+    .string({
+      required_error: 'Enter an item.',
+      invalid_type_error: 'Enter an item name.'
+    })
+    .trim()
+    .min(1, { message: 'Item name is required.' })
+    .max(128, { message: 'Item names can be max 128 characters.' }),
+  quantity: z.coerce
+    .number({
+      required_error: 'Quantity is required.',
+      invalid_type_error: 'Quantity must be a number.'
+    })
+    .int({ message: 'Quantity must be an integer.' })
+    .gt(0, { message: 'Enter a quantity greater than 0.' }),
+  date: z.string()
+});
+
+export { ItemFormSchema };
+```
 
 ### Server Cleanup 
 
-What I need is [Manual Graceful Shutdowns](https://nextjs.org/docs/pages/building-your-application/deploying#manual-graceful-shutdowns) in App Router, but it doesn't seem to exist.
+It is hinted [in the node-postgres docs](https://node-postgres.com/apis/pool#poolend) and as well I am told by ChatGPT, that I need to make sure call `pool.end()` when my application shuts down to close all the connections in the pool.
 
-I found these github issues:
+> Generally, you don't need to manually shut down the pool, especially in a serverless production environment. However, in a development environment or if you're running a Next.js custom server (next start or a Node.js server script that uses next), you might want to properly close the pool when the server process is terminated. This can be achieved with process event listeners like SIGINT.
 
-- [Docs: App Router docs for gracefully handling shutdowns still requires pages/_document.js #51404](https://github.com/vercel/next.js/issues/51404): No solution, no activity. Someone mentions using a `server.js` instead of `pages/_document.js`. This `server.js` appears to be yet another Pages Router section that is missing in the App Router docs: [Configuring > Custom Server](https://nextjs.org/docs/pages/building-your-application/configuring/custom-server).
+Implementing a *graceful shutdown* is crucial for long-running applications to release resources properly, which can help prevent issues related to resource leaks or locked connections. This can be done by listening to process termination signals (like `SIGINT` and `SIGTERM`) and then calling `pool.end()`.
+
+```js
+process.on('SIGINT', async () => {
+  await pool.end();
+  console.log('Pool has ended');
+  process.exit(0);
+});
+```
+
+If you plan to deploy your Next.js application on a Digital Ocean droplet (or any similar virtual server environment) and run it with `npm run start`, you are effectively running a Node.js server that serves your Next.js application in a more traditional server environment. This scenario is different from serverless deployments and brings your application closer to traditional web applications in terms of lifecycle management.
+
+In this context, listening for `SIGINT` makes more sense because:
+
+Long-running Process: Your Next.js server is a long-running process that can benefit from graceful shutdown procedures. This includes cleaning up resources like database connections or other tasks you need to ensure are handled properly before the server process exits.
+
+Manual Interruptions and Deployments: During deployments, updates, or maintenance, you might manually stop the server using `Ctrl+C` or through scripts that send `SIGINT` or similar signals. Handling these signals allows you to ensure that your application shuts down gracefully, closing out resources like your PostgreSQL connection pool.
+
+You can implement `SIGINT` handling in the main entry point of your application or in a specific module responsible for your server's setup and resource management. Here’s a basic approach:
+
+Identify the Main Server File: This is typically the file where you start your Next.js application with a custom server setup. For a basic Next.js setup without custom server logic, you won't have this file, so you might be looking at adding some custom server logic.
+
+**There's no solution/documentation yet for App Router**
+
+In the Next.js docs for Pages Router, there are two sections that are exactly what I'm looking for to solve this problem:
+
+- [Deploying > Manual Graceful Shutdowns](https://nextjs.org/docs/pages/building-your-application/deploying#manual-graceful-shutdowns)
+- [Configuring > Custom Server](https://nextjs.org/docs/pages/building-your-application/configuring/custom-server)
+
+Both of these would work however, both sections are missing from the App Router documentation.
+
+Regarding manual graceful shutdowns, I found these github issues:
+
+- [Docs: App Router docs for gracefully handling shutdowns still requires pages/_document.js #51404](https://github.com/vercel/next.js/issues/51404): No solution, no activity. Someone mentions using a `server.js` instead of `pages/_document.js`. This `server.js` appears to be yet another Pages Router section that is missing in the App Router docs: [Custom Server](https://nextjs.org/docs/pages/building-your-application/configuring/custom-server).
 - [Manual Graceful shutdowns do not work #56810](https://github.com/vercel/next.js/issues/56810): Has been marked as resolved even though the solution thread seems to be pages router based again.
 - [Add NEXT_MANUAL_SIG_HANDLE handling to start-server.ts](https://github.com/vercel/next.js/pull/59117): The "solution" to the above issue #56810. It is a pages router fix not an app router solution.
 
@@ -572,59 +763,5 @@ Regarding a custom `server.js`:
 
 - This article talks about creating a custom server (and server.js) with express: [Next.js Custom Server with Node.js](https://louispetrik.medium.com/next-js-custom-server-e1011c4142c9)
 - This video talks about deploying: [How to Deploy a Next.js app to a Custom Server - NOT Vercel!](https://www.youtube.com/watch?v=HIb4Ucs_foQ)
-
-
-Chat GPT:
-
-Particularly when not using connection pooling, but even with it, ensure that your application correctly handles shutdowns and cleans up resources. This includes ending pool connections when your application exits.
-
-Handling Pool Shutdown in Next.js
-
-For Development: Generally, you don't need to manually shut down the pool, especially in a serverless production environment. However, in a development environment or if you're running a Next.js custom server (next start or a Node.js server script that uses next), you might want to properly close the pool when the server process is terminated. This can be achieved with process event listeners like SIGINT, but it's more relevant when you have a long-running server process, not typical in standard Next.js usage.
-
-How to ensure ending pool connections when your application exits?
-
-To gracefully shut down and release all the resources held by a connection pool when your application exits, you can listen to global events such as SIGINT (which is sent to terminate the process, for example, when you press Ctrl+C in the terminal) and then call pool.end() to close all the connections in the pool:
-
-javascript
-
-process.on('SIGINT', async () => {
-  await pool.end();
-  console.log('Pool has ended');
-  process.exit(0);
-});
-
-If you plan to deploy your Next.js application on a Digital Ocean droplet (or any similar virtual server environment) and run it with npm run start, you are effectively running a Node.js server that serves your Next.js application in a more traditional server environment. This scenario is different from serverless deployments and brings your application closer to traditional web applications in terms of lifecycle management.
-
-If you plan to deploy your Next.js application on a Digital Ocean droplet (or any similar virtual server environment) and run it with npm run start, you are effectively running a Node.js server that serves your Next.js application in a more traditional server environment. This scenario is different from serverless deployments and brings your application closer to traditional web applications in terms of lifecycle management.
-Why Listening for SIGINT Makes Sense Here
-
-In this context, listening for SIGINT makes more sense because:
-
-Long-running Process: Your Next.js server is a long-running process that can benefit from graceful shutdown procedures. This includes cleaning up resources like database connections or other tasks you need to ensure are handled properly before the server process exits.
-
-Manual Interruptions and Deployments: During deployments, updates, or maintenance, you might manually stop the server using Ctrl+C or through scripts that send SIGINT or similar signals. Handling these signals allows you to ensure that your application shuts down gracefully, closing out resources like your PostgreSQL connection pool.
-
-How and Where to Implement SIGINT Handling
-
-Given your deployment strategy, you can implement SIGINT handling in the main entry point of your application or in a specific module responsible for your server's setup and resource management. Here’s a basic approach:
-
-Identify the Main Server File: This is typically the file where you start your Next.js application with a custom server setup. For a basic Next.js setup without custom server logic, you might not have this file, but since you're considering handling SIGINT, you might be looking at adding some custom server logic.
-
-Implement SIGINT Handling: You can add the SIGINT listener in the same file where you set up your database connection pool if you're managing it manually or in your server's main file. 
-
-When deploying updates or making changes, gracefully stopping your server will ensure that database connections and other resources are properly closed, which can help prevent issues related to resource leaks or locked connections.
-
-Ensure that any other resources (like file streams, external API connections, etc.) are also gracefully handled in your shutdown procedure.
-
-How PM2 Manages Graceful Shutdown
-
-PM2 sends a SIGINT signal to your application when stopping it, which is the standard signal for interrupting a process. Your application can listen for this signal to initiate a graceful shutdown, including closing database connections, saving state, or cleaning up resources before the process exits.
-
-PM2 Configuration: When using PM2, you can specify how your application should be started, including setting up instances, watch mode, and more in an ecosystem configuration file (ecosystem.config.js or similar). PM2 automatically handles the rest, including restarting your application if it crashes and gracefully stopping it when required.
-
-Using PM2 to Stop/Reload Your Application: To stop or reload your application gracefully, you would use PM2 commands. For example, to reload your application (which allows current connections to finish before restarting), you can use:
-
-pm2 reload ecosystem.config.js
 
 ## Setting up a Next.js app with a sqlite3 database
