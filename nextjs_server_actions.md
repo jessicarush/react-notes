@@ -19,7 +19,7 @@
 - [Server-side validation](#server-side-validation)
 - [Resetting form fields](#resetting-form-fields)
 - [Headers](#headers)
-- [Resources](#redources)
+- [Resources](#resources)
 
 <!-- tocstop -->
 
@@ -581,9 +581,6 @@ When the form is submitted with empty fields:
 
 ## Resetting form fields
 
-
-TODO...
-
 ```tsx
 'use client';
 
@@ -596,11 +593,13 @@ function ItemAdd() {
   const initialState = { message: null, errors: {} };
   const [state, dispatch] = useFormState(addItem, initialState);
 
+  const dispatchAndReset = async (formData: FormData) => {
+    await dispatch(formData);
+    ref.current?.reset();
+  };
+
   return (
-    <form ref={ref} action={async (formData) => {
-      await dispatch(formData)
-      ref.current?.reset()
-    }}>
+    <form ref={ref} action={dispatchAndReset}>
       // ...
     </form>
   );
@@ -609,8 +608,171 @@ function ItemAdd() {
 export default ItemAdd;
 ```
 
-see also robins progressive enhancement solution: https://www.robinwieruch.de/next-forms/
+This solution would not work in environments where JS is disabled. In addition, if there are field errors, the form gets reset which is not good. 
 
+A more thorough approach as seen in [Robin's progressive enhancement solution](https://www.robinwieruch.de/next-forms/):
+
+First, I need to update the `PrevState` type to include a couple more fields: `status` and `timestamp`. I also decided to call this `FormState` instead of just `State`:
+
+```ts
+export type FormState = {
+  status: 'UNSET' | 'SUCCESS' | 'ERROR';
+  message: string;
+  errors: {
+    name?: string[];
+    quantity?: string[];
+  };
+  timestamp: number;
+};
+```
+
+We also need to make sure the `initialState` passed to `useFormState` has the same fields:
+
+```ts
+export const initialFormState: FormState = {
+  status: 'UNSET' as const,
+  message: '',
+  errors: {},
+  timestamp: Date.now(),
+};
+```
+
+I also modified all the actions to make sure they always return this type of object. Note I've switcjed to `node-postgres` here:
+
+```ts
+export async function addItem(prevState: FormState, formData: FormData): Promise<FormState> {
+  // Extract the data from the formData object.
+  const rawFormData = {
+    name: formData.get('name'),
+    quantity: formData.get('quantity')
+  };
+
+  // Validate form fields with Zod
+  const validatedFields = AddItem.safeParse(rawFormData);
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      status: 'ERROR' as const,
+      message: 'Missing Fields. Failed to add item.',
+      errors: validatedFields.error.flatten().fieldErrors,
+      timestamp: Date.now(),
+    };
+  }
+
+  // Prepare data for insertion into the database
+  const { name, quantity } = validatedFields.data;
+  const date = new Date().toISOString().split('T')[0];
+  const values = [name, quantity, date];
+
+  // Insert the data and handle any errors.
+  try {
+    await pool.query(`
+      INSERT INTO items (name, quantity, date)
+      VALUES ($1, $2, $3);
+    `, values);
+  } catch (error) {
+    return {
+      status: 'ERROR' as const,
+      message: 'Database Error: Failed to add item.',
+      errors: {},
+      timestamp: Date.now(),
+    };
+  }
+
+  // Revalidate the cache
+  revalidatePath('/');
+  return {
+    status: 'SUCCESS' as const,
+    message: 'Item added.',
+    errors: {},
+    timestamp: Date.now(),
+  };
+}
+```
+
+Then we make a form reset hook:
+
+```ts
+import { useRef, useEffect } from 'react';
+import type { FormState } from '@/app/_lib/definitions';
+
+const useFormReset = (formState: FormState) => {
+  const formRef = useRef<HTMLFormElement>(null);
+  const prevTimestamp = useRef(formState.timestamp);
+
+  useEffect(() => {
+    if (!formRef.current) return;
+    if (formState.status === 'SUCCESS' && formState.timestamp !== prevTimestamp.current) {
+      formRef.current.reset();
+      prevTimestamp.current = formState.timestamp;
+    }
+  }, [formState.status, formState.timestamp]);
+
+  return formRef;
+};
+
+export { useFormReset };
+```
+
+Then in the form, we call the hook and pass the result to the form `ref`:
+
+```tsx
+'use client';
+
+import { useFormState } from 'react-dom';
+import { initialFormState } from '@/app/_lib/utils';
+import { addItem } from '@/app/_lib/actions';
+import { useFormReset } from '@/app/_hooks/useFormReset';
+
+function ItemAdd() {
+  const [state, dispatch] = useFormState(addItem, initialFormState);
+  const formRef = useFormReset(state);
+
+  return (
+    <div className='ItemAdd'>
+      <form ref={formRef} action={dispatch}>
+      // ...
+```
+
+I used teh same pattern in a case were instead of clearing the form on a successful submit, I wanted to update state:
+
+```tsx
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { useFormState } from 'react-dom';
+import { initialFormState } from '@/app/_lib/utils';
+import { updateItem } from '@/app/_lib/actions';
+import type { Item } from '@/app/_lib/definitions';
+
+type Props = {
+  item: Item;
+  editItem: (id: null) => void; // <- updates state
+};
+
+function ItemEdit({ item, editItem }: Props) {
+  // Bind in order to pass args to the server action
+  const updateItemWithId = updateItem.bind(null, item.id);
+  const [state, dispatch] = useFormState(updateItemWithId, initialFormState);
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const prevTimestamp = useRef(state.timestamp);
+
+  useEffect(() => {
+    if (!formRef.current) return;
+    if (state.status === 'SUCCESS' && state.timestamp !== prevTimestamp.current) {
+      editItem(null);
+      prevTimestamp.current = state.timestamp;
+    }
+  }, [state.status, state.timestamp, editItem]);
+
+
+  return (
+    <div className='ItemEdit'>
+      <form action={dispatch} ref={formRef}>
+      // ...
+```
 
 ## Headers
 
