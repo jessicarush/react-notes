@@ -35,6 +35,7 @@ A list of react packages/libraries that I've used.
 - [react-icons](#react-icons)
 - [use-debounce](#use-debounce)
 - [zod](#zod)
+- [react-hot-toast](#react-hot-toast)
 
 <!-- tocstop -->
 
@@ -700,3 +701,12 @@ npm install zod
 
 See the [Validate and prepare the data to be inserted into your database](#validate-and-prepare-the-data-to-be-inserted-into-your-database) section in [nextjs_server_actions.md](nextjs_server_actions.md) for example usage.
 
+## react-hot-toast 
+
+[react-hot-toast](https://react-hot-toast.com/) is a little lbrary for React notifications (flashed messages).
+
+```bash 
+npm install react-hot-toast
+```
+
+See [nextjs_server_actions.md](nextjs_server_actions.md) for an example.
