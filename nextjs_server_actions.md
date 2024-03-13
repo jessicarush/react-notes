@@ -637,7 +637,7 @@ export const initialFormState: FormState = {
 };
 ```
 
-I also modified all the actions to make sure they always return this type of object. Note I've switcjed to `node-postgres` here:
+I also modified all the actions to make sure they always return this type of object. Note I've switched to `node-postgres` here:
 
 ```ts
 export async function addItem(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -735,7 +735,7 @@ function ItemAdd() {
       // ...
 ```
 
-I used teh same pattern in a case were instead of clearing the form on a successful submit, I wanted to update state:
+I used the same pattern in a case were instead of clearing the form on a successful submit, I wanted to update state:
 
 ```tsx
 'use client';
@@ -772,6 +772,113 @@ function ItemEdit({ item, editItem }: Props) {
     <div className='ItemEdit'>
       <form action={dispatch} ref={formRef}>
       // ...
+```
+
+## Adding toast messages 
+
+In addition to displaying field `errors` using Zod's schema parsing, we can also show the general `message` to the user, for example when something was successfully created, deleted, updated or when something went wrong.
+
+```ts
+export type FormState = {
+  status: 'UNSET' | 'SUCCESS' | 'ERROR';
+  message: string;  // Display with toast
+  errors: {
+    name?: string[]; 
+    quantity?: string[];
+  };
+  timestamp: number;
+};
+```
+
+Install:
+
+```bash 
+npm install react-hot-toast
+```
+
+Create a new component which will be used as a provider for the toast messages:
+
+```tsx
+'use client';
+
+import { Toaster } from 'react-hot-toast';
+
+type Props = {
+  children: React.ReactNode;
+};
+
+export default function ToastProvider({children}: Props) {
+  return (
+    <>
+      {children}
+      <Toaster />
+    </>
+  );
+}
+```
+
+> There may be the question about why we didn't use the <Toaster> directly in the RootLayout. The reason is that the Toaster is a third-party component from a library which is not declared as client component (yet) within the library but should be declared as client component in this new paradigm of RSCs, because it makes use of React's useContext Hook. Hence we created our own wrapper component Provider for it, where we declared the component as client component, and thus all child components of it become automatically client components too. [Source](https://www.robinwieruch.de/next-forms/)
+
+Add the new Provider to the `RootLayout`:
+
+```tsx
+// ...
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html
+      lang="en"
+      className={`${main_font.variable} ${mono_font.variable} ${alt_font.variable}`}>
+      <body>
+        <Navbar />
+        <ToastProvider>{children}</ToastProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+Use React's useEffect Hook to show the toast message where the status determines whether the message is a styled success or error message. We also use a the timestamp to make sure the hook runs again, even when the message hasn't changed. Put this in a reusable hook:
+
+```tsx
+import { useRef, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
+import { FormState } from '@/app/_lib/definitions';
+
+const useToastMessage = (formState: FormState) => {
+  const prevTimestamp = useRef(formState.timestamp);
+  const showToast = formState.message && formState.timestamp !== prevTimestamp.current;
+
+  useEffect(() => {
+    if (showToast) {
+      if (formState.status === 'ERROR') {
+        toast.error(formState.message);
+      } else {
+        toast.success(formState.message);
+      }
+
+      prevTimestamp.current = formState.timestamp;
+    }
+  }, [formState, showToast]);
+};
+
+export { useToastMessage };
+```
+
+Use the new custom hook in the form component and provide it with the form state:
+
+```tsx
+'use client';
+// ...
+import { useToastMessage } from '@/app/_hooks/useToastMessage';
+
+
+function ItemAdd() {
+  const [state, dispatch] = useFormState(addItem, initialFormState);
+  // Toast hook will display general state.message from our server actions
+  useToastMessage(state);
+
+  // ...
 ```
 
 ## Headers
