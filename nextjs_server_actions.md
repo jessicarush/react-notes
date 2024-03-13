@@ -18,6 +18,7 @@
 - [Client-side validation](#client-side-validation)
 - [Server-side validation](#server-side-validation)
 - [Resetting form fields](#resetting-form-fields)
+- [Adding toast messages](#adding-toast-messages)
 - [Headers](#headers)
 - [Resources](#resources)
 
