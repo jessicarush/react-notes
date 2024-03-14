@@ -19,6 +19,7 @@
 - [Server-side validation](#server-side-validation)
 - [Resetting form fields](#resetting-form-fields)
 - [Adding toast messages](#adding-toast-messages)
+- [Actions can be called outside of forms](#actions-can-be-called-outside-of-forms)
 - [Headers](#headers)
 - [Resources](#resources)
 
@@ -880,6 +881,116 @@ function ItemAdd() {
   useToastMessage(state);
 
   // ...
+```
+
+## Actions can be called outside of forms
+
+Imagine I have item components that contain their own delete button that calls a server action that deletes the given item from the database, then revalidates the path, updating the UI.
+
+```ts
+export async function deleteItem(id: number): Promise<FormState> {
+  const values = [id];
+  try {
+    await pool.query(`DELETE FROM items WHERE id = $1;`, values);
+    revalidatePath('/');
+    return {
+      status: 'SUCCESS' as const,
+      message: 'Item deleted.',
+      errors: {},
+      timestamp: Date.now(),
+    };
+  } catch (error) {
+    return {
+      status: 'ERROR' as const,
+      message: 'Database Error. Failed to Delete Item.',
+      errors: {},
+      timestamp: Date.now(),
+    };
+  }
+}
+```
+
+This works great until I decide I want to display the returned message on successful delete. The problem is that on `revalidatePath` the form and is associated `useFormSatus` no longer exist to receivethe message and call `toast.success`. The solution here is to call the server action in a parent component, and pass the handler down to the item component:
+
+```tsx
+'use client';
+// ...
+import { deleteItem } from "@/app/_lib/actions";
+import { toast } from 'react-hot-toast';
+
+// ...
+
+export default function ItemList({ items }: Props) {
+  // ...
+  const removeItem = async (id: number) => {
+    const res = await deleteItem(id);
+    if (res.status === 'SUCCESS') {
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
+    }
+  };
+
+  return (
+    <div className='ItemList'>
+      <p>Items:</p>
+      {items.map((item) => {
+        const isEditable = item.id === editableItemId;
+
+        return (
+          <div key={item.id} className='ItemList__item'>
+            {isEditable ? (
+              <ItemEdit item={item} editItem={editItem} />
+            ) : (
+              <ItemView item={item} editItem={editItem} deleteItem={removeItem} />
+            )}
+          </div>
+        );
+      })}
+      <ItemAdd />
+    </div>
+  );
+}
+```
+
+Then in my item component:
+
+```tsx
+'use client';
+
+import { formatDateToLocal } from '@/app/_lib/utils';
+import { DeleteButton, EditButton } from '@/app/_ui/ItemButtons';
+import type { Item } from '@/app/_lib/definitions';
+
+type Props = {
+  item: Item;
+  editItem: (id: number) => void;
+  deleteItem: (id: number) => void;
+  // children: React.ReactElement;
+};
+
+function ItemView({ item, editItem, deleteItem }: Props) {
+
+  const handleEditItem = () => {
+    editItem(item.id);
+  };
+
+  const handleDeleteItem = () => {
+    deleteItem(item.id);
+  }
+
+  return (
+    <div className='ItemView' style={{ display: 'inline-flex', alignItems: 'baseline', gap: '10px' }}>
+      <span>
+        {item.name}, qty: {item.quantity}, date added: {formatDateToLocal(item.date)}
+      </span>
+      <EditButton onClick={handleEditItem} />
+      <DeleteButton onClick={handleDeleteItem} />
+    </div>
+  );
+}
+
+export default ItemView;
 ```
 
 ## Headers
