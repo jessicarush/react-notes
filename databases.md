@@ -17,8 +17,8 @@
   * [Seeding using client](#seeding-using-client)
   * [Fetch data using pool](#fetch-data-using-pool)
   * [Server actions using pool](#server-actions-using-pool)
-  * [Server Cleanup](#server-cleanup)
-- [Setting up a Next.js app with a sqlite3 database](#setting-up-a-nextjs-app-with-a-sqlite3-database)
+- [Set up a Next.js app with](#set-up-a-nextjs-app-with)
+- [Server Cleanup](#server-cleanup)
 
 <!-- tocstop -->
 
@@ -342,9 +342,7 @@ type Config = {
 }
 ```
 
-One last piece of the puzzle I haven't quite sorted out:
-
-> Calling `pool.end` will drain the pool of all active clients, disconnect them, and shut down any internal timers in the pool. It is common to call this at the end of a script using the pool or when your process is attempting to shut down cleanly.
+Calling `pool.end` will drain the pool of all active clients, disconnect them, and shut down any internal timers in the pool. It is common to call this at the end of a script using the pool or when your process is attempting to shut down cleanly.
 
 ```js
 import { Pool } from 'pg';
@@ -716,9 +714,16 @@ const ItemFormSchema = z.object({
 export { ItemFormSchema };
 ```
 
-### Server Cleanup 
 
-It is hinted [in the node-postgres docs](https://node-postgres.com/apis/pool#poolend) and as well I am told by ChatGPT, that I need to make sure call `pool.end()` when my application shuts down to close all the connections in the pool.
+
+
+## Set up a Next.js app with
+
+
+
+## Server Cleanup 
+
+In [the node-postgres docs](https://node-postgres.com/apis/pool#poolend) it says that you need to make sure call `pool.end()` when your application shuts down to close all the connections in the pool. With Kysley its `db.destroy()`.
 
 > Generally, you don't need to manually shut down the pool, especially in a serverless production environment. However, in a development environment or if you're running a Next.js custom server (next start or a Node.js server script that uses next), you might want to properly close the pool when the server process is terminated. This can be achieved with process event listeners like SIGINT.
 
@@ -732,36 +737,122 @@ process.on('SIGINT', async () => {
 });
 ```
 
-If you plan to deploy your Next.js application on a Digital Ocean droplet (or any similar virtual server environment) and run it with `npm run start`, you are effectively running a Node.js server that serves your Next.js application in a more traditional server environment. This scenario is different from serverless deployments and brings your application closer to traditional web applications in terms of lifecycle management.
+You can implement these handlers in a custom server file. First, create a `server.js` in your root directory:
 
-In this context, listening for `SIGINT` makes more sense because:
+```js
+// server.js
+const { createServer } = require('http');
+const { parse } = require('url');
+const next = require('next');
 
-Long-running Process: Your Next.js server is a long-running process that can benefit from graceful shutdown procedures. This includes cleaning up resources like database connections or other tasks you need to ensure are handled properly before the server process exits.
+const dev = process.env.NODE_ENV !== 'production';
+const hostname = 'localhost';
+const port = 3000;
+const app = next({ dev, hostname, port });
+const handle = app.getRequestHandler();
 
-Manual Interruptions and Deployments: During deployments, updates, or maintenance, you might manually stop the server using `Ctrl+C` or through scripts that send `SIGINT` or similar signals. Handling these signals allows you to ensure that your application shuts down gracefully, closing out resources like your PostgreSQL connection pool.
+app.prepare().then(() => {
+  createServer(async (req, res) => {
+    try {
+      const parsedUrl = parse(req.url, true);
+      await handle(req, res, parsedUrl);
+    } catch (err) {
+      console.error('Error occurred handling', req.url, err);
+      res.statusCode = 500;
+      res.end('internal server error');
+    }
+  }).listen(port, (err) => {
+    if (err) throw err;
+    console.log(`> Ready on http://${hostname}:${port}`);
+  });
 
-You can implement `SIGINT` handling in the main entry point of your application or in a specific module responsible for your server's setup and resource management. Here’s a basic approach:
+  process.on('SIGTERM', async () => {
+    console.log('Received SIGTERM: cleaning up');
+    // Perform your cleanup tasks here
+    process.exit(0);
+  });
 
-Identify the Main Server File: This is typically the file where you start your Next.js application with a custom server setup. For a basic Next.js setup without custom server logic, you won't have this file, so you might be looking at adding some custom server logic.
+  process.on('SIGINT', async () => {
+    console.log('Received SIGINT: cleaning up');
+    // Perform your cleanup tasks here
+    process.exit(0);
+  });
+});
+```
 
-**There's no solution/documentation yet for App Router**
+Then update your scripts in your `package.json`:
 
-In the Next.js docs for Pages Router, there are two sections that are exactly what I'm looking for to solve this problem:
+```json
+{
+  "scripts": {
+    "dev": "node server.js",
+    "build": "next build",
+    "start": "NODE_ENV=production node server.js"
+  },
+}
+```
+
+Then, create a cleanup function in your database file. You'll also have to make this a regular `.js` file. We also have to change the ES6 imports to CommonJS for the server file. Surprisingly, we can still import the `pool` in our `actions.ts` and `fetch-data.ts` using the import statement. 
+
+```js 
+// import { Pool } from 'pg';
+const { Pool } = require('pg');
+
+const pool = new Pool({
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  host: process.env.PGHOST,
+  database: process.env.PGDATABASE,
+  port: parseInt(process.env.PGPORT || '5432', 10)
+});
+
+const closePool = async () => {
+  await pool.end();
+  console.log('Database pool closed.');
+};
+
+// export default pool;
+
+module.exports = {
+  pool,
+  closePool,
+}
+```
+
+In the rest of my app:
+
+```ts
+// actions.ts 
+import { pool } from '@/app/_lib/database';
+```
+
+Then call the closePool function in your `server.js`:
+
+```js
+// server.js
+// ...
+const { pool, closePool } = require('./app/_lib/database');
+// ...
+app.prepare().then(() => {
+  // ...
+
+  process.on('SIGTERM', async () => {
+    console.log('Received SIGTERM: cleaning up');
+    // Perform your cleanup tasks here
+    await closePool();
+    process.exit(0);
+  });
+
+  process.on('SIGINT', async () => {
+    console.log('Received SIGINT: cleaning up');
+    // Perform your cleanup tasks here
+    await closePool();
+    process.exit(0);
+  });
+});
+```
+
+FYI the only information about this stuff in the Next.js docs is for Pages Router: 
 
 - [Deploying > Manual Graceful Shutdowns](https://nextjs.org/docs/pages/building-your-application/deploying#manual-graceful-shutdowns)
 - [Configuring > Custom Server](https://nextjs.org/docs/pages/building-your-application/configuring/custom-server)
-
-Both of these would work however, both sections are missing from the App Router documentation.
-
-Regarding manual graceful shutdowns, I found these github issues:
-
-- [Docs: App Router docs for gracefully handling shutdowns still requires pages/_document.js #51404](https://github.com/vercel/next.js/issues/51404): No solution, no activity. Someone mentions using a `server.js` instead of `pages/_document.js`. This `server.js` appears to be yet another Pages Router section that is missing in the App Router docs: [Custom Server](https://nextjs.org/docs/pages/building-your-application/configuring/custom-server).
-- [Manual Graceful shutdowns do not work #56810](https://github.com/vercel/next.js/issues/56810): Has been marked as resolved even though the solution thread seems to be pages router based again.
-- [Add NEXT_MANUAL_SIG_HANDLE handling to start-server.ts](https://github.com/vercel/next.js/pull/59117): The "solution" to the above issue #56810. It is a pages router fix not an app router solution.
-
-Regarding a custom `server.js`:
-
-- This article talks about creating a custom server (and server.js) with express: [Next.js Custom Server with Node.js](https://louispetrik.medium.com/next-js-custom-server-e1011c4142c9)
-- This video talks about deploying: [How to Deploy a Next.js app to a Custom Server - NOT Vercel!](https://www.youtube.com/watch?v=HIb4Ucs_foQ)
-
-## Setting up a Next.js app with a sqlite3 database
