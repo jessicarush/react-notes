@@ -837,17 +837,17 @@ await db.deleteFrom('items').where('id', '=', id).executeTakeFirst()
 
 method | description
 ------ | -----------
-`.insertInto()` |
-`.selectFrom()` | 
-`.deleteFrom()` |
-`.updateTable` | 
-`.set()` |
-`.where()` | 
-`.selectAll()` | The selectAll method generates `SELECT *`:
-`.returningAll()` | Adds a `returning *` to an insert/update/delete query on databases that support returning such as PostgreSQL.
-`.execute()` | Executes the query and returns an array of rows.
-`.executeTakeFirst()` | Executes the query and returns the first result or undefined if the query returned no result.
-`.executeTakeFirstOrThrow()` | Executes the query and returns the first result or throws if the query returned no result. By default an instance of `NoResultError` is thrown, but you can provide a custom error class, or callback as the only argument to throw a different error.
+[`.insertInto()`](https://kysely-org.github.io/kysely-apidoc/classes/Kysely.html#insertInto) | Creates an insert query. The return value of this query is an instance of InsertResult. InsertResult has the insertId field that holds the auto incremented id of the inserted row if the db returned one.
+[`.selectFrom()`](https://kysely-org.github.io/kysely-apidoc/classes/Kysely.html#selectFrom) | Creates a select query builder for the given table or tables. The tables passed to this method are built as the query's from clause.
+[`.deleteFrom()`](https://kysely-org.github.io/kysely-apidoc/classes/Kysely.html#deleteFrom) | Creates a delete query. See the `where` method for examples on how to specify a where clause for the delete operation.
+[`.updateTable`](https://kysely-org.github.io/kysely-apidoc/classes/Kysely.html#updateTable) | Creates an update query. See the `where` method for examples on how to specify a where clause for the update operation. See the `set` method for examples on how to specify the updates.
+[`.where()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#where) | Adds a `where` expression to the query. Calling this method multiple times will combine the expressions using `and`.
+[`.set()`](https://kysely-org.github.io/kysely-apidoc/classes/UpdateQueryBuilder.html#set) | Sets the values to update for an update query. This method takes an object whose keys are column names and values are values to update. In addition to the column's type, the values can be any expressions such as raw sql snippets or select queries.
+[`.selectAll()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#selectAll) | The selectAll method generates `SELECT *`:
+[`.returningAll()`](https://kysely-org.github.io/kysely-apidoc/classes/InsertQueryBuilder.html#returningAll) | Adds a `returning *` to an insert/update/delete query on databases that support returning such as PostgreSQL.
+[`.execute()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#execute) | Executes the query and returns an array of rows.
+[`.executeTakeFirst()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#executeTakeFirst) | Executes the query and returns the first result or undefined if the query returned no result.
+[`.executeTakeFirstOrThrow()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#executeTakeFirstOrThrow) | Executes the query and returns the first result or throws if the query returned no result. By default an instance of `NoResultError` is thrown, but you can provide a custom error class, or callback as the only argument to throw a different error.
 
 > `returning *` lets you perform an operation and retrieve the resulting data in a single query, rather than having to execute a separate SELECT query afterwards. For an INSERT operation, it returns the rows that were inserted, including all their columns. This is particularly useful if your table includes automatically generated values (like ids or timestamps). For an UPDATE operation, it returns the rows as they appear after the update, allowing you to see the effect of your changes directly. For a DELETE operation, it returns the rows that were deleted, which can be useful for logging or auditing purposes, or to simply confirm what data was removed.
 
