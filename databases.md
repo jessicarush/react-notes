@@ -22,7 +22,9 @@
   * [Querying](#querying-1)
   * [Fetch data using Kysely](#fetch-data-using-kysely)
 - [Server Cleanup](#server-cleanup)
-  * [Using TypeScript](#using-typescript)
+  * [Using server.js](#using-serverjs)
+  * [Using server.js](#using-serverjs-1)
+  * [Using instrumentation.ts](#using-instrumentationts)
 
 <!-- tocstop -->
 
@@ -893,6 +895,10 @@ process.on('SIGINT', async () => {
 });
 ```
 
+There are two ways that I've found so far to handle this: one is to create a `server.js` or `server.ts` file and run the app using `node` or `tsx`. The second way is using an experimental feature `instrumentation.ts`.
+
+### Using server.js
+
 You can implement these handlers in a custom server file. First, create a `server.js` in your root directory:
 
 ```js
@@ -970,7 +976,6 @@ const closePool = async () => {
 };
 
 // export default pool;
-
 module.exports = {
   pool,
   closePool,
@@ -1010,12 +1015,7 @@ app.prepare().then(() => {
 });
 ```
 
-FYI the only information about this stuff in the Next.js docs is for Pages Router: 
-
-- [Deploying > Manual Graceful Shutdowns](https://nextjs.org/docs/pages/building-your-application/deploying#manual-graceful-shutdowns)
-- [Configuring > Custom Server](https://nextjs.org/docs/pages/building-your-application/configuring/custom-server)
-
-### Using TypeScript
+### Using server.js
 
 If your database file needs to be TypeScript, then we need to make a few changes.
 
@@ -1080,12 +1080,71 @@ Update the `package.json` scripts to use `tsx`:
 ```json 
 {
   "scripts": {
-    "dev": "ts-node server.js",
+    "dev": "npx tsx ./server.ts",
     "build": "next build",
-    "start": "NODE_ENV=production ts-node server.js"
+    "start": "NODE_ENV=production npx tsx ./server.ts"
   },
 }
 ```
 
 Note, we use `npx tsx ...` because `tsx` is installed locally (`npx` is part of `npm` which comes with `node`). If you install `tsx` globally (`npm install --global tsx`) then you can call `tsx` directly `tsx ...`.
+
+### Using instrumentation.ts
+
+This last method is considered an experimental feature (for now at least). See [Instrumentation](https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation) in the docs.
+
+First, enable the feature in your `next.config.mjs`:
+
+```js
+const nextConfig = {
+  // To enable instrumentation.js which has our process listeners for db cleanup code.
+  experimental: {
+    instrumentationHook: true,
+  },
+};
+
+export default nextConfig;
+```
+
+Then create `instrumentation.ts` in your root folder (same level as `app` directory):
+
+```ts
+export async function register() {
+  console.log('Instrumentation: running');
+
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    console.log('Instrumentation: running in node');
+
+    const { db } = await import('./app/_lib/database');
+
+    if (process.env.NEXT_MANUAL_SIG_HANDLE) {
+      process.on('SIGTERM', async () => {
+        console.log('Received SIGTERM: cleaning up')
+        // Perform your cleanup tasks here
+        await db.destroy();
+        process.exit(0)
+      })
+      process.on('SIGINT', async () => {
+        console.log('Received SIGINT: cleaning up')
+        // Perform your cleanup tasks here
+        await db.destroy();
+        process.exit(0)
+      })
+    }
+  }
+}
+```
+
+Then update your scripts in `package.json`:
+
+```json
+{
+  "scripts": {
+    "dev": "NEXT_MANUAL_SIG_HANDLE=true next dev",
+    "start": "NEXT_MANUAL_SIG_HANDLE=true next start",
+    // ...
+  }
+}
+```
+
 
