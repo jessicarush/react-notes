@@ -845,7 +845,8 @@ method | description
 [`.updateTable`](https://kysely-org.github.io/kysely-apidoc/classes/Kysely.html#updateTable) | Creates an update query. See the `where` method for examples on how to specify a where clause for the update operation. See the `set` method for examples on how to specify the updates.
 [`.where()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#where) | Adds a `where` expression to the query. Calling this method multiple times will combine the expressions using `and`.
 [`.set()`](https://kysely-org.github.io/kysely-apidoc/classes/UpdateQueryBuilder.html#set) | Sets the values to update for an update query. This method takes an object whose keys are column names and values are values to update. In addition to the column's type, the values can be any expressions such as raw sql snippets or select queries.
-[`.selectAll()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#selectAll) | The selectAll method generates `SELECT *`:
+[`.select()`]() | Adds a select statement to the query e.g `select "id" from "person" where "first_name" = $1`
+[`.selectAll()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#selectAll) | The selectAll method generates `select *`:
 [`.returningAll()`](https://kysely-org.github.io/kysely-apidoc/classes/InsertQueryBuilder.html#returningAll) | Adds a `returning *` to an insert/update/delete query on databases that support returning such as PostgreSQL.
 [`.execute()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#execute) | Executes the query and returns an array of rows.
 [`.executeTakeFirst()`](https://kysely-org.github.io/kysely-apidoc/interfaces/SelectQueryBuilder.html#executeTakeFirst) | Executes the query and returns the first result or undefined if the query returned no result.
