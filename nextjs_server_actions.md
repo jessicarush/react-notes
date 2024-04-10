@@ -883,6 +883,10 @@ function ItemAdd() {
   // ...
 ```
 
+## Disabling submit buttons with useFormState
+
+TODO...
+
 ## Actions can be called outside of forms
 
 Imagine I have item components that contain their own delete button that calls a server action that deletes the given item from the database, then revalidates the path, updating the UI.
@@ -910,7 +914,7 @@ export async function deleteItem(id: number): Promise<FormState> {
 }
 ```
 
-This works great until I decide I want to display the returned message on successful delete. The problem is that on `revalidatePath` the form and is associated `useFormSatus` no longer exist to receivethe message and call `toast.success`. The solution here is to call the server action in a parent component, and pass the handler down to the item component:
+This works great until I decide I want to display the returned message on successful delete. The problem is that on `revalidatePath` the form and is associated `useFormSatus` no longer exist to receive the message and call `toast.success`. The solution here is to call the server action in a parent component, and pass the handler down to the item component:
 
 ```tsx
 'use client';
