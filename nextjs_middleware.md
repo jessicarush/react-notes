@@ -26,12 +26,30 @@ Some common scenarios where Middleware is particularly effective include:
 - **Logging and Analytics**: Capture and analyze request data for insights before processing by the page or API.
 - **Feature Flagging**: Enable or disable features dynamically for seamless feature rollouts or testing.
 
-Recognizing situations where middleware may not be the optimal approach is just as crucial. Here are some scenarios to be mindful of:
+Recognizing situations where middleware may **not** be the optimal approach is just as crucial. Here are some scenarios to be mindful of:
 
-- Complex Data Fetching and Manipulation: Middleware is not designed for direct data fetching or manipulation, this should be done within Route Handlers or server-side utilities instead.
-- Direct Database Operations: Performing direct database operations within Middleware is not recommended. Database interactions should done within Route Handlers or server-side utilities.
-- Heavy Computational Tasks: Middleware should be lightweight and respond quickly or it can cause delays in page load. Heavy computational tasks or long-running processes should be done within dedicated Route Handlers.
-- Extensive Session Management: While Middleware can manage basic session tasks, extensive session management should be managed by dedicated authentication services or within Route Handlers.
+- **Complex Data Fetching and Manipulation**: Middleware is not designed for direct data fetching or manipulation, this should be done within Route Handlers or server-side utilities instead.
+- **Direct Database Operations**: Performing direct database operations within Middleware is not recommended. Database interactions should done within Route Handlers or server-side utilities.
+- **Heavy Computational Tasks**: Middleware should be lightweight and respond quickly or it can cause delays in page load. Heavy computational tasks or long-running processes should be done within dedicated Route Handlers.
+- **Extensive Session Management**: While Middleware can manage basic session tasks, extensive session management should be managed by dedicated authentication services or within Route Handlers.
+
+The **most important thing to understand about middleware** is this:
+
+From the [Middleware docs](https://nextjs.org/docs/app/building-your-application/routing/middleware#runtime):
+
+> Middleware currently only supports the Edge runtime. The Node.js runtime can not be used.
+
+From the [Deploying docs](https://nextjs.org/docs/app/building-your-application/deploying):
+
+> Middleware works self-hosted with zero configuration when deploying using next start. Since it requires access to the incoming request, it is not supported when using a static export.
+>
+> Middleware uses a runtime that is a subset of all available Node.js APIs to help ensure low latency, since it may run in front of every route or asset in your application. This runtime does not require running “at the edge” and works in a single-region server. Additional configuration and infrastructure are required to run Middleware in multiple regions.
+
+So basically what this means is, currently, the design of Next.js middleware prioritizes integration with the Edge Runtime. It was 
+
+So basically how I interpret this is that the design of Next.js middleware prioritizes integration with the Edge Runtime. There's an intentional restriction on what you can do inside middleware to maintain its speed and performance. However, you *can* still use middleware with a traditional Node.js server, but if you attempt to use a Node.js API that isn't in runtime subset they mentioned, then you'll will get a build warning and it may not work. 
+
+A solution would be to run that code in a server action or server component instead.
 
 ## middleware.js
 
