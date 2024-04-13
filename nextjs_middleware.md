@@ -101,8 +101,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - any .png file
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)',
   ],
 };
 ```
@@ -114,6 +115,8 @@ Configures matchers:
 - can have modifiers on named parameters (starting with `:`): `/about/:path*` matches `/about/a/b/c` because `*` is zero or more. `?` is zero or one and `+` one or more
 - can use regular expression enclosed in parenthesis: `/about/(.*)` is the same as `/about/:path*`
 - values need to be constants so they can be statically analyzed at build-time. Dynamic values such as variables will be ignored.
+
+Note: When using a negative lookahead matcher, you should write **one string**. When I tried breaking it into two negative lookup strings, neither would work.
 
 
 ### conditional statements
