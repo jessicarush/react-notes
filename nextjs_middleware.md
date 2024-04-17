@@ -5,6 +5,7 @@
 <!-- toc -->
 
 - [Introduction](#introduction)
+- [middleware.js](#middlewarejs)
   * [matcher](#matcher)
   * [conditional statements](#conditional-statements)
   * [response](#response)
