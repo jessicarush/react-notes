@@ -652,6 +652,17 @@ function ExampleIcon() {
 }
 ```
 
+Icons can then be sized:
+
+```css
+.icon {
+  width: 1.25em;
+  height: 1.25em;
+  color: var(--body-text-color);
+  transition: color .3s;
+}
+```
+
 - 24x24 outline icons can be imported from` @heroicons/react/24/outline`
 - 24x24 solid icons can be imported from `@heroicons/react/24/solid`
 - 20x20 solid icons can be imported from `@heroicons/react/20/solid`
