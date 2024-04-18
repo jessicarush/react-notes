@@ -104,7 +104,7 @@ Firstly, know that Next.js will automatically look up environment variables in t
 - `process.env`
 - `.env.$(NODE_ENV).local`
 - `.env.local` (Not checked when `NODE_ENV` is `test`.)
-- `.env.$(NODE_ENV)`
+- `.env.$(NODE_ENV)` (production, development or test)
 - `.env`
 
 So if you or a package needs to access an environment variable from your `.env`, it will happen automatically once you create the file. In fact, you will notice as soon as you create a `.env` in your root directory, the next time you `npm run dev` you should see:

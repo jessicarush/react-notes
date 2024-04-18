@@ -19,6 +19,7 @@
 - [Server-side validation](#server-side-validation)
 - [Resetting form fields](#resetting-form-fields)
 - [Adding toast messages](#adding-toast-messages)
+- [Disabling submit buttons with useFormState](#disabling-submit-buttons-with-useformstate)
 - [Actions can be called outside of forms](#actions-can-be-called-outside-of-forms)
 - [Headers](#headers)
 - [Resources](#resources)

@@ -1340,13 +1340,13 @@ Next.js comes with built-in support for environment variables, which allows you 
 
 `.env.local` should be located in the root project folder (at the same level as `package.json` and `next.config.js`):
 
-```
+```bash
 DB_HOST=localhost
 DB_USER=myuser
 DB_PASS=mypassword
 ```
 
-This loads the variables into the Node.js environment allowing you to use them in Route Handlers (API routes).
+This loads the variables into the Node.js environment allowing you to use them in Route Handlers (API routes), server actions and any other server functions or components.
 
 ```javascript
 export async function GET() {
@@ -1361,22 +1361,53 @@ export async function GET() {
 
 These environment variables are only available in the Node.js environment, meaning they aren't accessible to the browser. 
 
-In order to make the value of an environment variable accessible in the browser, Next.js can inline insert a value at build time, into the js bundle that is delivered to the client. It just replaces all references to `process.env.[variable]` with a hard-coded value. To tell it to do this, you just have to prefix the variable with `NEXT_PUBLIC_`.
+> Note: to say they aren't available to the browser is actually a bit misleading because you CAN access and display an environment variable just fine in a server component. If it's a 'use client' component though, the value will be missing, so you'll need the `NEXT_PUBLIC` prefix.
 
-```
+In order to make the value of an environment variable accessible in ~~the browser~~ client components, Next.js can inline insert a value at build time, into the js bundle that is delivered to the client. It just replaces all references to `process.env.[variable]` with a hard-coded value. To tell it to do this, you just have to prefix the variable with `NEXT_PUBLIC_`.
+
+```bash
 NEXT_PUBLIC_ANALYTICS_ID=abcdefghijk
 ```
 
 Note: All `NEXT_PUBLIC_` variables will be frozen with the value evaluated at build time. If you need access to runtime environment values, you'll have to setup your own API to provide them to the client (either on demand or during initialization).
 
-In general only one `.env.local` file is needed. However, sometimes you might want to add some defaults for the development (next dev) or production (next start) environment.
+### .env, .env.local, .env.production, .env.development
+
+Firstly, know that Next.js will automatically look up environment variables in the following places, in order, stopping once the variable is found:
+
+- `process.env`
+- `.env.$(NODE_ENV).local` (`production`, `development` or `test`)
+- `.env.local` (not checked when `NODE_ENV` is `test`.)
+- `.env.$(NODE_ENV)` (`production`, `development` or `test`)
+- `.env`
+
+In general only one `.env.local` file is needed. However, sometimes you might want to add some defaults for the development (`next dev`) or production (`next start`) environment.
 
 Next.js allows you to set **defaults** in `.env` (all environments), `.env.development` (development environment), and `.env.production` (production environment).
 
 `.env.local` always overrides the defaults set.
 
-`.env`, `.env.development`, and `.env.production` files should be included in your repository as they define defaults. `.env*.local` should be added to `.gitignore`, as those files are intended to be ignored. .`env.local` is where secrets can be stored.
+You can use the `NODE_ENV` environment variable to determine which `.env` to use. The allowed values for `NODE_ENV` are `production`, `development` and `test`.
 
+If the environment variable `NODE_ENV` is unassigned, Next.js automatically assigns `development` when running the `next dev` command, or `production` for all other commands. For example, if I was starting my application using a `server.ts` file, I would want to add the appropriate `NODE_ENV`:
+
+```json
+"scripts": {
+    "dev": "next dev",
+    "start": "next start",
+    "build": "next build",
+    "lint": "next lint",
+    "init": "node -r dotenv/config ./scripts/initialize-database.js",
+    "server-dev": "NODE_ENV=development npx tsx ./server.ts",
+    "server-start": "NODE_ENV=production npx tsx ./server.ts"
+  },
+```
+
+I think Next.js intends that you use `.env`, `.env.development`, and `.env.production` files for values that aren't secret (include them in your repo) and `env.local` for secrets (should be added to `.gitignore`). I don't really get this intention, because this assumes you have no secrets in the dev or prod files. So I guess that's why they've listed `.env.$(NODE_ENV).local` as another option.
+
+I have a situation as seen in the `init` script where I have a separate file that I run in Node, (outside of Next.js) for initializing my database. That script needs access to the environment variables so I use the `dotenv` package which is only loading a `.env` file.
+
+So, while it's cool they have all these other options... it doesn't work for me.
 
 ## Absolute import path alias
 
