@@ -221,7 +221,7 @@ const closeModal = useCallback(() => {
 }, [isSoftNavigation, router]);
 ```
 
-If this method ends up not working down thr road, you could also fix this by using *Intercepting routes* instead, but I'm not sure why they put this as a parallel routes example.
+If this method ends up not working down the road, you could also fix this by using *Intercepting routes* instead, but I'm not sure why they put this as a parallel routes example. **Note: they have since removed it from the parallel routes example and now show it as parallel + intercepting routes**.
 
 
 ## Intercepting routes 
@@ -383,3 +383,13 @@ export default function Default() {
 }
 ```
 
+When using the `Link` component to navigate away from a page that shouldn't render the `@modal` slot anymore, you can use a catch-all route that returns `null`.
+
+
+app/@modal/[...catchAll]/page.tsx
+
+```tsx
+export default function CatchAll() {
+  return null
+}
+```
