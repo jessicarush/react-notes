@@ -14,6 +14,7 @@ npm install react-transition-group
 - [CSSTransition](#csstransition)
 - [TransitionGroup](#transitiongroup)
 - [Transitioning routes](#transitioning-routes)
+- [Page transitions in Next.js](#page-transitions-in-nextjs)
 
 <!-- tocstop -->
 
@@ -460,3 +461,6 @@ Doing this may help visualize some other things too, for example you may decide 
 
 Lastly, [this git commit](https://github.com/jessicarush/colour-app/commit/7183725387a60b24d268760cfd463601b2b7ae97) shows the changes made to implement page transitions. The commit after that one refactors the `page-transition-helper` wrapper div into its own component.
 
+## Page transitions in Next.js
+
+- [How to Add Page Transitions in NextJs 14](https://www.youtube.com/watch?v=jVU3JD6qOBo)

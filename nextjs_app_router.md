@@ -48,6 +48,7 @@ The [13.5 release blog post](https://nextjs.org/blog/next-13-4) explains some of
   * [Lazy loading with loader](#lazy-loading-with-loader)
 - [Eslint](#eslint)
 - [Environment variables](#environment-variables)
+  * [.env, .env.local, .env.production, .env.development](#env-envlocal-envproduction-envdevelopment)
 - [Absolute import path alias](#absolute-import-path-alias)
 - [See also](#see-also)
 
