@@ -584,36 +584,7 @@ When the form is submitted with empty fields:
 
 ## Resetting form fields
 
-```tsx
-'use client';
-
-import { useRef } from 'react';
-import { useFormState } from 'react-dom';
-import { addItem } from '@/app/_lib/actions';
-
-function ItemAdd() {
-  const ref = useRef<HTMLFormElement>(null);
-  const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(addItem, initialState);
-
-  const dispatchAndReset = async (formData: FormData) => {
-    await dispatch(formData);
-    ref.current?.reset();
-  };
-
-  return (
-    <form ref={ref} action={dispatchAndReset}>
-      // ...
-    </form>
-  );
-}
-
-export default ItemAdd;
-```
-
-This solution would not work in environments where JS is disabled. In addition, if there are field errors, the form gets reset which is not good. 
-
-A more thorough approach as seen in [Robin's progressive enhancement solution](https://www.robinwieruch.de/next-forms/):
+One approach is seen in [Robin's progressive enhancement solution](https://www.robinwieruch.de/next-forms/):
 
 First, I need to update the `PrevState` type to include a couple more fields: `status` and `timestamp`. I also decided to call this `FormState` instead of just `State`:
 
@@ -775,6 +746,61 @@ function ItemEdit({ item, editItem }: Props) {
     <div className='ItemEdit'>
       <form action={dispatch} ref={formRef}>
       // ...
+```
+
+An alternate approach altogether can be found in [github issue #58448](https://github.com/vercel/next.js/discussions/58448#discussioncomment-9110468). This feels more straightforward in that it uses React's key trick as described in [jsx.md#keys-identify-components-as-being-unique](jsx.md#keys-identify-components-as-being-unique). The react docs mention this technique in [Resetting the form with a key](https://react.dev/learn/preserving-and-resetting-state#resetting-a-form-with-a-key) and in [You might not need an effect](https://react.dev/learn/you-might-not-need-an-effect#resetting-all-state-when-a-prop-changes).
+
+```tsx
+"use client";
+
+import { useFormState } from "react-dom";
+import { addPost } from "./actions";
+
+export default function Home() {
+  const [state, action] = useFormState(addPost, { error: null });
+
+  return (
+    <main>
+      <form action={action} key={state?.resetKey}>
+        <input type="text" placeholder="Title" name="title" />
+        <button>Submit</button>
+      </form>
+    </main>
+  );
+}
+```
+
+Server action:
+
+```ts
+"use server";
+
+import { redirect } from "next/navigation";
+
+export const addPost = (prevState, formData: FormData) => {
+  const title = formData.get("title")?.toString();
+  if (!title) {
+    return {
+      resetKey: prevState.resetKey,
+      error: "Title is required",
+    };
+  }
+  
+  const post = createPost(title);
+
+  return {
+    error: null,
+    data: post,
+    resetKey: post.id,
+  };
+};
+
+function createPost(title: string) {
+  return {
+    id: Date.now(),
+    title,
+  };
+}
 ```
 
 ## Adding toast messages 
