@@ -33,7 +33,7 @@ Use case: Simple replacement for raster images that don't need customization
 
 ## SVG imported as a component
 
-[SVGR](https://github.com/gregberge/svgr) is the library that powers this ability. Setting it up could be a little hairy but thankfully many popular frameworks like Create React App support this feature out of the box.
+[SVGR](https://github.com/gregberge/svgr) is the library that powers this ability. Setting it up could be a little hairy but thankfully many popular tools like Create React App support this feature out of the box.
 
 ```Javascript
 import { ReactComponent as EyeIcon } from './icons/eye.svg';
@@ -41,6 +41,39 @@ import { ReactComponent as EyeIcon } from './icons/eye.svg';
 // ...
 
 <EyeIcon />
+```
+
+To do this in Next.js, we have to install a package:
+
+```bash
+npm install @svgr/webpack --save-dev
+```
+
+Conigure Next.js to use it:
+
+```js
+// next.config.mjs
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/, 
+      use: ['@svgr/webpack'],
+    });
+    return config;
+  },
+};
+
+export default nextConfig;
+```
+
+Then import and use:
+
+```jsx
+import Logo from '@/public/logo.svg';
+// Usage in JSX
+<Logo />
 ```
 
 Use case: A custom SVG icon library
@@ -60,7 +93,7 @@ To work in JSX I would have to:
 
 - replace `<!-- -->` comments with `{/* */}`
 - change `class` to `className`
-- wrap style decalration in `{''}` – not actually sure if this is correct but it seems to work
+- wrap style declaration in `{''}` – not actually sure if this is correct but it seems to work
 
 ```Javascript
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
@@ -73,7 +106,7 @@ To work in JSX I would have to:
 </svg>
 ```
 
-Here's another example of otiginal svg:
+Here's another example of original svg:
 
 ```html
 <svg class="svg-icon" style="width: 1em; height: 1em;vertical-align: middle;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M556.01602 769.767264l453.883943-454.93226c18.798868-18.797098 18.798868-49.373591 0.008854-68.167148-9.057669-9.054127-21.159352-14.042485-34.080917-14.042485s-25.023249 4.988358-34.082688 14.044256L511.467873 687.601901 82.146769 246.561608c-8.95142-8.94965-21.054874-13.938008-33.972898-13.938008-12.919795 0-25.023249 4.988358-34.082688 14.044256-18.786473 18.791785-18.786473 49.368279 0 68.156523l452.562922 454.652473c10.723996 9.19225 25.28887 21.563095 38.55043 21.559553 1.156336 0 2.30913-0.093853 3.424737-0.279787l2.103717-0.348849 2.078925 0.462181c1.514038 0.336453 3.102451 0.504679 4.720967 0.504679 10.879827 0.001771 24.546902-7.672899 38.483139-21.607365z"  /></svg>
@@ -104,6 +137,8 @@ Note that I can color the above icon by adding a `fill:` to the styles or with t
   fill: yellow;
 }
 ```
+
+You can use a tool like [SVGR](https://react-svgr.com/playground/) to automatically convert the syntax for you.
 
 Use case: One-off graphics
 
