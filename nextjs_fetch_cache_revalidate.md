@@ -20,6 +20,8 @@
 
 By default, Next.js will cache the result of `fetch()` requests that do not specifically opt out of caching behavior. Dynamic data fetches are `fetch()` requests that specifically opt out of caching behavior by setting the `cache` option to `'no-store'` or `revalidate` to `0`.
 
+> **UPDATE:** Next.js 15 changes the fetch requests, `GET` Route Handlers, and Client Router Cache from cached by default to uncached by default. 
+
 The caching options for **all** `fetch` requests in a layout, page or route handler can also be set using the [segment config object](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config).
 
 Lastly, there's also [unstable_noStore](https://nextjs.org/docs/app/api-reference/functions/unstable_noStore) which can be used to declaratively opt out of static rendering and indicate a particular component should not be cached.

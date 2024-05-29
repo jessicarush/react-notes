@@ -842,6 +842,7 @@ By default, Next.js statically renders routes to improve performance. To change 
 - Use a Next.js dynamic function like `cookies()`, `headers()`, or `useSearchParams()`
 - `searchParams` which are passed automatically in the props of a `page.js` is a Dynamic API whose values cannot be known ahead of time. Using it will opt the page into dynamic rendering at request time.
 
+> **UPDATE:** Next.js 15 changes the fetch requests, `GET` Route Handlers, and Client Router Cache from cached by default to uncached by default. 
 
 ## Dynamic functions
 
