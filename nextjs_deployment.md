@@ -272,10 +272,11 @@ Note that for static exports, you no longer need to run the `export` command as 
 
 The Next.js App Router supports streaming responses when self-hosting. If you are using Nginx or a similar proxy, you will need to configure it to disable buffering to enable streaming.
 
-For example, you can disable buffering in Nginx by setting X-Accel-Buffering to no:
-next.config.js
+For example, you can disable buffering in Nginx by setting `X-Accel-Buffering` to `no`:
 
-```
+*next.config.js*
+
+```js
 module.exports = {
   async headers() {
     return [
