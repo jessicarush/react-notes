@@ -373,3 +373,31 @@ function Box(props) {
 
 export default Box;
 ```
+
+Here's a weird one though, you actually don't have to explicitly add children. JSX allows a self-closing syntax for components with no children like: `<div />`. However, we can also receive and pass on any/all additional props given to the component using `{...props}`. If there are children, React will know to pass these on and render them properly inside the `<div>`.
+
+```jsx
+export default function Box({ ...props }) {
+  return <div style={{border: 'solid 1px red'}} {...props} />;
+}
+```
+
+Then in my page:
+
+```jsx
+import Box from './_ui/box';
+
+export default function Home() {
+  return (
+    <main>
+      {/* Box can be used with or without children */}
+      <Box />
+      <Box>
+        <h1>This is my box component.</h1>
+      </Box>
+    </main>
+  );
+}
+```
+
+In short, you're not explicitly handling children. You're just passing all props, and React takes care of children automatically.
