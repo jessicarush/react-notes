@@ -15,6 +15,8 @@ Various notes related to performance.
 
 The [useMemo](https://react.dev/reference/react/useMemo) hook lets you cache the result of a calculation between re-renders. See [hooks.md](hookd.md).
 
+> Note: useMemo will be obsolete with the release of React 19 and the new React Compiler.
+
 
 ## measuring if a calculation is slow 
 

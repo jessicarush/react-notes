@@ -293,6 +293,8 @@ See:
 
 ## useCallback
 
+> Note: useCallback will be obsolete with the release of React 19 and the new React Compiler.
+
 Call [useCallback](https://react.dev/reference/react/useCallback#usecallback) at the top level of your component to cache a function definition between re-renders (until its dependencies change). It should only be used as a performance optimization.
 
 ```javascript
@@ -364,6 +366,8 @@ export default Modal;
 ```
 
 ## useMemo
+
+> Note: useMemo will be obsolete with the release of React 19 and the new React Compiler.
 
 `useMemo` is a hook that lets you cache the result of a calculation between re-renders.
 
