@@ -45,6 +45,12 @@ Next, you'll need to use the pgAdmin tool to create a database. Launch it from `
 
 The OID field is the object identifier to be used for the new database. If this parameter is not specified, PostgreSQL will choose a suitable OID automatically. This parameter is primarily intended for internal use by `pg_upgrade`.
 
+You can check the version of postgres after it's been installed:
+
+```bash
+postgres --version
+```
+
 ## Check your new database using psql 
 
 [psql](https://www.postgresql.org/docs/current/app-psql.html) is the PostgreSQL interactive terminal. This is installed with the 'command line tools' option when you installed PostgreSQL. Before we can use it, you need to make sure the path is added to your `bash_profile` or `bash_rc`, for example:
