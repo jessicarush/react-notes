@@ -69,6 +69,8 @@ Route Handlers are cached by default when using the `GET` method with the Respon
 
 The [NextResponse](https://nextjs.org/docs/app/api-reference/functions/next-response) extends the standard Web Response with some additional convenience methods.
 
+> **UPDATE:** Next.js 15 changes the fetch requests, `GET` Route Handlers, and Client Router Cache from cached by default to uncached by default. 
+
 ### request body 
 
 You can read the `Request` body using the standard Web API methods:
