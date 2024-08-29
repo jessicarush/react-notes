@@ -18,6 +18,8 @@
 - [Client-side validation](#client-side-validation)
 - [Server-side validation](#server-side-validation)
 - [Resetting form fields](#resetting-form-fields)
+  * [Using a ref and performing a form.reset()](#using-a-ref-and-performing-a-formreset)
+  * [Using a key](#using-a-key)
 - [Adding toast messages](#adding-toast-messages)
 - [Disabling submit buttons with useFormState](#disabling-submit-buttons-with-useformstate)
 - [Actions can be called outside of forms](#actions-can-be-called-outside-of-forms)
@@ -584,6 +586,10 @@ When the form is submitted with empty fields:
 
 ## Resetting form fields
 
+### Using a ref and performing a form.reset()
+
+> Note: a demo of this method can be found in the next_kysely example
+
 One approach is seen in [Robin's progressive enhancement solution](https://www.robinwieruch.de/next-forms/):
 
 First, I need to update the `PrevState` type to include a couple more fields: `status` and `timestamp`. I also decided to call this `FormState` instead of just `State`:
@@ -709,7 +715,7 @@ function ItemAdd() {
       // ...
 ```
 
-I used the same pattern in a case were instead of clearing the form on a successful submit, I wanted to update state:
+I used the same pattern in a case where instead of clearing the form on a successful submit, I wanted to update state:
 
 ```tsx
 'use client';
@@ -747,6 +753,10 @@ function ItemEdit({ item, editItem }: Props) {
       <form action={dispatch} ref={formRef}>
       // ...
 ```
+
+### Using a key
+
+> Note: a demo of this method can be found in the templates next_lucia_kysely_postgres and next_lucia_kysely_postgres_tailwind
 
 An alternate approach altogether can be found in [github issue #58448](https://github.com/vercel/next.js/discussions/58448#discussioncomment-9110468). This feels more straightforward in that it uses React's key trick as described in [jsx.md#keys-identify-components-as-being-unique](jsx.md#keys-identify-components-as-being-unique). The react docs mention this technique in [Resetting the form with a key](https://react.dev/learn/preserving-and-resetting-state#resetting-a-form-with-a-key) and in [You might not need an effect](https://react.dev/learn/you-might-not-need-an-effect#resetting-all-state-when-a-prop-changes).
 
