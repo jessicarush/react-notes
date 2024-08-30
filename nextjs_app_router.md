@@ -60,24 +60,37 @@ See the [create-next-app API reference](https://nextjs.org/docs/app/api-referenc
 
 There are many [official Next.js examples](https://github.com/vercel/next.js/tree/canary/examples) but they all seem to be using Pages Router.
 
-- `npx create-next-app@latest`
+```bash
+npx create-next-app@latest
+```
 
-To start the development server on http://localhost:3000
+To start the development server on http://localhost:3000:
 
-- `npm run dev`
+```bash
+npm run dev
+```
+
+To run on a specfic port:
+
+```bash
+npm run dev -- -p 4000
+```
 
 To run the build:
 
-- `npm run build && npm start`
+```bash
+npm run build && npm start
+```
 
 Note: `next start` does not work with `output: export` (static exports... see [nextjs_deployment.md](nextjs_deployment.md)). Instead use: 
 
-- `npm run build && npx serve@latest out`
-
+```bash
+npm run build && npx serve@latest out
+```
 
 ## Updating 
 
-```
+```bash
 npm i next@latest react@latest react-dom@latest eslint-config-next@latest
 ```
 
