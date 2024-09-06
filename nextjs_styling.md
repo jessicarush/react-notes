@@ -304,12 +304,12 @@ import './globals.css';
 // subsets reduce the size of the font file and improves performance.
 // You can find a list of all subsets on the Google Fonts page for your font.
 // variable lets you define a css variable name.
-const main = Montserrat({ subsets: ['latin'], variable: '--font-main' });
+const fontMain = Montserrat({ subsets: ['latin'], variable: '--font-main' });
 
 // Some variable fonts have extra axes that can be included. By default,
 // only the font weight is included to keep the file size down.
 // The possible values of axes depend on the specific font.
-const alt = Commissioner({ 
+const fontAlt = Commissioner({ 
   subsets: ['latin'], 
   axes: ['slnt'], 
   variable: '--font-alt' });
@@ -328,7 +328,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${main.variable} ${roboto.variable} ${alt.variable}`}>
+      className={`${fontMain.variable} ${roboto.variable} ${fontAlt.variable}`}>
       <body>
         {children}
       </body>
@@ -366,6 +366,16 @@ Variable font axes can be adjusted like so:
 }
 ```
 
+> WARNING BUG: For some weird reason I have had troubles when naming my font `main` and `mono`:
+>
+> ```javascript
+> // Fonts
+> const main = Montserrat({ subsets: ['latin'], variable: '--font-main' });
+> const mono = Noto_Sans_Mono({ subsets: ['latin'], variable: '--font-mono' });
+> ```
+> 
+> In a handful (but not all) of my examples, the font doesn't work when using these names. Only changing the variable names to something else like `fontMain` and `fontMono` worked. No idea why.
+> 
 - See the list of [all google variable fonts and their axes](https://fonts.google.com/variablefonts#font-families)
 - You can also [load local fonts](https://nextjs.org/docs/app/building-your-application/optimizing/fonts#local-fonts)
 - See [fonts with tailwind](https://nextjs.org/docs/app/building-your-application/optimizing/fonts#with-tailwind-css)
