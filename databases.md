@@ -23,7 +23,7 @@
   * [Fetch data using Kysely](#fetch-data-using-kysely)
 - [Server Cleanup](#server-cleanup)
   * [Using server.js](#using-serverjs)
-  * [Using server.js](#using-serverjs-1)
+  * [Using server.jt](#using-serverts)
   * [Using instrumentation.ts](#using-instrumentationts)
 
 <!-- tocstop -->
@@ -1022,7 +1022,7 @@ app.prepare().then(() => {
 });
 ```
 
-### Using server.js
+### Using server.ts
 
 If your database file needs to be TypeScript, then we need to make a few changes.
 
@@ -1153,5 +1153,3 @@ Then update your scripts in `package.json`:
   }
 }
 ```
-
-
