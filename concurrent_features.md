@@ -52,10 +52,10 @@ Updates wrapped in startTransition are handled as non-urgent and will be interru
 
 There are two transition APIs:
 
-- useTransition() hook to start transitions, including a value to track the pending state.
-- startTransition() method to start transitions when the hook cannot be used.
+- `useTransition()` hook to start transitions, including a value to track the pending state.
+- `startTransition()` function returned by `useTransition` lets you mark a state update as a Transition.
 
-The example from the React API docs is pretty uninspired. I can't quite see what benefit it provides here and not sure how or when I would apply this.
+The early example from the React API docs was pretty uninspired. They have since updated it: see <https://react.dev/reference/react/useTransition>.
 
 ```jsx
 import React, { useState, useTransition } from 'react';
@@ -83,7 +83,59 @@ function DemoTransitions() {
 export default DemoTransitions;
 ```
 
-Hopefully in time, there will be better, more practical demos out there.
+My example using server actions:
+
+```tsx
+'use client';
+
+import { useState, useTransition } from 'react';
+import { getColor } from '@/app/_lib/actions';
+
+interface Color {
+  name: string | null;
+  value: string | null;
+}
+
+export default function ServerActionWithoutForm() {
+  const [color, setColor] = useState<Color>({ name: null, value: null });
+  const [isPending, startTransition] = useTransition();
+
+  // Server Actions are exposed server endpoints and can be called anywhere in client code.
+  // When using a Server Action outside of a form, call the Server Action in a Transition, which
+  // allows you to display a loading indicator, show optimistic state updates, and handle
+  // unexpected errors. Forms will automatically wrap Server Actions in transitions.
+  // See: https://react.dev/reference/rsc/use-server#calling-a-server-action-outside-of-form
+
+  const handleGetColor = async () => {
+    startTransition(async () => {
+      const res = await getColor('rgb');
+      if (res.status === 'SUCCESS' && res.data) {
+        console.log('Success getting color');
+        setColor({ name: res.data.name, value: res.data.value });
+      } else {
+        console.error('Error fetching color');
+      }
+    });
+  };
+
+  return (
+    <main>
+      <p>client-side data fetching with server actions.</p>
+
+      <button onClick={handleGetColor} disabled={isPending}>Get color</button>
+      {isPending && <span> getting color...</span>}
+      {color.value && (
+        <p>
+          color:{' '}
+          <span style={{ color: color.value }}>
+            {color.name} {color.value}
+          </span>
+        </p>
+      )}
+    </main>
+  );
+}
+```
 
 In summary:
 
