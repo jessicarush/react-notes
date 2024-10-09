@@ -269,9 +269,8 @@ client component:
 ```tsx
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition, useRef } from 'react';
 import { getColor } from '@/app/_lib/actions';
-import ThrottledButton from '@/app/_components/ThrottledButton';
 
 interface Color {
   name: string | null;
@@ -281,9 +280,14 @@ interface Color {
 export default function ServerActions() {
   const [color, setColor] = useState<Color>({ name: null, value: null });
   const [isPending, startTransition] = useTransition();
+  const didFetch = useRef(false);
 
   useEffect(() => {
-    handleGetColor();
+    // Prevents double API call in dev mode
+    if (!didFetch.current) {
+      handleGetColor();
+      didFetch.current = true;
+    }
   }, []);
 
   const handleGetColor = async () => {
