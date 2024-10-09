@@ -1034,6 +1034,8 @@ function ItemView({ item, editItem, deleteItem }: Props) {
 export default ItemView;
 ```
 
+See <https://react.dev/reference/react/use-server#calling-a-server-action-outside-of-form>
+
 ## Headers
 
 You can read incoming request headers such as cookies and headers within a Server Action.
