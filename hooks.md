@@ -20,7 +20,10 @@
 - [useId](#useid)
 - [useTransition and useDeferredValue](#usetransition-and-usedeferredvalue)
 - [useSyncExternalStore](#usesyncexternalstore)
-- [coming soon: use](#coming-soon-use)
+- [useOptimistic](#useoptimistic)
+- [useActionState](#useactionstate)
+- [Form hooks](#form-hooks)
+  * [useFormStatus](#useformstatus)
 - [Custom hooks](#custom-hooks)
   * [Custom hook example: localStorage](#custom-hook-example-localstorage)
 - [Docs references](#docs-references)
@@ -46,6 +49,10 @@ In React, there are basic [built-in hooks](https://react.dev/reference/react):
 - `useTransition` lets you update the state without blocking the UI
 - `useDeferredValue` lets you defer updating a part of the UI
 - `useSyncExternalStore` lets you subscribe to an external store
+- `useOptimistic`
+- `useActionState`
+- `use`
+
 
 And some that are intended for library/framework maintainers:
 
@@ -468,7 +475,7 @@ See [concurrent_features.md](concurrent_features.md) for `useTransition` and `us
 
 ## useSyncExternalStore
 
-`useSyncExternalStore` is a hook that's specifically designed for subscribing to an external store/value. Most components will only read data from props, state, and context. However, sometimes a component needs to read some data from some store outside of React that changes over time. This includes:
+[useSyncExternalStore](https://react.dev/reference/react/useSyncExternalStore) is a hook that's specifically designed for subscribing to an external store/value. Most components will only read data from props, state, and context. However, sometimes a component needs to read some data from some store outside of React that changes over time. This includes:
 
 - Third-party state management libraries that hold state outside of React.
 - Browser APIs that expose a mutable value and events to subscribe to its changes.
@@ -529,10 +536,51 @@ function getServerSnapshot() {
 export default useOnlineStatus;
 ```
 
-## coming soon: use
+## useOptimistic
 
-`use` is a new React function that accepts a promise conceptually similar to `await`. `use` handles the promise returned by a function in a way that is compatible with components, hooks, and Suspense.
+[useOptimistic](https://react.dev/reference/react/useOptimistic) is a React Hook that lets you optimistically update the UI.
 
+Todo...
+
+## useActionState
+
+[useActionState](https://react.dev/reference/react/useActionState) is a Hook that allows you to update state based on the result of a form action. In earlier React Canary versions, this API was part of React DOM and called `useFormState`.
+
+```javascript
+const [state, formAction, isPending] = useActionState(fn, initialState, permalink?);
+```
+
+## Form hooks
+
+The `react-dom` package contains Hooks that are only supported for web apps (which run in the browser DOM environment). These Hooks are not supported in non-browser environments like iOS, Android, or Windows applications. 
+
+### useFormStatus 
+
+[useFormStatus](https://react.dev/reference/react-dom/hooks/useFormStatus) gives you status information of the last form submission.
+
+```javascript
+const { pending, data, method, action } = useFormStatus();
+```
+
+Example:
+
+```tsx
+import { useFormStatus } from 'react-dom';
+import action from './actions';
+
+function Submit() {
+  const status = useFormStatus();
+  return <button disabled={status.pending}>Submit</button>
+}
+
+export default function App() {
+  return (
+    <form action={action}>
+      <Submit />
+    </form>
+  );
+}
+```
 
 ## Custom hooks
 
