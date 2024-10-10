@@ -23,7 +23,7 @@
   * [Fetch data using Kysely](#fetch-data-using-kysely)
 - [Server Cleanup](#server-cleanup)
   * [Using server.js](#using-serverjs)
-  * [Using server.jt](#using-serverts)
+  * [Using server.ts](#using-serverts)
   * [Using instrumentation.ts](#using-instrumentationts)
 
 <!-- tocstop -->
