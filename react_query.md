@@ -314,6 +314,7 @@ There are many other things react query is good add. These will require addition
 - [Parallel Queries](https://tanstack.com/query/latest/docs/framework/react/guides/parallel-queries): Queries that are executed in parallel, or at the same time so as to maximize fetching concurrency.
 - [Dependent Queries](https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries): Dependent (or serial) queries depend on previous ones to finish before they can execute. 
 - [Disabling/Pausing Queries](https://tanstack.com/query/latest/docs/framework/react/guides/disabling-queries): Disabling or pausing queries can be useful in some cases.
+- [Initial Query Data](https://tanstack.com/query/latest/docs/framework/react/guides/initial-query-data): Used to prepopulate a query.
 - [Placeholder data](https://tanstack.com/query/latest/docs/framework/react/guides/placeholder-query-data): Allows a query to behave as if it already has data, similar to the initialData option, but the data is not persisted to the cache.
 - [Prefetching](https://tanstack.com/query/latest/docs/framework/react/guides/prefetching): Load data ahead of time for improved user experience using `queryClient.prefetchQuery()`.
 - [Optimistic Updates](https://tanstack.com/query/latest/docs/framework/react/guides/optimistic-updates): Update UI immediately before server confirmation for a snappier feel. Requires custom setup in your mutation logic.
