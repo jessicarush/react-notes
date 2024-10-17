@@ -1,12 +1,29 @@
 # Fetching data in Next.js 
 
+## Table of contents
+
+<!-- toc -->
+
+- [Demos](#demos)
+- [Server components](#server-components)
+- [Server actions](#server-actions)
+- [Client-side](#client-side)
+- [Client-side with react query](#client-side-with-react-query)
+- [Server components + react query](#server-components--react-query)
+- [React use() API](#react-use-api)
+
+<!-- tocstop -->
+
 ## Demos 
 
-examples/next_data_fetching
-examples/next_node_postgres
-examples/next_kysely
+- examples/next_data_fetching
+- examples/next_data_fetching_with_react_query
+- examples/next_node_postgres
+- examples/next_kysely
 
 ## Server components 
+
+Whenever possible, data fetching should be done in server components. It's easy, improves performance, reduces bundle size, and ensures that sensitive data stays secure on the server. Since data fetching is done on the server-side, functions can directly read data from a database without the need for an API. Async components pause their execution until the asynchronous operation is done. Once the awaited promise is resolved, the component will continue rendering with the fetched data. 
 
 **Fetching data from a database**
 
@@ -117,7 +134,7 @@ From here you can add a loading state to the component by using the `Suspense` c
 
 ## Server actions
 
-> Server Actions are exposed server endpoints and can be called anywhere in client code. When using a Server Action outside of a form, call the Server Action in a Transition, which allows you to display a loading indicator, show optimistic state updates, and handle unexpected errors. Forms will automatically wrap Server Actions in transitions. See: <https://react.dev/reference/rsc/use-server#calling-a-server-action-outside-of-form>
+Server Actions are exposed server endpoints and can be called anywhere in client code. When using a Server Action outside of a form, call the Server Action in a Transition, which allows you to display a loading indicator, show optimistic state updates, and handle unexpected errors. Forms will automatically wrap Server Actions in transitions. See: <https://react.dev/reference/rsc/use-server#calling-a-server-action-outside-of-form>
 
 **Server action called in a form**
 
@@ -359,7 +376,7 @@ export async function getColor(value: string): Promise<FormState> {
 
 ## Client-side
 
-This demonstrates fetching data on load with `useEffect` as well as `Onclick`. 
+Client-side data fetching is necessary when data needs to be updated dynamically after the initial page load, such as for real-time updates, user interactions that trigger data changes (e.g., search inputs, filters), or when using APIs that require client authentication tokens. It’s also used when some data depends on browser state, like window size or user geolocation, which isn’t available on the server. This demonstrates fetching data on load with `useEffect` as well as `Onclick`. 
 
 ```jsx 
 'use client';
@@ -430,6 +447,153 @@ export default function ClientSide() {
 ## Client-side with react query 
 
 When it comes to client-side rendered React applications (i.e. SPAs), the most recommended way to fetch data is by using a library like React Query. This library comes with a bunch of additional features like automatic retry on failure, optimized performance with request deduplication, support for pagination and infinite scrolling and more.
+
+This is the method the docs recommend for [server components & Next.js app router](https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr#server-components-and-nextjs-app-router).
+
+app/_lib/query-provider.ts:
+
+```ts
+'use client';
+
+import { isServer, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactNode } from 'react';
+
+function makeQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        // With SSR, we usually want to set some default staleTime
+        // above 0 to avoid refetching immediately on the client
+        // This value is in milliseconds therefor 60 * 1000 = 1 minute
+        staleTime: 60 * 1000
+      }
+    }
+  });
+}
+
+let browserQueryClient: QueryClient | undefined = undefined;
+
+function getQueryClient() {
+  if (isServer) {
+    // Server: always make a new query client
+    return makeQueryClient();
+  } else {
+    // Browser: make a new query client if we don't already have one
+    // This is very important, so we don't re-make a new client if React
+    // suspends during the initial render. This may not be needed if we
+    // have a suspense boundary BELOW the creation of the query client
+    if (!browserQueryClient) browserQueryClient = makeQueryClient();
+    return browserQueryClient;
+  }
+}
+
+export default function QueryProvider({ children }: { children: ReactNode }) {
+  // Avoid useState when initializing the query client if you don't
+  // have a suspense boundary between this and the code that may
+  // suspend because React will throw away the client on the initial
+  // render if it suspends and there is no boundary
+  const queryClient = getQueryClient();
+
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+}
+```
+
+layout.tsx:
+
+```tsx
+// Note: The root layout cannot be a client component
+import { fontSans, fontMono, fontAlt } from '@/app/fonts';
+import QueryProvider from '@/app/_lib/query-provider';
+import '@/app/globals.css';
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html
+      lang="en"
+      className={`${fontSans.variable} ${fontMono.variable} ${fontAlt.variable}`}>
+      <body>
+        <QueryProvider>{children}</QueryProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+get-data.ts:
+
+```ts
+export async function getColor(): Promise<Color> {
+  const url = 'https://log.zebro.id/api_demo_two';
+  const res = await fetch(url);
+  
+  if (!res.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const data = await res.json();
+  return {
+    name: data.name,
+    value: data.value
+  };
+}
+```
+
+demo.tsx:
+
+```tsx
+'use client';
+
+import { getColor } from '@/app/_lib/get-data';
+import { useQuery } from '@tanstack/react-query';
+
+type Props = {
+  children?: React.ReactElement;
+};
+
+export default function ReactQueryDemo({}: Props) {
+  const {
+    isPending,
+    isError,
+    isRefetching,
+    data: color,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['colorData'],
+    queryFn: getColor
+    // staleTime: 60 * 1000, // data becomes stale after 1 minute
+    // gcTime: 5 * 60 * 1000 // unused data is garbage collected after 5 minutes
+  });
+
+  const handleRefetch = () => {
+    refetch();
+  };
+
+  return (
+    <div>
+      <p>client-side data fetching with react query</p>
+
+      {isPending && <span> getting color...</span>}
+
+      {isError && <p>An error has occurred: {error.message}</p>}
+
+      {color?.value && (
+        <p>
+          color:{' '}
+          <span style={{ color: color.value }}>
+            {color.name} {color.value}
+          </span>
+        </p>
+      )}
+      <p>
+        <button onClick={handleRefetch} disabled={isPending || isRefetching}>
+          Get color
+        </button>
+      </p>
+    </div>
+  );
+}
+```
 
 ## Server components + react query
 
