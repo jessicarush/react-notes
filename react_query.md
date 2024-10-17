@@ -311,6 +311,7 @@ There are many other things react query is good add. These will require addition
 - [Mutations](https://tanstack.com/query/latest/docs/framework/react/guides/mutations): For handling POST, PUT, DELETE operations with `useMutation` hook.
 - [Query Invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation): Automatically refetch and update related queries after a mutation using `queryClient.invalidateQueries()`.
 - [Infinite Queries](https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries): Handle pagination and "load more" scenarios with `useInfiniteQuery`. Your API must also be set up to support pagination.
+- [Paginated / Lagged Queries](https://tanstack.com/query/latest/docs/framework/react/guides/paginated-queries): Render paginated data using by including the page information in the queryKey. 
 - [Parallel Queries](https://tanstack.com/query/latest/docs/framework/react/guides/parallel-queries): Queries that are executed in parallel, or at the same time so as to maximize fetching concurrency.
 - [Dependent Queries](https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries): Dependent (or serial) queries depend on previous ones to finish before they can execute. 
 - [Disabling/Pausing Queries](https://tanstack.com/query/latest/docs/framework/react/guides/disabling-queries): Disabling or pausing queries can be useful in some cases.
