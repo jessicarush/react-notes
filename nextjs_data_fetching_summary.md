@@ -599,6 +599,103 @@ export default function ReactQueryDemo({}: Props) {
 
 If you have RSC enabled and want to support more advanced data fetching patterns such as infinite scrolling, you can combine React Server Components with React Query. This way you can fetch initial data on the server-side and then use React Query for continued data fetching on the client-side.
 
+To start, you might fetch data in a server component, then pass that data to a client component:
+
+```tsx
+// ...
+
+export default async function PostPage() {
+  const posts = await getPosts();
+
+  return (
+    <div>
+      <PostList initialPosts={posts} />
+    </div>
+  );
+}
+```
+
+Then in the client component, use the initialData option to prepopulate the query:
+
+```tsx
+"use client";
+// ...
+
+type PostListProps = {
+  initialPosts: Post[];
+};
+
+const PostList = ({ initialPosts }: PostListProps) => {
+  const { data: posts } = useQuery({
+    queryKey: ["posts"],
+    queryFn: getPosts,
+    initialData: initialPosts,
+  });
+
+  return (
+    <ul>
+      {posts?.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+};
+```
+
+To implement infinite scrolling see [Infinite Queries](https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries).
+
 ## React use() API 
 
 React's use API is still in experimental mode. It allows you to pass a Promise from a Server Component to a Client Component and resolve it in the Client Component. This way you can avoid blocking the rendering of the Server Component with await.
+
+app/page.tsx:
+
+```tsx
+import { getColor } from '@/app/_lib/data';
+import { Suspense } from 'react';
+import RandomColor from './random-color';
+
+export default async function ServerSide() {
+  // const colorPromise: Color = await getColor();
+  const colorPromise = getColor();
+
+  return (
+    <main>
+      <p>React use() API.</p>
+      <Suspense>
+        <RandomColor promisedColor={colorPromise} />
+      </Suspense>
+    </main>
+  );
+}
+```
+
+app/random-color.tsx:
+
+```tsx
+'use client';
+
+import { use } from "react";
+import type { Color } from "@/app/_lib/definitions";
+
+type Props = {
+  children?: React.ReactElement;
+  // promisedColor: Color;
+  promisedColor: Promise<Color>;
+};
+
+export default function RandomColor({promisedColor}: Props) {
+  const color = use(promisedColor);
+
+  return (
+    <div>
+      <p>
+        color:{' '}
+        <span style={{ color: color.value }}>
+          {color.name} {color.value}
+        </span>
+      </p>
+    </div>
+  );
+}
+```
