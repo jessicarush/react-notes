@@ -59,9 +59,7 @@ const ThemeToggle = dynamic(() => import('./theme-toggle'), {
 });
 ```
 
-
-
-## Async request apis 
+## Async request APIs 
 
 To enable optimizations such as server components rendering before a request happens, APIs that rely on request-specific data are now asynchronous. These include:
 
