@@ -1,4 +1,4 @@
-# Next.js 15 and React 19 updates
+# Next.js 15 updates
 
 - [What's new in Next.js 15](https://nextjs.org/blog/next-15)
 - [What's new in React 19](https://react.dev/blog/2024/04/25/react-19)
