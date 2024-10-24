@@ -27,7 +27,6 @@
 A CLI that helps upgrade to the latest Next.js and React versions. Codemods (automated code transformations) are included with every major Next.js release to help automate upgrading breaking changes.
 
 ```bash
-npx @next/codemod@canary upgrade
 npx @next/codemod@canary upgrade latest
 ```
 
