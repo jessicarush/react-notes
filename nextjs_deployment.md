@@ -58,6 +58,8 @@ Again, all this fancy stuff will cost you. I have heard that [Vercel can get ver
 
 You can self-host Next.js with support for all features using Node.js or Docker. You can also do a Static HTML Export, which has some limitations.
 
+See their [demo and tutorial video on self-hosting Next.js](https://www.youtube.com/watch?v=sIVL4JMqRfc).
+
 ### Node.js server
 
 To use all of its features, Next.js can be deployed to any hosting provider that supports Node.js. This could be something like [AWS EC2](https://aws.amazon.com/ec2/) or a [DigitalOcean Droplet](https://www.digitalocean.com/products/droplets).
