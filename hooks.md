@@ -22,8 +22,7 @@
 - [useSyncExternalStore](#usesyncexternalstore)
 - [useOptimistic](#useoptimistic)
 - [useActionState](#useactionstate)
-- [Form hooks](#form-hooks)
-  * [useFormStatus](#useformstatus)
+- [useFormStatus](#useformstatus)
 - [Custom hooks](#custom-hooks)
   * [Custom hook example: localStorage](#custom-hook-example-localstorage)
 - [Docs references](#docs-references)
@@ -540,6 +539,8 @@ export default useOnlineStatus;
 
 [useOptimistic](https://react.dev/reference/react/useOptimistic) is a React Hook that lets you optimistically update the UI.
 
+<https://react.dev/blog/2024/04/25/react-19#new-hook-optimistic-updates>
+
 Todo...
 
 ## useActionState
@@ -550,11 +551,9 @@ Todo...
 const [state, formAction, isPending] = useActionState(fn, initialState, permalink?);
 ```
 
-## Form hooks
+## useFormStatus 
 
 The `react-dom` package contains Hooks that are only supported for web apps (which run in the browser DOM environment). These Hooks are not supported in non-browser environments like iOS, Android, or Windows applications. 
-
-### useFormStatus 
 
 [useFormStatus](https://react.dev/reference/react-dom/hooks/useFormStatus) gives you status information of the last form submission.
 
