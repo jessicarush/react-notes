@@ -13,12 +13,12 @@
 - [`useFormState` has been replaced by `useActionState`](#useformstate-has-been-replaced-by-useactionstate)
 - [`useFormStatus` now includes additional keys](#useformstatus-now-includes-additional-keys)
 - [`ssr: false` not allowed in sever components](#ssr-false-not-allowed-in-sever-components)
-- [Async request apis](#async-request-apis)
+- [Async request APIs](#async-request-apis)
 - [`fetch` requests are no longer cached by default](#fetch-requests-are-no-longer-cached-by-default)
 - [`GET` functions in route handlers are no longer cached by default](#get-functions-in-route-handlers-are-no-longer-cached-by-default)
 - [Turbopack](#turbopack)
 - [Instrumentation.js|ts](#instrumentationjsts)
-- [`` component](#-component)
+- [`Form` component](#form-component)
 
 <!-- tocstop -->
 
@@ -38,12 +38,42 @@ Read more about the [codemod CLI](https://nextjs.org/docs/app/building-your-appl
 
 The `useFormState` hook is still available in React 19, but it is deprecated and will be removed in a future release. [useActionState](https://react.dev/reference/react/useActionState) is recommended and includes additional properties like reading the `pending` state directly.
 
+See [hooks.md](hooks.md).
+
+> Note: I have noticed that with the Next.js 15 update, when error messages are passed to the component, the input fields are re-rendered to an empty state. This means we have to use controlled inputs in order to retain the user's input when there is a validation error.
+
 ## `useFormStatus` now includes additional keys 
 
 These include: `data`, `method`, and `action`. Prior to React 19, only the `pending` key was available. See the [useFormStatus reference](https://react.dev/reference/react-dom/hooks/useFormStatus).
 
 ```ts
 const { pending, data, method, action } = useFormStatus();
+```
+
+- `pending`: A boolean. If `true`, this means the parent `<form>` is pending submission. Otherwise, `false`.
+- `data`: An object implementing the [FormData interface](https://developer.mozilla.org/en-US/docs/Web/API/FormData) that contains the data the parent `<form>` is submitting. If there is no active submission or no parent `<form>`, it will be `null`.
+- `method`: A string value of either 'get' or 'post'. This represents whether the parent `<form>` is submitting with either a GET or POST HTTP method. By default, a `<form>` will use the GET method and can be specified by the method property.
+- `action`: A reference to the function passed to the action prop on the parent `<form>`. If there is no parent `<form>`, the property is `null`. If there is a URI value provided to the action prop, or no action prop specified, status.action will be `null`.
+
+For example:
+
+```tsx
+export const SubmitButton = (props: SubmitButtonProps) => {
+  const { pending, data, method, action } = useFormStatus();
+
+  console.log(`
+    pending: ${pending}
+    data: ${data ? JSON.stringify(Array.from(data.entries())) : data}
+    method: ${method}
+    action: ${action}
+    `);
+
+  return (
+    <button type='submit' className={className} disabled={pending}>
+      {props.children}
+    </button>
+  );
+};
 ```
 
 ## `ssr: false` not allowed in sever components
@@ -57,6 +87,14 @@ const ThemeToggle = dynamic(() => import('./theme-toggle'), {
   loading: () => <ThemeToggleSkeleton size='medium' />
 });
 ```
+
+## Always use controlled inputs with `useActionState`
+
+Discovered that with this update, native browser managed `input` elements are now resetting to a blank fields when there are validation errors. To fix this, updated all forms to use controlled inputs.
+
+## TypeScript: server actions should only return a Promise if using `useActionState`
+
+Discovered with this update, you will now get a Typescript error on a `<form>` using a server action if that action returns an object and that object is not being consumed by the form via the `useActionState` mechanism. This was the case with a `logout` action which was using the same return pattern for consistency but technically didn't need to use `useActionState`. Fixed by using a `redirect` instead of returning a state object and removed the return type `Promise<FormState>`. 
 
 ## Async request APIs 
 
@@ -80,11 +118,23 @@ export async function AdminPanel() {
 }
 ```
 
+and params:
+
+```tsx
+interface PageProps {
+  params: Promise<{ token: string }>;
+};
+
+export default async function PasswordResetPage(props: PageProps) {
+  const params = await props.params;
+  // ...
+```
+
 See more [examples in the upgrade guide](https://nextjs.org/docs/app/building-your-application/upgrading/version-15#async-request-apis-breaking-change).
 
 ## `fetch` requests are no longer cached by default
 
-See [fetch requests in teh upgarde guide](https://nextjs.org/docs/app/building-your-application/upgrading/version-15#fetch-requests).
+See [fetch requests in the upgrade guide](https://nextjs.org/docs/app/building-your-application/upgrading/version-15#fetch-requests).
 
 To opt specific fetch requests into caching, you can pass the `cache: 'force-cache'` option.
 
@@ -118,7 +168,7 @@ Read [more about Turbopack here](https://nextjs.org/blog/turbopack-for-developme
 
 See [instrumentation.md](instrumentation.md).
 
-## `<Form>` component
+## `Form` component
 
 The new `<Form>` component extends the HTML `<form>` element with prefetching, client-side navigation, and progressive enhancement.
 
