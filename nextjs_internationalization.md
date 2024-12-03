@@ -360,3 +360,8 @@ export async function GET(req) {
 }
 ```
 
+## next-intl
+
+[next-intl](https://github.com/amannn/next-intl) is an Internationalization (i18n) for Next.js. It looks well-supported and easy to use.
+
+
