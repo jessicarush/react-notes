@@ -70,7 +70,7 @@ To start the development server on http://localhost:3000:
 npm run dev
 ```
 
-To run on a specfic port:
+To run on a specific port:
 
 ```bash
 npm run dev -- -p 4000
