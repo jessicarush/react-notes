@@ -588,6 +588,8 @@ When the form is submitted with empty fields:
 
 ### Using a ref and performing a form.reset()
 
+**WARNING: This method worked great up until Next 15/React 19, then suddenly stopped working.**
+
 > Note: a demo of this method can be found in the next_kysely example
 
 One approach is seen in [Robin's progressive enhancement solution](https://www.robinwieruch.de/next-forms/):
@@ -754,7 +756,9 @@ function ItemEdit({ item, editItem }: Props) {
       // ...
 ```
 
-### Using a key
+### Using a key 
+
+**WARNING: This method worked great up until Next 15/React 19, then suddenly stopped working.**
 
 > Note: a demo of this method can be found in the templates next_lucia_kysely_postgres and next_lucia_kysely_postgres_tailwind
 
@@ -811,6 +815,93 @@ function createPost(title: string) {
     title,
   };
 }
+```
+
+### Resetting fields manually on success
+
+As of Next 15 and React 19 the above two methods no longer work. The solution now is to une an Effect to manually reset the fields on success:
+
+```tsx
+export interface ActionState {
+  status: 'UNSET' | 'SUCCESS' | 'ERROR';
+  message: string;
+  errors: object;
+  timestamp: number;
+}
+```
+action:
+
+```ts
+export async function sendPasswordResetLink(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  // ...
+  try {
+    // ...
+    return {
+      status: 'SUCCESS' as const,
+      message: 'Password reset link sent!',
+      errors: {},
+      timestamp: Date.now(),
+    };
+  } catch (error) {
+    return {
+      status: 'ERROR' as const,
+      message: 'Error. Failed to send password reset link.',
+      errors: {},
+      timestamp: Date.now(),
+    };
+  }
+}
+```
+
+form:
+
+```tsx
+'use client';
+
+// ...
+
+export default function SendResetLink() {
+  const [state, dispatch] = useActionState(
+    sendPasswordResetLink,
+    initialActionState as ActionState
+  );
+  const { formData, setFormData, handleChange } = useControlledInput({ email: '' });
+
+  useEffect(() => {
+    if (state.status === 'SUCCESS') {
+      setFormData({ email: '' });
+    }
+  }, [state, setFormData]);
+
+  return (
+    <form action={dispatch} className='auth-form'>
+      <label htmlFor='email' className='auth-form-label'>Email</label>
+      <input
+        id='email'
+        name='email'
+        type='text'
+        value={formData.email}
+        onChange={handleChange}
+        aria-describedby='email-error'
+        className='auth-form-field'
+      />
+      <div id='email-error' aria-live='polite' aria-atomic='true'>
+        {state.errors?.email &&
+          state.errors.email.map((error: string) => (
+            <p className='auth-form-error' key={error}>
+              <Asterisk className='auth-form-error__icon' strokeWidth={2} /> {error}
+            </p>
+          ))}
+      </div>
+
+      <SubmitButton>Request password reset</SubmitButton>
+    </form>
+  );
+}
+
 ```
 
 ## Adding toast messages 
