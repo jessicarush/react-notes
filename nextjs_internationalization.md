@@ -15,6 +15,7 @@ Next.js enables you to configure the routing and rendering of content to support
 - [7. using dictionaries in server components](#7-using-dictionaries-in-server-components)
 - [8. using dictionaries in client components](#8-using-dictionaries-in-client-components)
 - [gotchas](#gotchas)
+- [next-intl](#next-intl)
 
 <!-- tocstop -->
 
