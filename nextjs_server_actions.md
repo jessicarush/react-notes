@@ -20,8 +20,9 @@
 - [Resetting form fields](#resetting-form-fields)
   * [Using a ref and performing a form.reset()](#using-a-ref-and-performing-a-formreset)
   * [Using a key](#using-a-key)
+  * [Resetting fields manually on success](#resetting-fields-manually-on-success)
 - [Adding toast messages](#adding-toast-messages)
-- [Disabling submit buttons with useFormState](#disabling-submit-buttons-with-useformstate)
+- [Disabling submit buttons with useFormStatus](#disabling-submit-buttons-with-useformstatus)
 - [Actions can be called outside of forms](#actions-can-be-called-outside-of-forms)
 - [Headers](#headers)
 - [Resources](#resources)
@@ -88,7 +89,12 @@ export default function AddToCart({ productId }) {
 Server Actions can be defined in two places:
 
 - Inside the component that uses it (**Server Components only**)
-- In a separate 'server-only' file. You can define multiple Server Actions in a single file and both client and server components can import and use them.
+- In a separate `use server` file. You can define multiple Server Actions in a single file and both client and server components can import and use them.
+
+> What 'use server' actually does:
+>
+> - It marks JavaScript functions (not components) as server functions that can be called from client components
+> - It enables Server Actions - functions that run on the server but can be imported and called from the client. This allows forms and event handlers in client components to trigger server-side code execution.
 
 Server Actions became a stable feature in Next.js 14, and are enabled by default. By default, the maximum size of the request body sent to a Server Action is 1MB. This prevents large amounts of data being sent to the server, which consumes a lot of server resource to parse. However, you can configure this limit in `next.config.js`.
 
@@ -223,7 +229,7 @@ export async function createInvoice(formData: FormData) {
 
 ### Validate and prepare the data to be inserted into your database.
 
-To handle type validation, you can manually validate types or use a type validation library which can save you time and effort. For your example, [Zod](https://zod.dev/), a TypeScript-first validation library.
+To handle type validation, you can manually validate types or use a type validation library which can save you time and effort. For this example: [Zod](https://zod.dev/), a TypeScript-first validation library.
 
 In your `actions.ts` file, import Zod and define a schema that matches the shape of your form object. This schema will validate the formData before saving it to a database.
 
@@ -240,13 +246,16 @@ const FormSchema = z.object({
   date: z.string(),
 });
 
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
+// const CreateInvoice = FormSchema.omit({ id: true, date: true });
+const CreateInvoice = FormSchema.pick({ customerId: true, amount: true, status: true });
 
 export async function createInvoice(formData: FormData) {
   // ...
 ```
 
 The `amount` field is specifically set to coerce (change) from a string to a number while also validating its type.
+
+I highly recommend using `pick()` over `omit()`. If you add fields down the road, you will need to remember to go back to any `omit()` calls and update them. I have been screwed by this.
 
 You can then pass your `rawFormData` to `CreateInvoice` to validate the types:
 
@@ -441,30 +450,30 @@ By validating forms on the server, you can:
 - Reduce the risk of malicious users bypassing client-side validation.
 - Have one source of truth for what is considered valid data.
 
-In your form component, import the `useFormState` hook from react-dom. Since `useFormState` is a hook, you will need to turn your form into a client component:
+In your form component, import the `useActionState` (formerly `useFormState`) hook from react-dom. Since `useActionState` is a hook, you will need to turn your form into a client component:
 
 ```tsx
 'use client';
 // ...
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react-dom';
  
 export default function Form({ customers }: { customers: CustomerField[] }) {
-  const [state, dispatch] = useFormState(createInvoice, initialState);
+  const [state, dispatch, isPending] = useActionState(createInvoice, initialState);
  
   return <form action={dispatch}>...</form>;
 }
 ```
 
-The `useFormState` hook takes two arguments: `(action, initialState)`, and returns two values: `[state, dispatch]` - similar to [useReducer](https://react.dev/reference/react/useReducer).
+The `useActionState` hook takes two arguments: `(action, initialState)`, and returns three values: `[state, dispatch, isPending]` - similar to [useReducer](https://react.dev/reference/react/useReducer).
 
-Pass your action (`createInvoice`) as the first arg of `useFormState`, and pass the `dispatch` to the form action attribute `<form action={}>`.
+Pass your action (`createInvoice`) as the first arg of `useActionState`, and pass the `dispatch` to the form action attribute `<form action={}>`. The `isPending` value can be used to disable submit buttons while teh form is processing.
 
 The `initialState` can be anything you define. In this case, create an object with two empty keys: `message` and `errors`.
 
 ```tsx
 export default function Form({ customers }: { customers: CustomerField[] }) {
   const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(createInvoice, initialState);
+  const [state, dispatch] = useActionState(createInvoice, initialState);
 
   // ...
 }
@@ -508,7 +517,7 @@ export async function createInvoice(PrevState: State, formData: FormData) {
 }
 ```
 
-`prevState` contains the state passed from the `useFormState` hook. We won't be using it in this example, but it's a required prop.
+`prevState` contains the state passed from the `useActionState` hook. We won't be using it in this example, but it's a required prop.
 
 Next, change the Zod `parse()` function to `safeParse()`. This will return an object containing either a `success` or `error` field. This will help handle validation more gracefully without having put this logic inside the try/catch block. If the parse is successful, we can then get our individual fields from `.data`:
 
@@ -588,7 +597,7 @@ When the form is submitted with empty fields:
 
 ### Using a ref and performing a form.reset()
 
-**WARNING: This method worked great up until Next 15/React 19, then suddenly stopped working.**
+**WARNING: This method only works up to Next 14/React 18 with useFormState.**
 
 > Note: a demo of this method can be found in the next_kysely example
 
@@ -758,7 +767,7 @@ function ItemEdit({ item, editItem }: Props) {
 
 ### Using a key 
 
-**WARNING: This method worked great up until Next 15/React 19, then suddenly stopped working.**
+**WARNING: This method only works up to Next 14/React 18, with useFormState.**
 
 > Note: a demo of this method can be found in the templates next_lucia_kysely_postgres and next_lucia_kysely_postgres_tailwind
 
@@ -819,7 +828,7 @@ function createPost(title: string) {
 
 ### Resetting fields manually on success
 
-As of Next 15 and React 19 the above two methods no longer work. The solution now is to une an Effect to manually reset the fields on success:
+As of **Next 15 and React 19** the above two methods no longer work. The solution now is to une an Effect to manually reset the fields on success:
 
 ```tsx
 export interface ActionState {
@@ -1004,16 +1013,33 @@ import { useToastMessage } from '@/app/_hooks/useToastMessage';
 
 
 function ItemAdd() {
-  const [state, dispatch] = useFormState(addItem, initialFormState);
+  const [state, dispatch, isPending] = useActionState(addItem, initialFormState);
   // Toast hook will display general state.message from our server actions
   useToastMessage(state);
 
   // ...
 ```
 
-## Disabling submit buttons with useFormState
+## Disabling submit buttons with useFormStatus
 
-TODO...
+In addition to `isPending` returned by `useActionState`, we cal also use `useFormSatus`. 
+
+> The `useFormStatus` Hook must be called from a component that is rendered inside a `<form>`.
+> `useFormStatus` will only return status information for a parent `<form>`. It will not return status information for any `<form>` rendered in that same component or children components.
+
+```tsx
+export const SubmitButton = (props: SubmitButtonProps) => {
+  const { pending } = useFormStatus();
+
+  // ...
+
+  return (
+    <button type={type} className={className} disabled={pending} {...rest}>
+      {children}
+    </button>
+  );
+};
+```
 
 ## Actions can be called outside of forms
 
@@ -1042,7 +1068,7 @@ export async function deleteItem(id: number): Promise<FormState> {
 }
 ```
 
-This works great until I decide I want to display the returned message on successful delete. The problem is that on `revalidatePath` the form and is associated `useFormSatus` no longer exist to receive the message and call `toast.success`. The solution here is to call the server action in a parent component, and pass the handler down to the item component:
+This works great until I decide I want to display the returned message on successful delete. The problem is that on `revalidatePath` the form and its associated `useFormStatus` no longer exist to receive the message and call `toast.success`. The solution here is to call the server action in a parent component, and pass the handler down to the item component:
 
 ```tsx
 'use client';
@@ -1137,7 +1163,8 @@ You can read incoming request headers such as cookies and headers within a Serve
 import { cookies } from 'next/headers';
  
 export async function addItem(data) {
-  const cartId = cookies().get('cartId')?.value;
+  const cookieStore = await cookies();
+  const cartId = cookieStore.get('cartId')?.value;
 }
 ```
 
@@ -1151,9 +1178,10 @@ import { cookies } from 'next/headers';
 export async function create(data) {
 
   const cart = await createCart():
-  cookies().set('cartId', cart.id)
+  const cookieStore = await cookies();
+  cookieStore.set('cartId', cart.id)
   // or
-  cookies().set({
+  cookieStore.set({
     name: 'cartId',
     value: cart.id,
     httpOnly: true,
@@ -1165,3 +1193,4 @@ export async function create(data) {
 ## Resources 
 
 - [Exploring Next.js Forms with Server Actions - Robin Wieruch](https://www.robinwieruch.de/next-forms/)
+- [Forms with React 19 and Next.js](https://www.youtube.com/watch?v=KhO4VjaYSXU&t=261s)
