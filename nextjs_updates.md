@@ -78,21 +78,42 @@ export const SubmitButton = (props: SubmitButtonProps) => {
 };
 ```
 
-## `ssr: false` not allowed in sever components
+## Use controlled inputs with `useActionState`
 
-Error:   × `ssr: false` is not allowed with `next/dynamic` in Server Components. Please move it into a client component.
+Discovered that with this update, native browser managed `input` elements are now resetting to a blank fields when there are validation errors. To fix this, you have two options:
+
+1. Use controlled inputs
+
+2. Pass the `rawFormData` back to the client via the `useActionState` response object and set that data on the field using the `defaultValue` attribute. However, there is an issue here. We have to update the `ActionState` type with the new return formData. The trouble is the `formData` is typed to be `string` or `undefined`. The `defaultValue` attribute can accept `string` or `undefined`. But the `formData.get()` in the `rawFormData` gives us `FormDataEntryValue` | `null`. This requires a helper function to convert the `rawFormData` before passing back to the client. After all this is feels like any less work than controlled inputs.
+
+See leerob's [Forms with React 19 and Next.js](https://www.youtube.com/watch?v=KhO4VjaYSXU&t=261s). He doesn't address the TypeScript issue.
+
+## `Form` component
+
+The new `<Form>` component extends the HTML `<form>` element with prefetching, client-side navigation, and progressive enhancement.
+
+It is useful for forms that navigate to a new page, such as a search form that leads to a results page.
 
 ```tsx
-// https://nextjs.org/docs/messages/react-hydration-error
-const ThemeToggle = dynamic(() => import('./theme-toggle'), {
-  ssr: false,
-  loading: () => <ThemeToggleSkeleton size='medium' />
-});
+import Form from 'next/form';
+ 
+export default function Page() {
+  return (
+    <Form action="/search">
+      <input name="query" />
+      <button type="submit">Submit</button>
+    </Form>
+  );
+}
 ```
 
-## Always use controlled inputs with `useActionState`
+The `<Form>` component comes with:
 
-Discovered that with this update, native browser managed `input` elements are now resetting to a blank fields when there are validation errors. To fix this, updated all forms to use controlled inputs.
+- Prefetching: When the form is in view, the layout and loading UI are prefetched, making navigation fast.
+- Client-side Navigation: On submission, shared layouts and client-side state are preserved.
+- Progressive Enhancement: If JavaScript hasn't loaded yet, the form still works via full-page navigation
+
+See the documentation for [`<Form>`](https://nextjs.org/docs/app/api-reference/components/form).
 
 ## TypeScript: server actions should only return a Promise if using `useActionState`
 
@@ -153,6 +174,19 @@ export default async function RootLayout() {
 
 To opt `GET` methods into caching, you can use a route config option such as `export const dynamic = 'force-static'` in your Route Handler file.
 
+
+## `ssr: false` not allowed in sever components
+
+Error: `ssr: false` is not allowed with `next/dynamic` in Server Components. Please move it into a client component.
+
+```tsx
+// https://nextjs.org/docs/messages/react-hydration-error
+const ThemeToggle = dynamic(() => import('./theme-toggle'), {
+  ssr: false,
+  loading: () => <ThemeToggleSkeleton size='medium' />
+});
+```
+
 ## Turbopack 
 
 When creating a new project with `npx create-next-app@latest` you will now be given the option to use Turbopack instead of webpack.
@@ -169,30 +203,3 @@ Read [more about Turbopack here](https://nextjs.org/blog/turbopack-for-developme
 [instrumentation.js|ts](https://nextjs.org/blog/next-15#instrumentationjs-stable) is now stable and the `experimental.instrumentationHook` config option can be removed. The instrumentation file, with the `register()` API, allows users to tap into the Next.js server lifecycle to monitor performance, track the source of errors, and deeply integrate with observability libraries like [OpenTelemetry](https://opentelemetry.io/).
 
 See [instrumentation.md](instrumentation.md).
-
-## `Form` component
-
-The new `<Form>` component extends the HTML `<form>` element with prefetching, client-side navigation, and progressive enhancement.
-
-It is useful for forms that navigate to a new page, such as a search form that leads to a results page.
-
-```tsx
-import Form from 'next/form';
- 
-export default function Page() {
-  return (
-    <Form action="/search">
-      <input name="query" />
-      <button type="submit">Submit</button>
-    </Form>
-  );
-}
-```
-
-The `<Form>` component comes with:
-
-- Prefetching: When the form is in view, the layout and loading UI are prefetched, making navigation fast.
-- Client-side Navigation: On submission, shared layouts and client-side state are preserved.
-- Progressive Enhancement: If JavaScript hasn't loaded yet, the form still works via full-page navigation
-
-See the documentation for [`<Form>`](https://nextjs.org/docs/app/api-reference/components/form).

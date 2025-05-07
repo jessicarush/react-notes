@@ -828,7 +828,7 @@ function createPost(title: string) {
 
 ### Resetting fields manually on success
 
-As of **Next 15 and React 19** the above two methods no longer work. The solution now is to une an Effect to manually reset the fields on success:
+As of **Next 15 and React 19** the above two methods no longer work. There are two new solutions: the first is to use controlled inputs and an Effect to manually reset the fields on success:
 
 ```tsx
 export interface ActionState {
@@ -910,7 +910,96 @@ export default function SendResetLink() {
     </form>
   );
 }
+```
 
+### Passing back the form data and using `defaultValue`
+
+The next method for **Next 15 and React 19** is to not use controlled inputs but instead pass the `rawFormData` back to the client via the `useActionState` response object and set that data on the field using the `defaultValue` attribute. 
+
+However, there is an issue here. We have to update the `ActionState` type with the new return formData. The trouble is the `formData` is typed to be `string` or `undefined`. The `defaultValue` attribute can also accept `string` or `undefined`. But the `formData.get()` in the `rawFormData` gives us `FormDataEntryValue` | `null`. This requires a helper function to convert the `rawFormData` before passing back to the client. After all this is feels like controlled inputs are no more work. 
+
+```tsx
+export interface UserActionState extends ActionState {
+  errors: {
+    email?: string[];
+    username?: string[];
+    password?: string[];
+    bio?: string[];
+    code?: string[];
+  };
+  formData?: { [K in keyof UserActionState['errors']]?: string };
+}
+```
+action:
+
+```ts
+export async function sendPasswordResetLink(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  // ...
+  const rawFormData = {
+    // convert type from FormDataEntryValue | null to string | undefined for passing back to client
+    email: (formData.get('email') as string) ?? undefined
+  };
+  // ...
+  try {
+    // ...
+    return {
+      status: 'SUCCESS' as const,
+      message: 'Password reset link sent!',
+      errors: {},
+      timestamp: Date.now(),
+    };
+  } catch (error) {
+    return {
+      status: 'ERROR' as const,
+      message: 'Error. Failed to send password reset link.',
+      errors: {},
+      timestamp: Date.now(),
+      formData: rawFormData
+    };
+  }
+}
+```
+
+form:
+
+```tsx
+'use client';
+
+// ...
+
+export default function SendResetLink() {
+  const [state, dispatch] = useActionState(
+    sendPasswordResetLink,
+    initialActionState as ActionState
+  );
+
+  return (
+    <form action={dispatch} className='auth-form'>
+      <label htmlFor='email' className='auth-form-label'>Email</label>
+      <input
+        id='email'
+        name='email'
+        type='text'
+        defaultValue={state.formData?.email}
+        aria-describedby='email-error'
+        className='auth-form-field'
+      />
+      <div id='email-error' aria-live='polite' aria-atomic='true'>
+        {state.errors?.email &&
+          state.errors.email.map((error: string) => (
+            <p className='auth-form-error' key={error}>
+              <Asterisk className='auth-form-error__icon' strokeWidth={2} /> {error}
+            </p>
+          ))}
+      </div>
+
+      <SubmitButton>Request password reset</SubmitButton>
+    </form>
+  );
+}
 ```
 
 ## Adding toast messages 
