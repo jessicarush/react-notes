@@ -109,7 +109,7 @@ class Test extends Component {
   }
 
   componentDidMount() {
-    const url = 'https://log.zebro.id/api_demo_one';
+    const url = 'https://log.zebro.id/api/demo_one';
     axios.get(url).then((response) => {
       this.setState({
         colorName: response.data.name,
@@ -134,7 +134,7 @@ class Test extends Component {
 For reference, the python flask endpoint for this api:
 
 ```python
-@app.route('/api_demo_one', methods=['GET'])
+@app.route('/api/demo_one', methods=['GET'])
 def api_demo():
     '''Demo API returns a random html color'''
     name, hex = random.choice(list(colors.items()))
@@ -166,8 +166,8 @@ class Test extends Component {
   }
 
   componentDidMount() {
-    const url = 'http://127.0.0.1:5000/api_demo_one';
-    // Equivalent to "http://127.0.0.1:5000/api_demo_one?value=rgb"
+    const url = 'http://127.0.0.1:5000/api/demo_one';
+    // Equivalent to "http://127.0.0.1:5000/api/demo_one?value=rgb"
     const config = {
       params: { value: 'rgb' }
     };

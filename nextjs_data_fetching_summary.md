@@ -106,7 +106,7 @@ data fetching function:
 import type { Color } from '@/app/_lib/definitions';
 
 async function getColor(): Promise<Color> {
-  const url = 'https://log.zebro.id/api_demo_two';
+  const url = 'https://log.zebro.id/api/demo_two';
   // RequestInit defines the shape of the options you can pass to the fetch function
   const options: RequestInit = {
     cache: 'no-store'
@@ -150,7 +150,7 @@ interface Color {
 }
 
 async function getColor(): Promise<Color> {
-  const url = 'https://log.zebro.id/api_demo_two';
+  const url = 'https://log.zebro.id/api/demo_two';
   // RequestInit defines the shape of the options you can pass to the fetch function
   const options: RequestInit = {
     cache: 'no-store'
@@ -341,7 +341,7 @@ action.ts:
 import type { FormState } from '@/app/_lib/definitions';
 
 export async function getColor(value: string): Promise<FormState> {
-  const url = 'https://log.zebro.id/api_demo_two';
+  const url = 'https://log.zebro.id/api/demo_two';
   const options: RequestInit = {
     cache: 'no-store'
   };
@@ -410,7 +410,7 @@ export default function ClientSide() {
 
     try {
       console.log('fetching...');
-      const url = 'https://log.zebro.id/api_demo_two';
+      const url = 'https://log.zebro.id/api/demo_two';
 
       // Sending request args with a fetch request:
       const params = new URLSearchParams({ value: 'rgb' });
@@ -523,7 +523,7 @@ get-data.ts:
 
 ```ts
 export async function getColor(): Promise<Color> {
-  const url = 'https://log.zebro.id/api_demo_two';
+  const url = 'https://log.zebro.id/api/demo_two';
   const res = await fetch(url);
   
   if (!res.ok) {

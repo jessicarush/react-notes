@@ -117,7 +117,7 @@ interface Color {
 
 // Same function used in examples/next_data_fetching server-side demo
 export async function getColor(): Promise<Color> {
-  const url = 'https://log.zebro.id/api_demo_two';
+  const url = 'https://log.zebro.id/api/demo_two';
   // RequestInit defines the shape of the options you can pass to the fetch function
   const options: RequestInit = {
     cache: 'no-store'
@@ -147,7 +147,7 @@ So we could shorten this function to:
 
 ```ts
 export async function getColor(): Promise<Color> {
-  const url = 'https://log.zebro.id/api_demo_two';
+  const url = 'https://log.zebro.id/api/demo_two';
   const res = await fetch(url);
   
   if (!res.ok) {

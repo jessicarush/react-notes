@@ -798,7 +798,7 @@ Example:
 ```javascript
 import useSWR from 'swr';
 
-const url = 'https://log.zebro.id/api_demo_one';
+const url = 'https://log.zebro.id/api/demo_one';
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Home() {
@@ -833,7 +833,7 @@ You could use axios as well:
 ```javascript
 import axios from 'axios';
 
-const url = 'https://log.zebro.id/api_demo_one';
+const url = 'https://log.zebro.id/api/demo_one';
 // const fetcher = (...args) => fetch(...args).then((res) => res.json());
 const fetcher = url => axios.get(url).then(res => res.data);
 
@@ -845,7 +845,7 @@ You can also fetch via a user event using `mutate`:
 ```javascript
 import useSWR, { mutate } from 'swr'; // <-- import mutate
 
-const url = 'https://log.zebro.id/api_demo_one';
+const url = 'https://log.zebro.id/api/demo_one';
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Home() {

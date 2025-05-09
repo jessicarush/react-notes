@@ -418,7 +418,7 @@ Example:
 ```javascript
 import useSWR from 'swr';
 
-const url = 'https://log.zebro.id/api_demo_one';
+const url = 'https://log.zebro.id/api/demo_one';
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Home() {
@@ -452,7 +452,7 @@ You can also fetch via a user event using `mutate`:
 ```javascript
 import useSWR, { mutate } from 'swr'; // <-- import mutate
 
-const url = 'https://log.zebro.id/api_demo_one';
+const url = 'https://log.zebro.id/api/demo_one';
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Home() {
@@ -510,7 +510,7 @@ They don't give an example but I'm guessing they mean doing something like this:
 
 ```javascript
 export async function GET(req) {
-  const url = 'https://log.zebro.id/api_demo_two';
+  const url = 'https://log.zebro.id/api/demo_two';
   const options = {
     cache: 'no-store'
   };

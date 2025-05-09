@@ -432,7 +432,7 @@ export default Color;
 And my fetch function looks like:
 
 ```javascript
-const url = 'https://log.zebro.id/api_demo_one';
+const url = 'https://log.zebro.id/api/demo_one';
 
 export async function getColorWithFetch() {
   const res = await fetch(url, options);
