@@ -6,6 +6,10 @@
 
 - [Introduction](#introduction)
 
+<!-- tocstop -->
+
+# Introduction
+
 [`after`](https://nextjs.org/docs/app/api-reference/functions/after) allows you to schedule work to be executed after a response (or prerender) is finished. This is useful for tasks and other side effects that should not block the response, such as logging and analytics.
 
 It can be used in Server Components, Server Actions, Route Handlers, and Middleware.
