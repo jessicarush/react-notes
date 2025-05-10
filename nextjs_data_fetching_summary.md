@@ -5,25 +5,43 @@
 <!-- toc -->
 
 - [Demos](#demos)
-- [Server components](#server-components)
-- [Server actions](#server-actions)
-- [Client-side](#client-side)
-- [Client-side with react query](#client-side-with-react-query)
+- [data.ts vs actions.ts](#datats-vs-actionsts)
+- [Server-side fetch in server components](#server-side-fetch-in-server-components)
+- [Server-side fetch in server actions](#server-side-fetch-in-server-actions)
+- [Client-side fetch](#client-side-fetch)
+- [Client-side fetch with react query](#client-side-fetch-with-react-query)
 - [Server components + react query](#server-components--react-query)
 - [React use() API](#react-use-api)
+- [GET/POST fetch() examples](#getpost-fetch-examples)
 
 <!-- tocstop -->
 
 ## Demos 
 
+**Fetching from API**
 - examples/next_data_fetching
 - examples/next_data_fetching_with_react_query
+
+**Fetching from Database**
 - examples/next_node_postgres
 - examples/next_kysely
 
-## Server components 
 
-Whenever possible, data fetching should be done in server components. It's easy, improves performance, reduces bundle size, and ensures that sensitive data stays secure on the server. Since data fetching is done on the server-side, functions can directly read data from a database without the need for an API. Async components pause their execution until the asynchronous operation is done. Once the awaited promise is resolved, the component will continue rendering with the fetched data. 
+## data.ts vs actions.ts
+
+Some foundational points to keep in mind:
+
+- Whenever possible, data fetching should be done server-side.
+- `data.ts` should be used for functions that `GET` or do database queries that just `select`. These can then be called in server components.
+- `actions.ts` should be used for functions that `POST` or do database queries that mutate (`POST`, `PUT`, `DELETE`) as these can be called as server actions in client components.
+- `data.ts` does not need the `use server` directive because these functions are only called from server components, which already run on the server.
+- `actions.ts` must use the `use server` directive as they are called from client components, either via a form’s action prop or from a client-side event handler.
+- Since server actions can be called in client components, they can be used as a wrapper to call any server-only function (including those in `data.ts`) from a client component. This is helpful for when you want to call a `GET` function in `data.ts` in a client component even handler. 
+
+
+## Server-side fetch in server components 
+
+Fetching in server components easy, improves performance, reduces bundle size, and ensures that sensitive data stays secure on the server. Since data fetching is done on the server-side, functions can directly read data from a database without the need for an API. Async components pause their execution until the asynchronous operation is done. Once the awaited promise is resolved, the component will continue rendering with the fetched data. 
 
 **Fetching data from a database**
 
@@ -31,7 +49,7 @@ server component:
 
 ```tsx 
 import ItemList from '@/app/_ui/ItemList';
-import { getItems } from '@/app/_lib/get-data';
+import { getItems } from '@/app/_lib/data';
 
 export default async function Home() {
   const items = await getItems();
@@ -44,7 +62,7 @@ export default async function Home() {
 }
 ```
 
-data fetching function:
+data.ts:
 
 ```ts 
 import { unstable_noStore as noStore } from 'next/cache';
@@ -77,13 +95,13 @@ server component:
 
 ```jsx 
 import { headers } from 'next/headers';
-import { getColor } from '@/app/_lib/get-data';
+import { getColor } from '@/app/_lib/data';
 
 export default async function ServerSide() {
   const color = await getColor();
 
   // Just for example:
-  const headersList = headers();
+  const headersList = await headers();
   const referer = headersList.get('referer');
   console.log('server-side render');
   console.log(Array.from(headersList.keys()));
@@ -97,13 +115,15 @@ export default async function ServerSide() {
     </main>
   );
 }
-
 ```
 
-data fetching function:
+data.ts:
 
-```js 
-import type { Color } from '@/app/_lib/definitions';
+```ts 
+interface Color {
+  name: string;
+  value: string;
+};
 
 async function getColor(): Promise<Color> {
   const url = 'https://log.zebro.id/api/demo_two';
@@ -132,7 +152,7 @@ async function getColor(): Promise<Color> {
 
 From here you can add a loading state to the component by using the `Suspense` component from React.
 
-## Server actions
+## Server-side fetch in server actions
 
 Server Actions are exposed server endpoints and can be called anywhere in client code. When using a Server Action outside of a form, call the Server Action in a Transition, which allows you to display a loading indicator, show optimistic state updates, and handle unexpected errors. Forms will automatically wrap Server Actions in transitions. See: <https://react.dev/reference/rsc/use-server#calling-a-server-action-outside-of-form>
 
@@ -142,43 +162,16 @@ server component:
 
 ```tsx
 import { headers } from 'next/headers';
+import { getColor } from '@/app/_lib/data'; // same as in previous example
 import Form from './form';
 
-interface Color {
-  name: string;
-  value: string;
-}
-
-async function getColor(): Promise<Color> {
-  const url = 'https://log.zebro.id/api/demo_two';
-  // RequestInit defines the shape of the options you can pass to the fetch function
-  const options: RequestInit = {
-    cache: 'no-store'
-    // next: { revalidate: 20 }
-  };
-  const res = await fetch(url, options);
-
-  // Handle errors using the standard Response.ok (a boolean indicating whether
-  // the response was successful (status in the range 200 – 299) or not.
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    throw new Error('Failed to fetch data')
-  }
-
-  const data = await res.json();
-  const color: Color = {
-    name: data.name,
-    value: data.value
-  };
-  return color;
-}
-
 export default async function ServerActionWithForm() {
-  console.log('server-side render');
   const color: Color = await getColor();
 
-  const headersList = headers();
+  // Just for example:
+  const headersList = await headers();
   const referer = headersList.get('referer');
+  console.log('server-side render');
   console.log(Array.from(headersList.keys()));
   console.log(referer);
 
@@ -198,12 +191,12 @@ form.tsx:
 ```tsx
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react-dom';
 import { revalidateColor } from '@/app/_lib/actions';
-import { initialFormState } from '@/app/_lib/definitions';
+import { initialActionState } from '@/app/_lib/definitions';
 
 export default function Form() {
-  const [state, dispatch] = useFormState(revalidateColor, initialFormState);
+  const [state, dispatch] = useActionState(revalidateColor, initialActionState);
   const { pending } = useFormStatus();
 
   return (
@@ -225,18 +218,18 @@ action.ts:
 import { revalidatePath } from 'next/cache';
 // Use this if you want to redirect after revalidatePath
 // import { redirect } from 'next/navigation';
-import type { FormState } from '@/app/_lib/definitions';
+import type { ActionState } from '@/app/_lib/definitions';
 
 
-export async function revalidateColor(prevState: FormState, formData: FormData): Promise<FormState> {
+export async function revalidateColor(prevState: ActionState, formData: FormData): Promise<ActionState> {
   try {
     // We are demonstrating using server actions with a form and revalidatePath('/') to update the
     // page after the form is submitted. In theory, you would choose this method when you want to
-    // Post data to an API, (which would update its database), then we would revalidatePath('/')
+    // POST data to an API, (which would update its database), then we would revalidatePath('/')
     // which would run the fetch call again inside the server component and update the results.
-    // See nextjs_server_actions.md, databases.md, examples/next_kysely,
+    // See nextjs_server_actions.md, databases.md, examples/next_kysely, examples/next_data_fetching
     // and templates/next_lucia_kysely_postgres for handling and validating form data with Zod.
-    console.log('Doing something');
+    console.log('Do something e.g. POST request to an API, or mutate a database');
     revalidatePath('/');
     return {
       status: 'SUCCESS' as const,
@@ -259,19 +252,18 @@ export async function revalidateColor(prevState: FormState, formData: FormData):
 type definition:
 
 ```ts
-export interface FormState {
+export interface ActionState {
   status: 'UNSET' | 'SUCCESS' | 'ERROR';
   message: string;
   errors: {};
   timestamp: number;
-  resetKey?: number;
   data?: {
     name: string;
     value: string;
   }
 }
 
-export const initialFormState: FormState = {
+export const initialActionState: ActionState = {
   status: 'UNSET' as const,
   message: '',
   errors: {},
@@ -287,7 +279,7 @@ client component:
 'use client';
 
 import { useEffect, useState, useTransition, useRef } from 'react';
-import { getColor } from '@/app/_lib/actions';
+import { getColor2Action } from '@/app/_lib/actions';
 
 interface Color {
   name: string | null;
@@ -309,7 +301,7 @@ export default function ServerActions() {
 
   const handleGetColor = async () => {
     startTransition(async () => {
-      const res = await getColor('rgb');
+      const res = await getColor2Action('rgb');
       if (res.status === 'SUCCESS' && res.data) {
         console.log('Success getting color');
         setColor({ name: res.data.name, value: res.data.value });
@@ -333,28 +325,53 @@ export default function ServerActions() {
 }
 ```
 
+*Note: This is primarily demonstrating how server actions can be called outside of a form, but it's also showing how you can use a server action as a wrapper for a fetching function in `data.ts`. Remember, server actions can be called by client-components, regular server files like `data.ts` cannot. Lastly to show something different we'll have this getColor function send query params and also a slightly different error message:*
+
+data.ts:
+
+```ts
+interface Color {
+  name: string;
+  value: string;
+};
+
+export async function getColor2(value: string): Promise<Color> {
+  const url = 'https://log.zebro.id/api/demo_two';
+  // RequestInit defines the shape of the options you can pass to the fetch function
+  const options: RequestInit = {
+    cache: 'no-store'
+  };
+  const params = new URLSearchParams({ value });
+  const res = await fetch(`${url}?${params}`, options);
+
+  // Handle errors using the standard Response.ok (a boolean indicating whether
+  // the response was successful (status in the range 200 – 299) or not.
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    // throw new Error('Failed to fetch data')
+    throw new Error(`Failed to fetch data: ${res.status} ${res.statusText}`);
+  }
+
+  const data = await res.json();
+  const color: Color = {
+    name: data.name,
+    value: data.value
+  };
+  return color;
+}
+```
+
 action.ts:
 
 ```ts
 'use server';
 
-import type { FormState } from '@/app/_lib/definitions';
+import type { ActionState } from '@/app/_lib/definitions';
+import { getColor2 } from '@/app/_lib/data';
 
-export async function getColor(value: string): Promise<FormState> {
-  const url = 'https://log.zebro.id/api/demo_two';
-  const options: RequestInit = {
-    cache: 'no-store'
-  };
-  const params = new URLSearchParams({ value });
-
+export async function getColor2Action(value: string): Promise<ActionState> {
   try {
-    const res = await fetch(`${url}?${params}`, options);
-
-    if (!res.ok) { // http errors e.g. 404, 500
-      throw new Error(`Failed to fetch data: ${res.status} ${res.statusText}`);
-    }
-
-    const data = await res.json();
+    const data = await getColor2(value);
     return {
       status: 'SUCCESS' as const,
       message: 'Successfully fetched data.',
@@ -374,9 +391,9 @@ export async function getColor(value: string): Promise<FormState> {
 }
 ```
 
-## Client-side
+## Client-side fetch
 
-Client-side data fetching is necessary when data needs to be updated dynamically after the initial page load, such as for real-time updates, user interactions that trigger data changes (e.g., search inputs, filters), or when using APIs that require client authentication tokens. It’s also used when some data depends on browser state, like window size or user geolocation, which isn’t available on the server. This demonstrates fetching data on load with `useEffect` as well as `Onclick`. 
+Client-side data fetching may be necessary when data needs to be updated dynamically after the initial page load, such as for real-time updates, user interactions that trigger data changes (e.g., search inputs, filters), or when using APIs that require client authentication tokens. It’s also used when some data depends on browser state, like window size or user geolocation, which isn’t available on the server. This demonstrates fetching data on load with `useEffect` as well as `onClick`. 
 
 ```jsx 
 'use client';
@@ -444,7 +461,7 @@ export default function ClientSide() {
 }
 ```
 
-## Client-side with react query 
+## Client-side fetch with react query 
 
 When it comes to client-side rendered React applications (i.e. SPAs), the most recommended way to fetch data is by using a library like React Query. This library comes with a bunch of additional features like automatic retry on failure, optimized performance with request deduplication, support for pagination and infinite scrolling and more.
 
@@ -519,7 +536,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 }
 ```
 
-get-data.ts:
+data.ts:
 
 ```ts
 export async function getColor(): Promise<Color> {
@@ -543,7 +560,7 @@ demo.tsx:
 ```tsx
 'use client';
 
-import { getColor } from '@/app/_lib/get-data';
+import { getColor } from '@/app/_lib/data';
 import { useQuery } from '@tanstack/react-query';
 
 type Props = {
@@ -699,3 +716,20 @@ export default function RandomColor({promisedColor}: Props) {
   );
 }
 ```
+
+## GET/POST fetch() examples
+
+**GET**
+
+**GET with query params**
+
+**POST**
+
+- Use query params when:
+  - you're retrieving data (read-only)
+  - the parameters are simple and idempotent
+  - you want the request to be bookmarkable, or shareable.
+- Use `POST` when:
+  - you’re submitting data (e.g. creating or updating resources)
+  - parameters include sensitive, complex, or large payloads
+  - you don’t want the data visible in the URL or cached
