@@ -12,15 +12,15 @@
 - [@next/codemod](#nextcodemod)
 - [`useFormState` has been replaced by `useActionState`](#useformstate-has-been-replaced-by-useactionstate)
 - [`useFormStatus` now includes additional keys](#useformstatus-now-includes-additional-keys)
-- [`ssr: false` not allowed in sever components](#ssr-false-not-allowed-in-sever-components)
-- [Always use controlled inputs with `useActionState`](#always-use-controlled-inputs-with-useactionstate)
+- [Use controlled inputs with `useActionState`](#use-controlled-inputs-with-useactionstate)
+- [`Form` component](#form-component)
 - [TypeScript: server actions should only return a Promise if using `useActionState`](#typescript-server-actions-should-only-return-a-promise-if-using-useactionstate)
 - [Async request APIs](#async-request-apis)
 - [`fetch` requests are no longer cached by default](#fetch-requests-are-no-longer-cached-by-default)
 - [`GET` functions in route handlers are no longer cached by default](#get-functions-in-route-handlers-are-no-longer-cached-by-default)
+- [`ssr: false` not allowed in sever components](#ssr-false-not-allowed-in-sever-components)
 - [Turbopack](#turbopack)
 - [Instrumentation.js|ts](#instrumentationjsts)
-- [`Form` component](#form-component)
 
 <!-- tocstop -->
 
