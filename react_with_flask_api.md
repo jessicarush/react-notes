@@ -44,18 +44,25 @@
 
 Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own from which a browser should permit loading resources. 
 
+Our approach to handling `CORS` will depend on how we intend on serving the frontend and backend:
+
+1. The frontend and backend will be served from the same domain and port by configuring Nginx as a reverse proxy (example below).
+2. The frontend and backend will be served separately (different domain and/or different ports)
+
 ### Frontend and backend will be served together (same origin)
 
-When developing, the Flask backend will likely be running on one port (e.g. http://localhost:5000/) and the React backend will be running on another (e.g. http://localhost:3000/). Out-of-the-box, if you want to make an API call to the backend, you would have to use the full URL:
+When developing, the Flask backend will be running on one port (e.g. http://localhost:5000/) and the React backend will be running on another (e.g. http://localhost:3000/). Out-of-the-box, if you want to make an API call to the backend, you would have to use the full URL since they are not the same origin:
 
 ```javascript
-axios.get('http://localhost:5000/api/color', headers);
+fetch('http://localhost:5000/api/color', options);
+// or 
+axios.get('http://localhost:5000/api/color', config);
 ```
 
-Anyone can make a get request without worrying about CORS. But, if the server is configured to send back some json data, we then need to consider the following:
+Note that anyone can make a `GET` request without worrying about CORS. But, if the server is configured to send back some json data, we then need to consider the following:
 
-- if the requester is from the same origin, we have no CORS issues 
-- if the requester is from a different origin (e.g. a different port), then the server needs to explicitly allow code from other origins to access the resource. This can be done with the `'Access-Control-Allow-Origin'` header using the `*` wildcard.
+- if the requester is from the same origin (same domain and port), we have no CORS issues 
+- if the requester is from a different origin (e.g. in our case, a different port), then the **server** needs to explicitly allow code from other origins to access the resource. This can be done quickly with the `'Access-Control-Allow-Origin'` header using the `*` wildcard. This allows **any** origin to access the resource
 
 ```Python
     # ...
@@ -64,9 +71,9 @@ Anyone can make a get request without worrying about CORS. But, if the server is
     return response
 ```
 
-As soon as we try to do a POST though, we will run into the same problem again. The Flask backend needs to identify if origins other than its own are allowed to Post. This is easiest done using [flask-cors](https://flask-cors.readthedocs.io/en/latest/) and is described in the next section.
+As soon as we try to do a `POST` though, we will run into the same problem again. The Flask backend needs to identify if origins other than its own are allowed to `POST`. This is easiest done using [flask-cors](https://flask-cors.readthedocs.io/en/latest/) and is described in the next section.
 
-But for this example, let's assume that in production we intend to serve the React frontend from the same domain and port as the Flask backend (e.g. using nginx).
+But for this example, we are assuming that in production we intend to serve the React frontend from the **same domain and port** as the Flask backend.
 
 In the meantime, we can configure a [proxy](https://create-react-app.dev/docs/proxying-api-requests-in-development/) in the `package.json` file of the React project. This allows the app to "pretend" it's making requests from the same port as the backend, thereby avoiding all CORS issues.
 
@@ -74,13 +81,13 @@ In the meantime, we can configure a [proxy](https://create-react-app.dev/docs/pr
   "proxy": "http://127.0.0.1:5000",
 ```
 
-This tells the React development server to proxy any unknown requests to your API server. Side note: for some reason you cannot use `http://localhost:5000`. Once we add this proxy pointing to our backend, we can change all our API calls to just the endpoint path:
+This tells the React development server to proxy any unknown requests to your backend API server. Side note: for some reason you cannot use `http://localhost:5000`. Once we add this proxy pointing to our backend, we can change all our API calls to just the endpoint path:
 
 ```javascript
-axios.get('/api/color', headers);
+fetch('/api/color', options);
 ```
 
-We also no longer need the headers for any responses on the server:
+With the proxy set, we no longer need the headers for any responses on the server, since it thinks the request is from the same origin:
 
 ```Python
     # ...
@@ -90,8 +97,30 @@ We also no longer need the headers for any responses on the server:
     return response
 ```
 
-This proxy is only applicable to the React development server. When we deploy the frontend and backend together, we would [configure nginx](https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project) to serve the frontend, then act as a reverse-proxy for the backend API which will be running as a service. In other words, we don't need to change anything in our front or backend code when we deploy this.
+**This proxy is only applicable to the React development server.** When we deploy the frontend and backend together, we would [configure nginx](https://blog.miguelgrinberg.com/post/how-to-deploy-a-react--flask-project) to serve the frontend, then act as a reverse-proxy for the backend API which will be running as a service. In other words, we don't need to change anything in our front or backend code when we deploy this.
 
+nginx example:
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    # Route API requests to Flask backend
+    location /api/ {
+        proxy_pass http://localhost:5000;  # Flask running locally on port 5000
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # Route all other requests to Next.js frontend
+    location / {
+        proxy_pass http://localhost:3000;  # Next.js running locally on port 3000
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
 
 ### Frontend and backend will be served separately (different origins)
 
@@ -114,9 +143,11 @@ app = Flask(__name__)
 CORS(app) 
 ```
 
-That't it. Our front end can now access resources and POST to our backend APIs using the full URL:
+That's it. Our front end can now access resources and `POST` to our backend APIs using the full URL:
 
 ```javascript
+fetch('http://localhost:5000/api/color', options)
+// or
 axios.post('http://localhost:5000/api/color', data, headers);
 ```
 
@@ -124,14 +155,16 @@ axios.post('http://localhost:5000/api/color', data, headers);
 
 #### Resource specific usage 
 
-Rather than allowing all origins access to everything, you might want to specify which origins have access to what resources:
+Rather than allowing all origins access to everything, you will likely want to specify which origins have access to what resources:
 
 ```Python
 # Allow some origins access to some resources:
 cors = CORS(app, resources={r'/api/*': {'origins': ['http://localhost:3000']}})
 ```
 
-:warning: Both the frontend URL here and the backend url used in the API requests will need to be updated with the actual domain name when deployed. 
+Any other routes in the Flask app that don't match the `/api/*` pattern cannot be accessed from different origins.
+
+:warning: Both the frontend URL here and the backend url used in the API requests will need to be updated with the actual domain when deployed. 
 
 #### Route specific usage 
 
@@ -143,7 +176,7 @@ from flask_cors import cross_origin
 
 @app.route('/api/demo', methods=['GET'])
 @cross_origin(origins=['http://localhost:3000'])
-def api_demo_one():
+def api_demo():
     return 'example'
 ```
 
