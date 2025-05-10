@@ -21,6 +21,7 @@
   * [Using a ref and performing a form.reset()](#using-a-ref-and-performing-a-formreset)
   * [Using a key](#using-a-key)
   * [Resetting fields manually on success](#resetting-fields-manually-on-success)
+  * [Passing back the form data and using `defaultValue`](#passing-back-the-form-data-and-using-defaultvalue)
 - [Adding toast messages](#adding-toast-messages)
 - [Disabling submit buttons with useFormStatus](#disabling-submit-buttons-with-useformstatus)
 - [Actions can be called outside of forms](#actions-can-be-called-outside-of-forms)
@@ -88,7 +89,7 @@ export default function AddToCart({ productId }) {
 ```
 Server Actions can be defined in two places:
 
-- Inside the component that uses it (**Server Components only**)
+- Inside the component that uses it (**Server components only**)
 - In a separate `use server` file. You can define multiple Server Actions in a single file and both client and server components can import and use them.
 
 > What 'use server' actually does:
