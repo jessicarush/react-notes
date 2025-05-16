@@ -816,3 +816,17 @@ Use `POST` when:
   - you’re submitting data (e.g. creating or updating resources)
   - parameters include sensitive, complex, or large payloads
   - you don’t want the data visible in the URL or cached
+
+## CORS 
+
+[Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS) is an HTTP-header based mechanism that allows a *server* to indicate any origins (domain, scheme, or port) other than its own from which a browser should permit loading resources. 
+
+CORS is specifically a *browser security mechanism*—it is implemented and enforced by web browsers. Server-to-server calls are not subject to CORS.
+
+In other words, CORS is only a concern when requests are coming from the client-side components (browser). If I had a Flask backend and a traditional client-side React frontend, then I would need to use something like `flask-cors` to allow requests from the React app's URL. Alternatively, if these were being deployed on the same server, I could use configure Nginx as reverse proxy and not need CORS at all.
+
+If I have a Next.js frontend and all my fetch requests to the Flask backend are happening in server components or server actions, then I don't need to worry about CORS as these are server-to-server calls.
+
+## Fetching from a backend API served alongside Next.js
+
+Nginx only handles requests coming from the client-side (browsers). If I have a Flask backend and a Next.js frontend and all my fetch requests to the backend are happening in server components or server actions, then these all need to use the full *internal URL* of the backend (e.g., http://flask-service:5000 if using service discovery, or http://192.168.1.10:5000 if using an internal IP).
