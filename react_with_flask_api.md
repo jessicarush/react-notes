@@ -42,7 +42,9 @@
 
 ## CORS 
 
-Cross-Origin Resource Sharing (CORS) is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own from which a browser should permit loading resources. 
+[Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS) is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own from which a browser should permit loading resources. 
+
+CORS is specifically a browser security mechanism—it is implemented and enforced by web browsers. If we have a Flask backend and a traditional client-side React frontend, since the `fetch` requests will be coming from the client-side (browser) going to the backend, we will need to set up CORS. If our frontend was instead something like Next.js 15 and all of our `fetch` requests were in server components and server actions then these would be server-to-server calls, and are therefor not subject to CORS.
 
 Our approach to handling `CORS` will depend on how we intend on serving the frontend and backend:
 
@@ -75,7 +77,7 @@ As soon as we try to do a `POST` though, we will run into the same problem again
 
 But for this example, we are assuming that in production we intend to serve the React frontend from the **same domain and port** as the Flask backend.
 
-In the meantime, we can configure a [proxy](https://create-react-app.dev/docs/proxying-api-requests-in-development/) in the `package.json` file of the React project. This allows the app to "pretend" it's making requests from the same port as the backend, thereby avoiding all CORS issues.
+In the meantime, if using *create-react-app* we can configure a [proxy](https://create-react-app.dev/docs/proxying-api-requests-in-development/) in the `package.json` file of the React project. This allows the app to "pretend" it's making requests from the same port as the backend, thereby avoiding all CORS issues.
 
 ```json
   "proxy": "http://127.0.0.1:5000",
@@ -86,6 +88,8 @@ This tells the React development server to proxy any unknown requests to your ba
 ```javascript
 fetch('/api/color', options);
 ```
+
+> Vite's development server also provides a proxy configuration option similar to the one in Create React App. Vite handles proxying through its vite.config.js (or vite.config.ts) file.
 
 With the proxy set, we no longer need the headers for any responses on the server, since it thinks the request is from the same origin:
 
