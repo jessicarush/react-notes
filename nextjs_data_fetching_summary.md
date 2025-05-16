@@ -76,6 +76,7 @@ export async function getItems(): Promise<Item[]> {
   // This is equivalent to in fetch(..., {cache: 'no-store'}).
   // unstable_noStore is preferred over export const dynamic = 'force-dynamic'
   // as it is more granular and can be used on a per-component basis.
+  // There is no need for noStore() in Next.js 15 - this is now the default behavior
   noStore();
 
   try {
@@ -721,15 +722,97 @@ export default function RandomColor({promisedColor}: Props) {
 
 **GET**
 
+```ts
+interface Color {
+  name: string;
+  value: string;
+}
+
+async function getColor(): Promise<Color> {
+  const url = 'https://log.zebro.id/api/demo_two';
+  // RequestInit defines the shape of the options you can pass to the fetch function
+  // cache: 'no-store' is the default in Next.js 15
+  const options: RequestInit = {
+    // cache: 'no-store'
+    // next: { revalidate: 20 }
+  };
+  const res = await fetch(url, options);
+
+  // Handle errors using the standard Response.ok (a boolean indicating whether
+  // the response was successful (status in the range 200 – 299) or not.
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error('Failed to fetch data')
+  }
+
+  const data = await res.json();
+  const color: Color = {
+    name: data.name,
+    value: data.value
+  };
+  return color;
+}
+```
+
 **GET with query params**
+
+```ts
+interface Color {
+  name: string;
+  value: string;
+}
+
+async function getColor(value: string): Promise<Color> {
+  const url = 'https://log.zebro.id/api/demo_two';
+  // RequestInit defines the shape of the options you can pass to the fetch function
+  // cache: 'no-store' is the default in Next.js 15
+  const options: RequestInit = {
+    // cache: 'no-store'
+    // next: { revalidate: 20 }
+  };
+  const params = new URLSearchParams({ value });
+  const res = await fetch(`${url}?${params}`, options);
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch data: ${res.status} ${res.statusText}`);
+  }
+
+  const data = await res.json();
+  const color: Color = {
+    name: data.name,
+    value: data.value
+  };
+  return color;
+}
+```
 
 **POST**
 
-- Use query params when:
+```ts
+async function postData(url: string, data: object) {
+  const options: RequestInit = {
+    cache: 'no-store',
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch data: ${res.status} ${res.statusText}`);
+  }
+  const resData = await res.json();
+  return resData;
+}
+```
+
+Use query params when:
   - you're retrieving data (read-only)
   - the parameters are simple and idempotent
   - you want the request to be bookmarkable, or shareable.
-- Use `POST` when:
+
+Use `POST` when:
   - you’re submitting data (e.g. creating or updating resources)
   - parameters include sensitive, complex, or large payloads
   - you don’t want the data visible in the URL or cached
