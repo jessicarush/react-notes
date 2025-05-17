@@ -13,6 +13,8 @@
 - [Server components + react query](#server-components--react-query)
 - [React use() API](#react-use-api)
 - [GET/POST fetch() examples](#getpost-fetch-examples)
+- [CORS](#cors)
+- [URL environment variables for backend APIs](#url-environment-variables-for-backend-apis)
 
 <!-- tocstop -->
 
@@ -827,6 +829,11 @@ In other words, CORS is only a concern when requests are coming from the client-
 
 If I have a Next.js frontend and all my fetch requests to the Flask backend are happening in server components or server actions, then I don't need to worry about CORS as these are server-to-server calls.
 
-## Fetching from a backend API served alongside Next.js
+## URL environment variables for backend APIs
 
-Nginx only handles requests coming from the client-side (browsers). If I have a Flask backend and a Next.js frontend and all my fetch requests to the backend are happening in server components or server actions, then these all need to use the full *internal URL* of the backend (e.g., http://flask-service:5000 if using service discovery, or http://192.168.1.10:5000 if using an internal IP).
+Nginx only handles requests coming from the client-side (browsers). If I have a Flask backend and a Next.js frontend and all my fetch requests to the backend are happening in server components or server actions, then these all need to use the full *internal URL* of the backend.
+
+You could set a `BACKEND_INTERNAL_URL` environment variable:
+
+Development: This could be http://127.0.0.1:5000.
+Production: The internal network address/port of the Flask service (e.g., http://flask-service:5000 if using service discovery, or http://192.168.1.10:5000 if using an internal IP).
