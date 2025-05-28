@@ -174,6 +174,8 @@ export default Form;
 
 Note that a ref can be passed to a browser element using the `ref` attribute. However, if you try to pass a ref to your own component, it will not work. You need to use `.forwardRef` to pass the ref into the component then apply the ref to a browser element within. See [transitions.md](transitions.md) for an example.
 
+**UPDATE: As of React 19, `forwardRef` is no longer necessary. Pass `ref` as a prop instead. In your `props` type interface: `ref?: React.Ref<HTMLInputElement>;`**.
+
 In a nutshell:
 
 ```javascript

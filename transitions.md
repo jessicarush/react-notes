@@ -215,6 +215,9 @@ export default CSSTransitionDemo;
 
 Note if you are wrapping a `CSSTransition` around your own component, you will need to do some extra work to pass the `ref` to the outermost element in your component. Specifically, you'll need to use the [forwardRef](https://react.dev/reference/react/forwardRef) function. 
 
+**UPDATE: As of React 19, `forwardRef` is no longer necessary. Pass `ref` as a prop instead. In your `props` type interface: `ref?: React.Ref<HTMLInputElement>;`**.
+
+
 For example:
 
 ```javascript
