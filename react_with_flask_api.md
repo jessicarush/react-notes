@@ -126,7 +126,7 @@ server {
 }
 ```
 
-> Nginx only handles requests coming from the client-side (browers). If I have a Flask backend and a Next.js frontend and all my fetch requests to the backend are happening in server components or server actions, then these all need to use the full internal URL of the backend (e.g., http://flask-service:5000 if using service discovery, or http://192.168.1.10:5000 if using an internal IP).
+> Nginx only handles requests coming from the client-side (browsers). If I have a Flask backend and a Next.js frontend and all my fetch requests to the backend are happening in server components or server actions, then these all need to use the full internal URL of the backend (e.g., http://flask-service:5000 if using service discovery, or http://192.168.1.10:5000 if using an internal IP).
 
 ### Frontend and backend will be served separately (different origins)
 
