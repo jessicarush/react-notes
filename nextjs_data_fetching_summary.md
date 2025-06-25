@@ -38,7 +38,10 @@ Some foundational points to keep in mind:
 - `actions.ts` should be used for functions that `POST` or do database queries that mutate (`POST`, `PUT`, `DELETE`) as these can be called as server actions in client components.
 - `data.ts` does not need the `use server` directive because these functions are only called from server components, which already run on the server.
 - `actions.ts` must use the `use server` directive as they are called from client components, either via a form’s action prop or from a client-side event handler.
-- Since server actions can be called in client components, they can be used as a wrapper to call any server-only function (including those in `data.ts`) from a client component. This is helpful for when you want to call a `GET` function in `data.ts` in a client component even handler. 
+- Since server actions can be called in client components, they could be used as a wrapper to call any server-only function (including those in `data.ts`) from a client component. This could be helpful for when you want to call a `GET` function in `data.ts` in a client component even handler. I've seen this method mentioned in a couple places however, the Next.js docs currently say if you want to fetch data in a client:
+
+  - use React's `use` hook - which means fetch data in a parent server component and pass it down so not really a solution for fetching in a client component, or:
+  - use external library like SWR or React Query.
 
 
 ## Server-side fetch in server components 
@@ -719,6 +722,8 @@ export default function RandomColor({promisedColor}: Props) {
   );
 }
 ```
+
+## Client-side fetch with SWR
 
 ## GET/POST fetch() examples
 
