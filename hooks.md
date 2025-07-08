@@ -301,7 +301,7 @@ See:
 
 ## useCallback
 
-> Note: useCallback will be obsolete with the release of React 19 and the new React Compiler.
+> Note: useCallback will be less necessary with the release of React 19 and the new React Compiler. There will still be specific, niche cases where manual memoization using useCallback
 
 Call [useCallback](https://react.dev/reference/react/useCallback#usecallback) at the top level of your component to cache a function definition between re-renders (until its dependencies change). It should only be used as a performance optimization.
 
@@ -315,8 +315,9 @@ By wrapping a function in `useCallback`, you ensure that it’s the same functio
 
 Caching a function with `useCallback` is only valuable in a few cases:
 
-- You pass it as a prop to a component wrapped in memo. You want to skip re-rendering if the value hasn’t changed. Memoization lets your component re-render only if dependencies changed.
-- The function you’re passing is later used as a dependency of some Hook. For example, another function wrapped in `useCallback` depends on it, or you depend on this function from useEffect.
+- **You pass it as a prop to a component wrapped in memo**. You want to skip re-rendering if the value hasn’t changed. Memoization lets your component re-render only if dependencies changed.
+- **The function you’re passing is later used as a dependency of some Hook**. For example, another function wrapped in `useCallback` depends on it, or you depend on this function from `useEffect`.
+- **The function is passed through Context?** → Use useCallback
 
 There is no benefit to wrapping a function in `useCallback` in other cases. There is no significant harm to doing that either, so some teams choose to not think about individual cases, and memoize as much as possible. The downside is that code becomes less readable. Also, not all memoization is effective: a single value that’s “always new” is enough to break memoization for an entire component.
 
