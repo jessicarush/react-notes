@@ -635,7 +635,7 @@ export async function DashboardPage() {
 
 ### Sharing fetch request data between server components
 
-When fetching data, you may want to share the result of a fetch between a page or layout and some of its children components. Next recommends that rather than passing props around, you put your data fetching code in the same place as the code that uses the data (colocating). If you do this and multiple components end up making the same fetch request, Next.js will automatically optimize this by only making the request once (deduping).
+When fetching data, you may want to share the result of a fetch between a page or layout and some of its children components. Next recommends that rather than passing props around, you put your data fetching code in the same place as the code that uses the data (collocating). If you do this and multiple components end up making the same fetch request, Next.js will automatically optimize this by only making the request once (deduping).
 
 
 ## Linking and navigating 
