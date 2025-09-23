@@ -1241,7 +1241,24 @@ function ItemView({ item, editItem, deleteItem }: Props) {
 export default ItemView;
 ```
 
-See <https://react.dev/reference/react/use-server#calling-a-server-action-outside-of-form>
+**Update: React.dev docs say [When using a Server Function outside a form, call the Server Function in a Transition](https://react.dev/reference/rsc/use-server#calling-a-server-function-outside-of-form)**
+
+So this would look like:
+
+```tsx
+const [isPending, startTransition] = useTransition();
+
+  const removeItem = (id: number) => {
+    startTransition(async () => {
+      const res = await deleteItem(id);
+      if (res.status === 'SUCCESS') {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    });
+  };
+```
 
 ## Headers
 
