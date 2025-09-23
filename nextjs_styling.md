@@ -93,7 +93,7 @@ Where `styles.dashboard` is a class in `layout.module.css`:
 
 > :warning: with css modules, class names with hyphens will break. The recommendation is to use camelCase instead but you can also use bracket notation instead of dot notation: `<div className={styles['nav-wrapper']}>`.
 
-To add multiple styles, use string temlate literals: 
+To add multiple styles, use string template literals: 
 
 ```jsx
 <PencilIcon className={`${styles.btn__icon} ${styles['btn__icon--edit']}`} />
