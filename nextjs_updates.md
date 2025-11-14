@@ -1,30 +1,33 @@
-# Next.js 15 updates
+# Next.js updates
+
+## Table of contents
+
+<!-- toc -->
+
+- [Next.js 15 updates](#nextjs-15-updates)
+  * [@next/codemod](#nextcodemod)
+  * [`useFormState` has been replaced by `useActionState`](#useformstate-has-been-replaced-by-useactionstate)
+  * [`useFormStatus` now includes additional keys](#useformstatus-now-includes-additional-keys)
+  * [Use controlled inputs with `useActionState`](#use-controlled-inputs-with-useactionstate)
+  * [`Form` component](#form-component)
+  * [TypeScript: server actions should only return a Promise if using `useActionState`](#typescript-server-actions-should-only-return-a-promise-if-using-useactionstate)
+  * [Async request APIs](#async-request-apis)
+  * [`fetch` requests are no longer cached by default](#fetch-requests-are-no-longer-cached-by-default)
+  * [`GET` functions in route handlers are no longer cached by default](#get-functions-in-route-handlers-are-no-longer-cached-by-default)
+  * [`ssr: false` not allowed in sever components](#ssr-false-not-allowed-in-sever-components)
+  * [Turbopack](#turbopack)
+  * [Instrumentation.js|ts](#instrumentationjsts)
+
+<!-- tocstop -->
+
+## Next.js 15 updates
 
 - [What's new in Next.js 15](https://nextjs.org/blog/next-15)
 - [What's new in React 19](https://react.dev/blog/2024/04/25/react-19)
 - [Next.js 15 upgrade guide](https://nextjs.org/docs/app/building-your-application/upgrading/version-15)
 - [React 19 upgrade guide](https://react.dev/blog/2024/04/25/react-19-upgrade-guide)
 
-## Table of contents
-
-<!-- toc -->
-
-- [@next/codemod](#nextcodemod)
-- [`useFormState` has been replaced by `useActionState`](#useformstate-has-been-replaced-by-useactionstate)
-- [`useFormStatus` now includes additional keys](#useformstatus-now-includes-additional-keys)
-- [Use controlled inputs with `useActionState`](#use-controlled-inputs-with-useactionstate)
-- [`Form` component](#form-component)
-- [TypeScript: server actions should only return a Promise if using `useActionState`](#typescript-server-actions-should-only-return-a-promise-if-using-useactionstate)
-- [Async request APIs](#async-request-apis)
-- [`fetch` requests are no longer cached by default](#fetch-requests-are-no-longer-cached-by-default)
-- [`GET` functions in route handlers are no longer cached by default](#get-functions-in-route-handlers-are-no-longer-cached-by-default)
-- [`ssr: false` not allowed in sever components](#ssr-false-not-allowed-in-sever-components)
-- [Turbopack](#turbopack)
-- [Instrumentation.js|ts](#instrumentationjsts)
-
-<!-- tocstop -->
-
-## @next/codemod 
+### @next/codemod 
 
 A CLI that helps upgrade to the latest Next.js and React versions. Codemods (automated code transformations) are included with every major Next.js release to help automate upgrading breaking changes.
 
@@ -36,7 +39,7 @@ The CLI will update your dependencies, show available codemods, and guide you th
 
 Read more about the [codemod CLI](https://nextjs.org/docs/app/building-your-application/upgrading/codemods).
 
-## `useFormState` has been replaced by `useActionState`
+### `useFormState` has been replaced by `useActionState`
 
 The `useFormState` hook is still available in React 19, but it is deprecated and will be removed in a future release. [useActionState](https://react.dev/reference/react/useActionState) is recommended and includes additional properties like reading the `pending` state directly.
 
@@ -44,7 +47,7 @@ See [hooks.md](hooks.md).
 
 > Note: I have noticed that with the Next.js 15 update, when error messages are passed to the component, the input fields are re-rendered to an empty state. This means we have to use controlled inputs in order to retain the user's input when there is a validation error.
 
-## `useFormStatus` now includes additional keys 
+### `useFormStatus` now includes additional keys 
 
 These include: `data`, `method`, and `action`. Prior to React 19, only the `pending` key was available. See the [useFormStatus reference](https://react.dev/reference/react-dom/hooks/useFormStatus).
 
@@ -78,7 +81,7 @@ export const SubmitButton = (props: SubmitButtonProps) => {
 };
 ```
 
-## Use controlled inputs with `useActionState`
+### Use controlled inputs with `useActionState`
 
 Discovered that with this update, native browser managed `input` elements are now resetting to a blank fields when there are validation errors. To fix this, you have two options:
 
@@ -88,7 +91,7 @@ Discovered that with this update, native browser managed `input` elements are no
 
 See leerob's [Forms with React 19 and Next.js](https://www.youtube.com/watch?v=KhO4VjaYSXU&t=261s). He doesn't address the TypeScript issue.
 
-## `Form` component
+### `Form` component
 
 The new `<Form>` component extends the HTML `<form>` element with prefetching, client-side navigation, and progressive enhancement.
 
@@ -115,11 +118,11 @@ The `<Form>` component comes with:
 
 See the documentation for [`<Form>`](https://nextjs.org/docs/app/api-reference/components/form).
 
-## TypeScript: server actions should only return a Promise if using `useActionState`
+### TypeScript: server actions should only return a Promise if using `useActionState`
 
 Discovered with this update, you will now get a Typescript error on a `<form>` using a server action if that action returns an object and that object is not being consumed by the form via the `useActionState` mechanism. This was the case with a `logout` action which was using the same return pattern for consistency but technically didn't need to use `useActionState`. Fixed by using a `redirect` instead of returning a state object and removed the return type `Promise<FormState>`. 
 
-## Async request APIs 
+### Async request APIs 
 
 To enable optimizations such as server components rendering before a request happens, APIs that rely on request-specific data are now asynchronous. These include:
 
@@ -155,7 +158,7 @@ export default async function PasswordResetPage(props: PageProps) {
 
 See more [examples in the upgrade guide](https://nextjs.org/docs/app/building-your-application/upgrading/version-15#async-request-apis-breaking-change).
 
-## `fetch` requests are no longer cached by default
+### `fetch` requests are no longer cached by default
 
 See [fetch requests in the upgrade guide](https://nextjs.org/docs/app/building-your-application/upgrading/version-15#fetch-requests).
 
@@ -170,12 +173,12 @@ export default async function RootLayout() {
 }
 ```
 
-## `GET` functions in route handlers are no longer cached by default
+### `GET` functions in route handlers are no longer cached by default
 
 To opt `GET` methods into caching, you can use a route config option such as `export const dynamic = 'force-static'` in your Route Handler file.
 
 
-## `ssr: false` not allowed in sever components
+### `ssr: false` not allowed in sever components
 
 Error: `ssr: false` is not allowed with `next/dynamic` in Server Components. Please move it into a client component.
 
@@ -187,7 +190,7 @@ const ThemeToggle = dynamic(() => import('./theme-toggle'), {
 });
 ```
 
-## Turbopack 
+### Turbopack 
 
 When creating a new project with `npx create-next-app@latest` you will now be given the option to use Turbopack instead of webpack.
 
@@ -198,8 +201,26 @@ When creating a new project with `npx create-next-app@latest` you will now be gi
 
 Read [more about Turbopack here](https://nextjs.org/blog/turbopack-for-development-stable).
 
-## Instrumentation.js|ts
+### Instrumentation.js|ts
 
 [instrumentation.js|ts](https://nextjs.org/blog/next-15#instrumentationjs-stable) is now stable and the `experimental.instrumentationHook` config option can be removed. The instrumentation file, with the `register()` API, allows users to tap into the Next.js server lifecycle to monitor performance, track the source of errors, and deeply integrate with observability libraries like [OpenTelemetry](https://opentelemetry.io/).
 
 See [instrumentation.md](instrumentation.md).
+
+## Next.js 16 updates
+
+### Turbopack by default 
+
+Next.js 16 enables Turbopack as the default bundler for both next dev and next build. Turbopack is faster than webpack and offers improved performance for development and production builds. The `--turbopack` flag is no longer needed (and should be removed from scripts). To use webpack instead, explicitly pass the `--webpack flag`.
+
+### middleware.ts is now proxy.ts
+
+The middleware file convention has been renamed to proxy to better reflect its purpose of intercepting and proxying requests. The functionality remains the same. Rename `middleware.ts` → `proxy.ts` and update the exported function name from `middleware` to `proxy`.
+
+### revalidateTag and updateTag
+
+The cache invalidation API changed in Next.js 16. For Server Actions, use `updateTag()` instead of `revalidateTag()` - this provides read-your-own-writes semantics for immediate consistency. For Route Handlers, use `revalidateTag(tag, profile)` with a new required second parameter (e.g., `'max'`, `'hours'`, `'minutes'`) for background invalidation. The old single-argument `revalidateTag(tag)` is deprecated.
+
+### `next lint` is dead
+
+Use `eslint` instead.
