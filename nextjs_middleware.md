@@ -1,4 +1,6 @@
-# Middleware 
+# Proxy (formerly Middleware)
+
+> Note: as of Next.js 16 middleware file convention has been renamed to proxy to better reflect its purpose of intercepting and proxying requests. The functionality remains the same. Rename `middleware.ts` → `proxy.ts` and update the exported function name from `middleware` to `proxy`. See [Proxy](https://nextjs.org/docs/app/getting-started/proxy)
 
 ## Table of Contents
 
