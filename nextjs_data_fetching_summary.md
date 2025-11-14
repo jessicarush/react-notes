@@ -12,6 +12,7 @@
 - [Client-side fetch with react query](#client-side-fetch-with-react-query)
 - [Server components + react query](#server-components--react-query)
 - [React use() API](#react-use-api)
+- [Client-side fetch with SWR](#client-side-fetch-with-swr)
 - [GET/POST fetch() examples](#getpost-fetch-examples)
 - [CORS](#cors)
 - [URL environment variables for backend APIs](#url-environment-variables-for-backend-apis)
