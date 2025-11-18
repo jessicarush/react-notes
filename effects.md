@@ -601,6 +601,86 @@ function ChatIndicator() {
 
 This approach is less error-prone than manually syncing mutable data to React state with an Effect. Typically, you’ll write a custom Hook like `useOnlineStatus()` above so that you don’t need to repeat this code in the individual components. See also: [hooks.md#usesyncexternalstore](hooks.md#usesyncexternalstore)
 
+
+## Eslint error: react-hooks/set-state-in-effect
+
+Eslint has become strict in reporting an error whenever a state update is done inside a `useEffect`.
+
+`Error: Calling setState synchronously within an effect can trigger cascading renders`
+
+Why there are no build errors:
+
+- Calling setState in useEffect is valid React code - this is not a syntax error
+- React doesn't forbid it - it's a legitimate pattern for certain use cases
+
+Why React 19 warns about it:
+
+- Performance: Causes "cascading renders" (unnecessary double rendering)
+- Code smell: Often indicates there's a simpler way
+- Not technically broken, just inefficient
+
+The Problem: Cascading Renders
+
+When you call setState synchronously inside useEffect:
+
+```tsx
+  useEffect(() => {
+    setState(true);  // ⚠️ Synchronous call
+  }, []);
+```
+
+What happens:
+
+1. Component renders (first render)
+2. useEffect runs after render completes
+3. setState is called → triggers another render
+4. Component re-renders (second render) ← "cascading render"
+5. useEffect might run again, potentially causing more renders
+
+This is wasteful - React had to render twice when it could've done it once.
+
+However, there is a mismatch.
+
+Next.js promotes:
+
+- `useActionState` with form actions
+- Progressive enhancement (works without JS)
+- Server Actions with `<form action={dispatch}>`
+
+React 19's new lint rules expect:
+
+- Side effects in event handlers (not Effects)
+- Direct async/await in onClick handlers
+- This works great for buttons, not for form actions
+
+The reality is the Next.js tutorial uses server-side solutions (redirect, revalidatePath) but doesn't address client-side side effects like:
+
+- Showing a modal after success
+- Resetting form fields
+- Triggering animations
+
+For these, there's no clean alternative to useEffect + useActionState right now.
+
+So fir now, this pattern is fine. Disable the lint rule:
+
+```tsx
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 
+    // No alternative pattern for client-side effects with useActionState form actions
+    if (state.status === 'SUCCESS') {
+      showModal();
+      setFormData({ email: '' });
+    }
+  }, [state, setFormData]);
+```
+
+Why this is reasonable:
+
+1. You're using the Next.js-recommended pattern (useActionState + form actions)
+2. React's lint rule is too strict for this use case
+3. This will likely get clearer guidance in future React/Next.js updates
+
+
 ## Effect events 
 
 Things get more tricky when you want to mix reactive logic with non-reactive logic. For example, imagine that you want to show a notification when the user connects to the chat. You read the current theme (dark or light) from the props so that you can show the notification in the correct color:
